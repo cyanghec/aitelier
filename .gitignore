@@ -3,3 +3,18 @@
 
 # macOS
 .DS_Store
+
+# Secrets — never commit
+backend/.env
+*.env
+
+# SQLite database — stored on persistent disk in production
+backend/aitelier.db
+*.db
+
+# Python caches
+backend/__pycache__/
+backend/routers/__pycache__/
+backend/agents/__pycache__/
+**/__pycache__/
+*.pyc
