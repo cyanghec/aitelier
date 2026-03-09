@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AItelier · Your Session</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy:    #1E2761;
+  --navy2:   #2A3580;
+  --navy3:   #3A4898;
+  --navy-b:  #1E276112;
+  --navy-g:  #1E276130;
+  --bg:      #f4f3f0;
+  --surface: #ffffff;
+  --surface2:#f7f6f3;
+  --border:  #e2dfd8;
+  --border2: #ccc8c0;
+  --border3: #b0aba0;
+  --ink:     #141624;
+  --ink2:    #3e4260;
+  --ink3:    #505470;
+  --ink4:    #9095b0;
+  --gold:    #C8922A;
+  --gold-b:  #C8922A18;
+  --green:   #1a7a4a;
+  --phase1:  #1E2761;
+  --phase2:  #6a3a98;
+  --phase3:  #1a7a50;
+  --phase4:  #b84a20;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 700px 500px at 80% -10%,#1E276108 0%,transparent 70%),
+    radial-gradient(ellipse 500px 400px at -10% 80%,#C8922A06 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:var(--navy);z-index:100;}
+.nav-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:#fff;}
+.nav-logo em{font-style:italic;color:var(--gold);}
+.nav-right{display:flex;align-items:center;gap:20px;}
+.nav-programme{font-size:13px;color:rgba(255,255,255,.5);letter-spacing:.4px;}
+.nav-user{display:flex;align-items:center;gap:8px;}
+.nav-avatar{width:30px;height:30px;border-radius:6px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--navy);}
+.nav-name{font-size:13px;color:rgba(255,255,255,.7);}
+.nav-sep{width:1px;height:18px;background:rgba(255,255,255,.15);}
+.nav-logout{font-size:13px;color:rgba(255,255,255,.4);cursor:pointer;transition:color .15s;background:none;border:none;font-family:'Inter',sans-serif;}
+.nav-logout:hover{color:rgba(255,255,255,.8);}
+.nav-team{display:flex;align-items:center;gap:5px;}
+.nav-av{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.3px;}
+.nav-av.you{background:var(--gold);color:var(--navy);}
+.nav-av.other{background:rgba(255,255,255,.15);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.2);}
+.nav-pagenav{display:flex;align-items:center;gap:6px;position:absolute;left:50%;transform:translateX(-50%);}
+.nav-page-link{font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;letter-spacing:.5px;padding:6px 12px;border-radius:4px;transition:all .15s;}
+.nav-page-link:hover{color:#fff;background:rgba(255,255,255,.08);}
+.nav-page-link.active{color:#fff;background:rgba(255,255,255,.14);font-weight:500;}
+.nav-page-sep{font-size:12px;color:rgba(255,255,255,.18);}
+
+/* ── MAIN ── */
+main{padding-top:56px;min-height:100vh;display:flex;flex-direction:column;position:relative;z-index:1;}
+
+/* ── HERO ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.hero{
+  padding:52px 40px 44px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+  animation:fadeUp .6s ease both;
+}
+.hero-time{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px;}
+.hero-greeting{font-family:'Playfair Display',serif;font-size:44px;font-weight:400;line-height:1.1;margin-bottom:10px;}
+.hero-greeting em{font-style:italic;color:var(--navy);}
+.hero-sub{font-size:16px;color:var(--ink3);line-height:1.65;max-width:480px;}
+.hero-right{display:flex;align-items:center;flex-shrink:0;margin-left:40px;padding-bottom:4px;}
+.hero-stat{text-align:right;}
+.hero-stat-num{font-family:'Playfair Display',serif;font-size:52px;font-weight:600;line-height:1;color:var(--navy);}
+.hero-stat-label{font-size:12px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;margin-top:3px;}
+.hero-divider{width:1px;height:44px;background:var(--border);margin:0 24px;}
+
+/* ── SECTION LABEL ── */
+.section-label{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink3);padding:28px 40px 16px;font-weight:500;animation:fadeUp .5s ease .15s both;}
+
+/* ── PROJECT CARD ── */
+.project-card{
+  margin:0 40px 36px;
+  border:1px solid var(--border2);
+  border-radius:14px;
+  background:var(--surface);
+  overflow:hidden;
+  animation:fadeUp .5s ease .2s both;
+  box-shadow:0 2px 16px rgba(30,39,97,.06),0 1px 3px rgba(30,39,97,.04);
+  transition:box-shadow .3s,border-color .3s;
+}
+.project-card:hover{box-shadow:0 4px 28px rgba(30,39,97,.10),0 1px 4px rgba(30,39,97,.06);border-color:var(--border3);}
+.project-card::before{content:'';display:block;height:3px;background:linear-gradient(90deg,var(--navy) 0%,var(--navy3) 40%,var(--gold) 100%);}
+
+/* card header */
+.pc-header{
+  display:grid;grid-template-columns:1fr auto;
+  gap:24px;align-items:start;
+  padding:26px 32px 22px;
+  border-bottom:1px solid var(--border);
+}
+.pc-eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:8px;font-weight:500;}
+.pc-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px var(--gold-b);animation:blink 2.4s ease infinite;}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 0 3px var(--gold-b);}50%{opacity:.6;box-shadow:0 0 0 5px transparent;}}
+.pc-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:400;line-height:1.25;margin-bottom:6px;color:var(--ink);}
+.pc-title-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.pc-desc{font-size:14px;color:var(--ink3);line-height:1.75;max-width:560px;}
+.pc-stats{display:flex;align-items:center;gap:0;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);}
+.pc-stat{text-align:left;padding:0 28px 0 0;}
+.pc-stat:first-child{padding-left:0;}
+.pc-stat-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:var(--navy);line-height:1;}
+.pc-stat-denom{font-size:15px;font-weight:400;color:var(--ink3);margin-left:1px;}
+.pc-stat-label{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink3);margin-top:4px;font-weight:500;}
+.pc-stat-div{width:1px;height:32px;background:var(--border);margin:0 28px 0 0;flex-shrink:0;}
+
+/* ── TEAM STRIP ── */
+.team-strip{padding:20px 32px 24px;border-bottom:1px solid var(--border);}
+.team-strip-hdr{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;}
+.team-strip-label{font-size:13px;font-weight:600;color:var(--ink);letter-spacing:.1px;}
+.team-strip-sub{font-size:13px;color:var(--ink3);}
+.team-members{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.tm{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;gap:11px;align-items:flex-start;transition:border-color .15s;}
+.tm:hover{border-color:var(--navy-g);}
+.tm-you{border-color:var(--navy-g);background:var(--navy-b);}
+.tm-avatar{width:32px;height:32px;border-radius:8px;background:var(--border2);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;letter-spacing:.5px;}
+.tm-avatar.you{background:var(--gold);color:var(--navy);}
+.tm-info{flex:1;min-width:0;}
+.tm-name{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px;}
+.tm-you-tag{font-size:11px;font-weight:500;color:var(--navy);background:var(--navy-b);border:1px solid var(--navy-g);border-radius:4px;padding:1px 5px;letter-spacing:.3px;}
+.tm-role{font-size:12px;color:var(--ink3);margin-top:1px;margin-bottom:8px;}
+.tm-progress{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.tm-bar-track{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.tm-bar-fill{height:100%;border-radius:2px;background:var(--navy);transition:width .6s cubic-bezier(.4,0,.2,1);}
+.tm-bar-fill.done{background:var(--green);}
+.tm-pct{font-size:11px;color:var(--ink3);min-width:26px;text-align:right;flex-shrink:0;}
+.tm-pct.done{color:var(--green);font-weight:600;}
+.tm-survey{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);}
+.tm-survey-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.tm-survey-dot.done{background:var(--green);}
+.tm-survey-dot.pending{background:var(--border2);}
+.pc-badge{font-size:12px;padding:3px 10px;border-radius:20px;border:1px solid;letter-spacing:.4px;white-space:nowrap;font-weight:500;flex-shrink:0;}
+
+/* ── SECTION ROW: shared styling for Initiative Brief + Canvas ── */
+.card-section{border-bottom:1px solid var(--border);}
+.card-section:last-child{border-bottom:none;}
+
+.cs-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 32px 16px;
+}
+.cs-left{display:flex;align-items:center;gap:12px;}
+.cs-icon{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;
+}
+.cs-icon.done{background:var(--navy-b);color:var(--navy);border:1px solid var(--navy-g);}
+.cs-icon.pending{background:#f0ede8;color:var(--ink3);border:1px solid var(--border2);}
+.cs-icon.locked{background:#f0ede8;color:var(--border3);border:1px solid var(--border);}
+.cs-label{font-size:13px;font-weight:600;color:var(--ink);letter-spacing:.1px;}
+.cs-sublabel{font-size:13px;color:var(--ink3);margin-top:1px;}
+.cs-action{}
+
+/* Initiative brief summary */
+.brief-summary{
+  margin:0 32px 20px;
+  background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  padding:14px 18px;
+}
+.brief-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.bi-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;font-weight:500;}
+.bi-val{font-size:13px;color:var(--ink);line-height:1.5;}
+.bi-val.muted{color:var(--ink3);font-style:italic;}
+
+/* Canvas progress */
+.canvas-progress{margin:0 32px 20px;}
+.cp-phases{display:flex;flex-direction:column;gap:9px;}
+.cp-phase{display:flex;align-items:center;gap:12px;}
+.cp-phase-label{font-size:13px;color:var(--ink3);font-weight:400;width:160px;flex-shrink:0;}
+.cp-phase-label.active{color:var(--ink2);font-weight:500;}
+.cp-phase-label.done{color:var(--ink);font-weight:500;}
+.cp-bar-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.cp-bar-fill{height:100%;border-radius:3px;transition:width .7s cubic-bezier(.4,0,.2,1);background:var(--navy);}
+.cp-phase-status{font-size:12px;font-weight:500;min-width:22px;text-align:right;flex-shrink:0;}
+
+/* Blueprint quality section */
+.bp-quality{margin:0 32px 20px;display:flex;align-items:center;gap:20px;}
+.bp-score-block{display:flex;align-items:baseline;gap:5px;flex-shrink:0;}
+.bp-score-num{font-family:'Playfair Display',serif;font-size:32px;font-weight:400;color:var(--navy);line-height:1;}
+.bp-score-denom{font-size:14px;color:var(--ink3);}
+.bp-score-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);font-weight:500;margin-top:3px;}
+.bp-quality-bars{flex:1;display:flex;flex-direction:column;gap:7px;}
+.bp-bar-row{display:flex;align-items:center;gap:10px;}
+.bp-bar-label{font-size:12px;color:var(--ink3);width:130px;flex-shrink:0;}
+.bp-bar-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.bp-bar-fill{height:100%;border-radius:2px;transition:width .7s cubic-bezier(.4,0,.2,1);}
+.bp-bar-val{font-size:11px;color:var(--ink3);min-width:28px;text-align:right;flex-shrink:0;}
+
+/* Survey progress */
+.survey-progress{margin:0 32px 20px;}
+.sq-rows{display:flex;flex-direction:column;gap:8px;}
+.sq-row{display:flex;align-items:center;gap:10px;}
+.sq-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sq-dot.done{background:var(--green);}
+.sq-dot.pending{background:var(--border2);}
+.sq-label{font-size:13px;color:var(--ink3);flex:1;}
+.sq-row.done .sq-label{color:var(--ink2);}
+.sq-val{font-size:13px;font-weight:500;color:var(--navy);min-width:32px;text-align:right;flex-shrink:0;}
+.sq-val.sq-empty{color:var(--ink4);font-weight:400;}
+
+/* locked canvas overlay */
+.canvas-locked{
+  margin:0 32px 20px;
+  padding:20px 22px;
+  border-radius:8px;
+  background:#f8f7f5;
+  border:1px dashed var(--border2);
+  display:flex;align-items:center;gap:14px;
+}
+.cl-icon{font-size:20px;opacity:.35;}
+.cl-text{font-size:14px;color:var(--ink3);line-height:1.6;}
+.cl-text strong{color:var(--ink2);font-weight:500;}
+
+/* card footer / CTA */
+.pc-cta{
+  padding:18px 32px;
+  display:flex;align-items:center;justify-content:flex-end;
+  gap:10px;
+  background:var(--surface2);
+  border-top:1px solid var(--border);
+}
+.pc-cta-info{font-size:13px;color:var(--ink3);line-height:1.6;margin-right:auto;}
+
+/* ── BUTTONS ── */
+.btn{padding:10px 24px;border-radius:7px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .18s;letter-spacing:.2px;border:1px solid;white-space:nowrap;}
+.btn-ghost{background:none;border-color:var(--border2);color:var(--ink2);}
+.btn-ghost:hover{border-color:var(--navy-g);color:var(--navy);background:var(--navy-b);}
+.btn-primary{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:600;box-shadow:0 2px 8px rgba(30,39,97,.25);}
+.btn-primary:hover{background:var(--navy2);border-color:var(--navy2);box-shadow:0 4px 14px rgba(30,39,97,.32);transform:translateY(-1px);}
+.btn-primary:active{transform:translateY(0);box-shadow:0 2px 6px rgba(30,39,97,.2);}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-sm{padding:7px 16px;font-size:13px;}
+
+/* ── FOOTER ── */
+footer{padding:28px 40px 24px;margin-top:auto;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);animation:fadeUp .5s ease .4s both;}
+.ft-left{font-size:12px;color:var(--ink3);line-height:1.7;}
+.ft-left strong{color:var(--ink2);}
+.ft-right{font-size:12px;color:var(--ink3);}
+
+/* ── INTAKE MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(14,16,32,.75);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:600px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(14,16,32,.2);animation:modalIn .28s cubic-bezier(.34,1.3,.64,1) both;}
+@keyframes modalIn{from{opacity:0;transform:scale(.94) translateY(14px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal-hdr{padding:20px 26px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--navy);}
+.modal-hdr-row{display:flex;align-items:flex-start;justify-content:space-between;}
+.modal-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;margin-bottom:3px;color:#fff;}
+.modal-title em{font-style:italic;color:var(--gold);}
+.modal-subtitle{font-size:13px;color:rgba(255,255,255,.55);}
+.modal-close{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:20px;line-height:1;padding:2px 4px;transition:color .15s;}
+.modal-close:hover{color:#fff;}
+.modal-chat{flex:1;overflow-y:auto;padding:18px 26px;display:flex;flex-direction:column;gap:12px;background:var(--surface2);}
+.modal-chat::-webkit-scrollbar{width:3px;}
+.modal-chat::-webkit-scrollbar-thumb{background:var(--border2);}
+.chat-msg{display:flex;gap:8px;animation:fadeUp .25s ease both;}
+.chat-msg.user{flex-direction:row-reverse;}
+.chat-avatar{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;align-self:flex-end;}
+.chat-bubble{max-width:78%;padding:10px 13px;border-radius:10px;font-size:13px;line-height:1.7;}
+.chat-msg.ai .chat-bubble{background:var(--surface);border:1px solid var(--border);color:var(--ink2);}
+.chat-msg.ai .chat-bubble strong{color:var(--ink);}
+.chat-msg.user .chat-bubble{background:var(--navy);color:#fff;}
+.typing-row{display:flex;gap:8px;align-items:flex-end;}
+.typing-bub{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;gap:4px;align-items:center;}
+.td{width:5px;height:5px;border-radius:50%;background:var(--ink3);animation:tp 1.2s ease infinite;}
+.td:nth-child(2){animation-delay:.2s;}
+.td:nth-child(3){animation-delay:.4s;}
+@keyframes tp{0%,60%,100%{opacity:.3;transform:scale(.8);}30%{opacity:1;transform:scale(1.1);}}
+.modal-input-row{padding:14px 26px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:8px;align-items:flex-end;background:var(--surface);}
+.modal-textarea{flex:1;border:1px solid var(--border2);background:var(--bg);border-radius:8px;padding:9px 13px;font-family:'Inter',sans-serif;font-size:13px;color:var(--ink);outline:none;resize:none;line-height:1.6;transition:border-color .15s;min-height:40px;max-height:120px;}
+.modal-textarea:focus{border-color:var(--navy);}
+.modal-textarea::placeholder{color:var(--ink4);}
+.modal-send{padding:9px 18px;background:var(--navy);border:none;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.modal-send:hover{background:var(--navy2);}
+.modal-send:disabled{opacity:.4;cursor:not-allowed;}
+.modal-complete-row{padding:12px 26px;border-top:1px solid var(--border);background:var(--navy-b);flex-shrink:0;display:none;}
+.modal-complete-row.show{display:flex;align-items:center;justify-content:space-between;}
+.mc-label{font-size:13px;color:var(--green);font-weight:500;}
+.mc-btn{padding:8px 20px;background:var(--navy);border:none;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:background .15s;}
+.mc-btn:hover{background:var(--navy2);}
+
+@media(max-width:768px){
+  nav{padding:0 20px;}
+  .nav-pagenav{display:none;}
+  .hero{flex-direction:column;align-items:flex-start;padding:36px 20px 32px;}
+  .hero-right{margin-left:0;margin-top:20px;}
+  .hero-greeting{font-size:34px;}
+  .section-label{padding:22px 20px 12px;}
+  .project-card{margin:0 16px 24px;}
+  .pc-header{grid-template-columns:1fr;gap:12px;}
+  .cs-header{padding:16px 20px 14px;}
+  .team-strip{padding:16px 20px 20px;}
+  .team-members{grid-template-columns:repeat(2,1fr);}
+  .brief-summary,.canvas-progress,.canvas-locked,.bp-quality,.survey-progress{margin-left:20px;margin-right:20px;}
+  .brief-grid{grid-template-columns:1fr 1fr;}
+  .cp-phases{grid-template-columns:repeat(2,1fr);}
+  .pc-cta{padding:16px 20px;flex-wrap:wrap;}
+  footer{padding:24px 20px;flex-direction:column;gap:8px;text-align:center;}
+  .modal{max-height:92vh;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AI<em>telier</em></div>
+  <div class="nav-pagenav">
+    <a class="nav-page-link active" href="index.html">Dashboard</a>
+    <span class="nav-page-sep">·</span>
+    <a class="nav-page-link" href="aitelier-canvas-T1-flow.html">Canvas</a>
+    <span class="nav-page-sep">·</span>
+    <a class="nav-page-link" href="aitelier-blueprint.html">Blueprint</a>
+    <span class="nav-page-sep">·</span>
+    <a class="nav-page-link" href="aitelier-survey.html">Readiness</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-team">
+      <div class="nav-av you" title="Marie Rousseau (you)">MR</div>
+      <div class="nav-av other" title="Jean Dupont">JD</div>
+      <div class="nav-av other" title="Sophie Chen">SC</div>
+      <div class="nav-av other" title="Lucas Martin">LM</div>
+    </div>
+    <div class="nav-sep"></div>
+    <button class="nav-logout">Sign out</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-time" id="heroTime">—</div>
+      <h1 class="hero-greeting">Welcome back,<br/><em>Marie</em>.</h1>
+
+    </div>
+    <div class="hero-right" id="heroStatBlock" style="opacity:0">
+    </div>
+  </div>
+
+  <div class="section-label">Current initiative</div>
+
+  <!-- PROJECT CARD -->
+  <div class="project-card">
+
+    <!-- CARD HEADER: project identity -->
+    <div class="pc-header">
+      <div>
+        <div class="pc-title-row">
+          <div class="pc-title">AI-Assisted Financial Risk Reporting</div>
+          <span class="pc-badge" id="pcBadge" style="color:var(--navy);border-color:var(--navy-g);background:var(--navy-b)">In progress</span>
+        </div>
+        <div class="pc-desc">Designing an AI initiative to transform how your team prepares and reviews monthly risk exposure reports — reducing time-to-insight while maintaining senior oversight on material decisions.</div>
+        <div class="pc-stats">
+          <div class="pc-stat">
+            <div class="pc-stat-num" id="heroStatNum">7/10</div>
+            <div class="pc-stat-label">Canvas completeness</div>
+          </div>
+          <div class="pc-stat-div"></div>
+          <div class="pc-stat">
+            <div class="pc-stat-num" id="heroScore">2.9<span class="pc-stat-denom">/5</span></div>
+            <div class="pc-stat-label">Blueprint quality</div>
+          </div>
+          <div class="pc-stat-div"></div>
+          <div class="pc-stat">
+            <div class="pc-stat-num">3.0<span class="pc-stat-denom">/5</span></div>
+            <div class="pc-stat-label">Your confidence</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAM MEMBERS -->
+    <div class="team-strip">
+      <div class="team-strip-hdr">
+        <span class="team-strip-label">Team · 4 members</span>
+        <span class="team-strip-sub">Shared canvas · each member contributes</span>
+      </div>
+      <div class="team-members">
+
+        <!-- Marie — current user -->
+        <div class="tm tm-you">
+          <div class="tm-avatar you">MR</div>
+          <div class="tm-info">
+            <div class="tm-name">Marie Rousseau <span class="tm-you-tag">you</span></div>
+            <div class="tm-role">CFO</div>
+          </div>
+        </div>
+
+        <!-- Member 2 -->
+        <div class="tm">
+          <div class="tm-avatar">JD</div>
+          <div class="tm-info">
+            <div class="tm-name">Jean Dupont</div>
+            <div class="tm-role">Risk Manager</div>
+          </div>
+        </div>
+
+        <!-- Member 3 -->
+        <div class="tm">
+          <div class="tm-avatar">SC</div>
+          <div class="tm-info">
+            <div class="tm-name">Sophie Chen</div>
+            <div class="tm-role">Finance Analyst</div>
+          </div>
+        </div>
+
+        <!-- Member 4 -->
+        <div class="tm">
+          <div class="tm-avatar">LM</div>
+          <div class="tm-info">
+            <div class="tm-name">Lucas Martin</div>
+            <div class="tm-role">Data Engineering</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="card-section" id="briefSection">
+      <div class="cs-header">
+        <div class="cs-left">
+          <div class="cs-icon done" id="briefIcon">◈</div>
+          <div>
+            <div class="cs-label" id="briefLabel">Initiative brief</div>
+            <div class="cs-sublabel" id="briefSublabel">Context captured — canvas pre-loaded with your responses</div>
+          </div>
+        </div>
+        <div class="cs-action">
+          <button class="btn btn-ghost btn-sm" id="briefBtn" onclick="openIntakeModal()">Review →</button>
+        </div>
+      </div>
+
+      <!-- Summary shown when intake done -->
+      <div class="brief-summary" id="briefSummary">
+        <div class="brief-grid">
+          <div>
+            <div class="bi-label">Initiative focus</div>
+            <div class="bi-val" id="intakeFocus">Financial risk reporting automation</div>
+          </div>
+          <div>
+            <div class="bi-label">Primary data sources</div>
+            <div class="bi-val" id="intakeData">Treasury ERP Ledger · Bloomberg Market Feed · Internal Reconciliation DB</div>
+          </div>
+          <div>
+            <div class="bi-label">Key stakeholders</div>
+            <div class="bi-val" id="intakeRoles">CFO · Risk Manager · Finance Analyst · Data Engineering</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: CANVAS -->
+    <div class="card-section" id="canvasSection">
+      <div class="cs-header">
+        <div class="cs-left">
+          <div class="cs-icon" id="canvasIcon">⬡</div>
+          <div>
+            <div class="cs-label" id="canvasLabel">AI Transformation Canvas</div>
+            <div class="cs-sublabel" id="canvasSublabel">7 of 10 fields complete</div>
+          </div>
+        </div>
+        <div class="cs-action">
+          <button class="btn btn-primary btn-sm" id="enterBtn" onclick="enterCanvas()">Continue canvas →</button>
+        </div>
+      </div>
+
+      <!-- Progress shown when canvas started -->
+      <div class="canvas-progress" id="canvasProgress">
+        <div class="cp-phases" id="cpPhases"></div>
+      </div>
+
+      <!-- Locked state: shown before intake complete -->
+      <div class="canvas-locked" id="canvasLocked" style="display:none">
+        <div class="cl-icon">🔒</div>
+        <div class="cl-text"><strong>Complete your initiative brief first.</strong><br/>The canvas will unlock once your context has been captured.</div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: BLUEPRINT -->
+    <div class="card-section" id="blueprintSection">
+      <div class="cs-header">
+        <div class="cs-left">
+          <div class="cs-icon" id="blueprintIcon" style="background:var(--navy-b);color:var(--navy);border:1px solid var(--navy-g);">◈</div>
+          <div>
+            <div class="cs-label">AI Decision Blueprint</div>
+            <div class="cs-sublabel" id="blueprintSublabel">Quality score based on canvas content so far</div>
+          </div>
+        </div>
+        <div class="cs-action">
+          <button class="btn btn-ghost btn-sm" onclick="window.location.href='aitelier-blueprint.html'">View blueprint →</button>
+        </div>
+      </div>
+      <div class="bp-quality" id="bpQuality">
+        <div>
+          <div class="bp-score-block">
+            <div class="bp-score-num" id="bpScoreNum">2.9</div>
+            <div class="bp-score-denom">/ 5.0</div>
+          </div>
+          <div class="bp-score-label">Quality score</div>
+        </div>
+        <div class="bp-quality-bars" id="bpBars"></div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: SURVEY -->
+    <div class="card-section" id="surveySection">
+      <div class="cs-header">
+        <div class="cs-left">
+          <div class="cs-icon pending" id="surveyIcon">✎</div>
+          <div>
+            <div class="cs-label">Readiness Check</div>
+            <div class="cs-sublabel">Confidence &amp; satisfaction ratings · 3 of 5 answered</div>
+          </div>
+        </div>
+        <div class="cs-action">
+          <button class="btn btn-ghost btn-sm" onclick="window.location.href='aitelier-survey.html'">Continue →</button>
+        </div>
+      </div>
+      <div class="survey-progress" id="surveyProgress">
+        <div class="sq-rows">
+          <div class="sq-row done"><span class="sq-dot done"></span><span class="sq-label">Decision confidence</span><span class="sq-val">4 / 5</span></div>
+          <div class="sq-row done"><span class="sq-dot done"></span><span class="sq-label">Advice-seeking intent</span><span class="sq-val">3 / 5</span></div>
+          <div class="sq-row done"><span class="sq-dot done"></span><span class="sq-label">Delegation comfort</span><span class="sq-val">2 / 5</span></div>
+          <div class="sq-row pending"><span class="sq-dot pending"></span><span class="sq-label">Implementation intent</span><span class="sq-val sq-empty">—</span></div>
+          <div class="sq-row pending"><span class="sq-dot pending"></span><span class="sq-label">Open reflection</span><span class="sq-val sq-empty">—</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /project-card -->
+
+  <footer>
+    <div class="ft-left">
+      <strong>AItelier</strong> · HEC Foundation Research Platform · F2026<br/>
+      All session data is anonymised before analysis. Your name is never linked to your responses.
+    </div>
+    <div class="ft-right">Questions? Contact your programme facilitator.</div>
+  </footer>
+
+</main>
+
+<!-- INTAKE MODAL -->
+<div class="modal-overlay" id="intakeModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-hdr-row">
+        <div>
+          <div class="modal-title">Initiative <em>Brief</em></div>
+          <div class="modal-subtitle">Describe your AI initiative — I'll ask a few questions to understand the context before you open the canvas.</div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+    </div>
+    <div class="modal-chat" id="chatContainer"></div>
+    <div class="modal-input-row" id="inputRow">
+      <textarea class="modal-textarea" id="chatInput" placeholder="Describe your initiative…" rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+      <button class="modal-send" id="sendBtn" onclick="sendMsg()">Send</button>
+    </div>
+    <div class="modal-complete-row" id="completeRow">
+      <span class="mc-label">✓ Brief complete — canvas is ready</span>
+      <button class="mc-btn" onclick="finishIntake()">Open canvas →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SESSION = {
+  id: 'S-MR2604',
+  participant: { first:'Marie', last:'Rousseau', initials:'MR' },
+  intakeComplete: true,
+  // canvasProgress: binary field completion (structural — are fields filled?)
+  canvasProgress: { F0:true,F1:true,F2:true,F3:true,F4:true,F5:true,F6:true,F7:false,F8:false,F9:false },
+  // readiness: content quality score (evaluated — how good is the content?)
+  // These are intentionally different: 10/10 fields done ≠ perfect readiness
+  readinessScore: 2.9,   // out of 5.0 — expert-style content quality score
+  readinessPct: 58,      // readinessScore / 5.0 * 100 — for the bar only
+  intakeSummary: {
+    focus: 'Financial risk reporting automation',
+    data:  'Treasury ERP Ledger · Bloomberg Market Feed · Internal Reconciliation DB',
+    roles: 'CFO · Risk Manager · Finance Analyst · Data Engineering',
+  },
+};
+
+const PHASES = [
+  { label:'Inputs & Context',     fields:['F0','F1','F2','F3','F4'], color:'var(--phase1)' },
+  { label:'AI Capabilities',      fields:['F5','F6'],                color:'var(--phase2)' },
+  { label:'Decision & Oversight', fields:['F7','F8'],                color:'var(--phase3)' },
+  { label:'Governance',           fields:['F9'],                     color:'var(--phase4)' },
+];
+
+// ── GREETING ──
+(function(){
+  const h = new Date().getHours();
+  const g = h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+  const d = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('heroTime').textContent = g + ' · ' + d;
+})();
+
+// ── RENDER ──
+function render(){
+  const prog = SESSION.canvasProgress;
+  const allF = Object.keys(prog);
+  const done = allF.filter(f=>prog[f]).length;
+  const pct  = Math.round(done/allF.length*100);
+  const canvasStarted = done > 0;
+
+  // Card stat strip — update canvas completeness and blueprint quality
+  document.getElementById('heroStatNum').textContent = done + '/' + allF.length;
+  document.getElementById('heroScore').textContent   = SESSION.readinessScore;
+
+  // Badge
+  const badge = document.getElementById('pcBadge');
+  if (!SESSION.intakeComplete) {
+    badge.textContent='Brief required';
+    badge.style.cssText='color:var(--ink3);border-color:var(--border2);background:none';
+  } else if (pct===100) {
+    badge.textContent='Canvas complete';
+    badge.style.cssText='color:var(--green);border-color:#1a7a4a30;background:#1a7a4a0a';
+  } else {
+    badge.textContent='In progress';
+    badge.style.cssText='color:var(--navy);border-color:var(--navy-g);background:var(--navy-b)';
+  }
+
+  // ── BRIEF SECTION ──
+  if (!SESSION.intakeComplete) {
+    document.getElementById('briefIcon').className = 'cs-icon pending';
+    document.getElementById('briefIcon').textContent = '○';
+    document.getElementById('briefLabel').textContent = 'Initiative brief';
+    document.getElementById('briefSublabel').textContent = 'Start here — describe your AI initiative in a short conversation';
+    document.getElementById('briefBtn').textContent = 'Start →';
+    document.getElementById('briefBtn').onclick = openIntakeModal;
+    document.getElementById('briefSummary').style.display = 'none';
+  } else {
+    document.getElementById('briefIcon').className = 'cs-icon done';
+    document.getElementById('briefIcon').textContent = '✓';
+    document.getElementById('briefLabel').textContent = 'Initiative brief';
+    document.getElementById('briefSublabel').textContent = 'Context captured — canvas pre-loaded with your responses';
+    document.getElementById('briefBtn').textContent = 'Review →';
+    document.getElementById('briefBtn').onclick = openIntakeModal;
+    document.getElementById('briefSummary').style.display = 'block';
+    document.getElementById('intakeFocus').textContent = SESSION.intakeSummary.focus;
+    document.getElementById('intakeData').textContent  = SESSION.intakeSummary.data;
+    document.getElementById('intakeRoles').textContent = SESSION.intakeSummary.roles;
+  }
+
+  // ── CANVAS SECTION ──
+  if (!SESSION.intakeComplete) {
+    document.getElementById('canvasIcon').className = 'cs-icon locked';
+    document.getElementById('canvasIcon').textContent = '⬡';
+    document.getElementById('canvasLabel').style.color = 'var(--ink3)';
+    document.getElementById('canvasSublabel').textContent = 'Unlocks after initiative brief';
+    document.getElementById('canvasProgress').style.display = 'none';
+    document.getElementById('canvasLocked').style.display = 'flex';
+  } else {
+    document.getElementById('canvasIcon').className = 'cs-icon done';
+    document.getElementById('canvasIcon').textContent = canvasStarted ? (pct===100 ? '✓' : '◐') : '⬡';
+    document.getElementById('canvasLabel').style.color = 'var(--ink)';
+    document.getElementById('canvasSublabel').textContent =
+      pct===0   ? 'Ready to start — all 10 fields awaiting input' :
+      pct===100 ? 'All 10 fields complete — blueprint ready' :
+                  `${done} of 10 fields complete`;
+    document.getElementById('canvasProgress').style.display = canvasStarted ? 'block' : 'none';
+    document.getElementById('canvasLocked').style.display = 'none';
+
+    // phase bars — green when complete, navy when in progress, always show z/y count
+    document.getElementById('cpPhases').innerHTML = PHASES.map(ph=>{
+      const phDone  = ph.fields.filter(f=>prog[f]).length;
+      const total   = ph.fields.length;
+      const phPct   = Math.round(phDone/total*100);
+      const allDone = phDone === total;
+      const started = phDone > 0;
+      const labelClass   = allDone ? 'cp-phase-label done' : started ? 'cp-phase-label active' : 'cp-phase-label';
+      const barColor     = allDone ? 'var(--green)' : 'var(--navy)';
+      const statusColor  = allDone ? 'var(--green)' : started ? 'var(--navy)' : 'var(--ink4)';
+      const statusText   = phDone + '/' + total;
+      return `<div class="cp-phase">
+        <span class="${labelClass}">${ph.label}</span>
+        <div class="cp-bar-track"><div class="cp-bar-fill" style="width:${phPct}%;background:${barColor}"></div></div>
+        <span class="cp-phase-status" style="color:${statusColor}">${statusText}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ── BLUEPRINT QUALITY SECTION ──
+  document.getElementById('bpScoreNum').textContent = SESSION.readinessScore;
+  const score = SESSION.readinessScore;
+  const BP_DIMS = [
+    { label:'Context depth',    pct: Math.min(100, Math.round((prog.F3&&prog.F4 ? 85 : prog.F3||prog.F4 ? 45 : 10))) },
+    { label:'Capability design',pct: Math.min(100, Math.round((prog.F5&&prog.F6 ? 90 : prog.F5 ? 40 : 0))) },
+    { label:'Oversight & KPIs', pct: Math.min(100, Math.round((prog.F7&&prog.F8 ? 88 : prog.F7||prog.F8 ? 44 : 0))) },
+    { label:'Governance',       pct: Math.min(100, Math.round((prog.F9 ? 85 : 0))) },
+  ];
+  document.getElementById('bpBars').innerHTML = BP_DIMS.map(d=>{
+    const color = d.pct>=70 ? 'var(--green)' : d.pct>=30 ? 'var(--navy)' : 'var(--border3)';
+    return `<div class="bp-bar-row">
+      <span class="bp-bar-label">${d.label}</span>
+      <div class="bp-bar-track"><div class="bp-bar-fill" style="width:${d.pct}%;background:${color}"></div></div>
+      <span class="bp-bar-val">${d.pct}%</span>
+    </div>`;
+  }).join('');
+  document.getElementById('blueprintSublabel').textContent =
+    score >= 4 ? 'Strong foundation — ready for expert review' :
+    score >= 3 ? 'Solid progress — complete remaining phases to improve' :
+                 'Early stage — more canvas fields needed';
+
+  // ── CTA ──
+  const btn = document.getElementById('enterBtn');
+  if (!SESSION.intakeComplete) {
+    btn.textContent = 'Start initiative brief →';
+    btn.onclick = openIntakeModal;
+  } else if (pct===0) {
+    btn.textContent = 'Start canvas →';
+    btn.onclick = enterCanvas;
+  } else if (pct===100) {
+    btn.textContent = 'Generate blueprint →';
+    btn.onclick = ()=>{ window.location.href='aitelier-blueprint.html'; };
+  } else {
+    btn.textContent = 'Continue canvas →';
+    btn.onclick = enterCanvas;
+  }
+}
+
+// ── INTAKE MODAL ──
+let chatTurn = 0;
+const INTAKE_FLOW = [
+  { role:'ai', text:`Hello — I'm here to help you set up your AI transformation canvas. <strong>Before we start, tell me about your initiative in your own words.</strong><br/><br/>What business problem are you trying to solve with AI?` },
+  { role:'probe', after:1, text:`Thank you. A few follow-up questions:<br/><br/>1. <strong>Who currently does this work?</strong> Which roles or teams are involved today?<br/>2. <strong>What data would the AI need?</strong> Name the systems or sources, even roughly.<br/>3. <strong>What does success look like in 12 months?</strong>` },
+  { role:'probe', after:2, text:`One more: <strong>Is there anything about this process that's hard to explain but everyone on the team just knows?</strong><br/><br/>Edge cases, informal rules, people who need to be consulted even when it's not in the official process.` },
+  { role:'complete', after:3, text:`That's everything I need. <strong>I've captured your initiative context</strong> — your canvas is pre-loaded and ready.<br/><br/>Click "Open canvas" when you're ready to continue.` },
+];
+
+function openIntakeModal(){ document.getElementById('intakeModal').classList.add('open'); if(chatTurn===0) initChat(); }
+function closeModal(){ document.getElementById('intakeModal').classList.remove('open'); }
+function initChat(){ appendAI(INTAKE_FLOW[0].text); chatTurn=1; }
+
+function sendMsg(){
+  const inp=document.getElementById('chatInput');
+  const txt=inp.value.trim(); if(!txt) return;
+  appendUser(txt); inp.value=''; inp.style.height='auto';
+  document.getElementById('sendBtn').disabled=true;
+  const next=INTAKE_FLOW.find(t=>t.after===chatTurn);
+  if(next){
+    setTimeout(()=>{
+      if(next.role==='complete'){
+        appendAI(next.text);
+        document.getElementById('inputRow').style.display='none';
+        document.getElementById('completeRow').classList.add('show');
+        SESSION.intakeComplete=true;
+      } else { appendAI(next.text); document.getElementById('sendBtn').disabled=false; }
+      chatTurn++;
+    },1000);
+  } else { setTimeout(()=>{ document.getElementById('sendBtn').disabled=false; },600); }
+}
+
+function appendAI(text){
+  const c=document.getElementById('chatContainer');
+  const t=document.createElement('div'); t.className='typing-row';
+  t.innerHTML=`<div class="chat-avatar" style="background:var(--navy);color:#fff">AI</div><div class="typing-bub"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+  c.appendChild(t); c.scrollTop=c.scrollHeight;
+  setTimeout(()=>{
+    t.remove();
+    const m=document.createElement('div'); m.className='chat-msg ai';
+    m.innerHTML=`<div class="chat-avatar" style="background:var(--navy);color:#fff">AI</div><div class="chat-bubble">${text}</div>`;
+    c.appendChild(m); c.scrollTop=c.scrollHeight;
+    document.getElementById('sendBtn').disabled=false;
+  },900);
+}
+
+function appendUser(text){
+  const c=document.getElementById('chatContainer');
+  const m=document.createElement('div'); m.className='chat-msg user';
+  m.innerHTML=`<div class="chat-avatar" style="background:var(--gold);color:var(--navy)">${SESSION.participant.initials}</div><div class="chat-bubble">${text}</div>`;
+  c.appendChild(m); c.scrollTop=c.scrollHeight;
+}
+
+function finishIntake(){
+  closeModal();
+  SESSION.intakeSummary.focus='Your AI initiative (captured from brief)';
+  render();
+  setTimeout(()=>{
+    sessionStorage.setItem('aitelier_session',JSON.stringify({sessionId:SESSION.id,participant:SESSION.participant,intakeSummary:SESSION.intakeSummary}));
+    window.location.href='aitelier-canvas-T1-flow.html';
+  },400);
+}
+
+function enterCanvas(){
+  sessionStorage.setItem('aitelier_session',JSON.stringify({sessionId:SESSION.id,participant:SESSION.participant,intakeSummary:SESSION.intakeSummary}));
+  window.location.href='aitelier-canvas-T1-flow.html';
+}
+
+render();
+</script>
+</body>
+</html>

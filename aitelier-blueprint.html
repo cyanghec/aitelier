@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AItelier · AI Decision Blueprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --navy:#1E2761; --navy2:#2A3580; --navy3:#3A4898;
+  --navy-b:#1E276112; --navy-g:#1E276130;
+  --bg:#f4f3f0; --surface:#ffffff; --surface2:#f7f6f3;
+  --border:#e2dfd8; --border2:#ccc8c0; --border3:#b0aba0;
+  --ink:#141624; --ink2:#3e4260; --ink3:#505470; --ink4:#9095b0;
+  --amber:#1E2761; --amber2:#2A3580; --amber-b:#1E276112; --amber-g:#1E276130;
+  --green:#1a7a4a; --green-b:#1a7a4a12;
+  --red:#8a2a2a; --red-b:#8a2a2a12;
+  --blue:#1E2761; --blue-b:#1E276112;
+  --purple:#6a3a98; --purple-b:#6a3a9810;
+  --gold:#C8922A; --gold-b:#C8922A18;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;background:var(--navy);z-index:100;
+}
+.nav-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:#fff;}
+.nav-logo em{font-style:italic;color:var(--gold);}
+.nav-pagenav{display:flex;align-items:center;gap:6px;position:absolute;left:50%;transform:translateX(-50%);}
+.nav-page-link{font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;letter-spacing:.4px;padding:6px 12px;border-radius:4px;transition:all .15s;}
+.nav-page-link:hover{color:#fff;background:rgba(255,255,255,.08);}
+.nav-page-link.active{color:#fff;background:rgba(255,255,255,.14);font-weight:500;}
+.nav-page-sep{font-size:12px;color:rgba(255,255,255,.18);}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-user{display:flex;align-items:center;gap:8px;}
+.nav-avatar{width:30px;height:30px;border-radius:6px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--navy);}
+.nav-name{font-size:13px;color:rgba(255,255,255,.7);}
+.nav-sep{width:1px;height:18px;background:rgba(255,255,255,.15);}
+.nav-btn{padding:7px 16px;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.2px;border:1px solid;}
+.nav-btn.ghost{background:none;border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.7);}
+.nav-btn.ghost:hover{border-color:rgba(255,255,255,.6);color:#fff;}
+.nav-btn.primary{background:var(--gold);border-color:var(--gold);color:#fff;}
+.nav-btn.primary:hover{background:#e0a830;}
+.nav-team{display:flex;align-items:center;gap:5px;}
+.nav-av{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.3px;}
+.nav-av.you{background:var(--gold);color:var(--navy);}
+.nav-av.other{background:rgba(255,255,255,.15);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.2);}
+.nav-logout{font-size:13px;color:rgba(255,255,255,.4);cursor:pointer;transition:color .15s;background:none;border:none;font-family:'Inter',sans-serif;}
+.nav-logout:hover{color:rgba(255,255,255,.8);}
+
+/* ── HERO ── */
+.hero{
+  padding:48px 48px 0;
+  animation:fadeUp .6s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.hero-eyebrow{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.hero-dot{width:5px;height:5px;border-radius:50%;background:var(--amber);}
+.hero-title{font-family:'Playfair Display',serif;font-size:42px;font-weight:400;line-height:1.15;margin-bottom:10px;}
+.hero-title em{font-style:italic;}
+.hero-meta{display:flex;align-items:center;gap:20px;font-size:10px;color:var(--ink3);}
+.hero-meta-sep{width:1px;height:12px;background:var(--border2);}
+
+/* ── READINESS BANNER ── */
+.readiness-banner{
+  margin:32px 48px 0;
+  border:1px solid var(--border2);border-radius:10px;
+  background:var(--surface);
+  display:grid;grid-template-columns:1fr auto;
+  overflow:hidden;
+  animation:fadeUp .6s ease .1s both;
+}
+.rb-left{padding:22px 28px;display:flex;align-items:center;gap:20px;}
+.rb-score-ring{
+  width:72px;height:72px;flex-shrink:0;
+  position:relative;display:flex;align-items:center;justify-content:center;
+}
+.rb-score-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);}
+.rb-score-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;position:relative;z-index:1;}
+.rb-score-label{font-size:8px;color:var(--ink3);position:relative;z-index:1;text-align:center;margin-top:2px;}
+.rb-text{}
+.rb-title{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:4px;}
+.rb-desc{font-size:10px;color:var(--ink2);line-height:1.7;max-width:480px;}
+.rb-right{padding:14px 20px;border-left:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:8px;min-width:160px;}
+.rb-stat{text-align:center;}
+.rb-stat-num{font-family:'Playfair Display',serif;font-size:24px;font-weight:400;color:var(--navy);}
+.rb-stat-label{font-size:9px;color:var(--ink3);letter-spacing:.5px;margin-top:2px;}
+.rb-stat-sep{height:1px;background:var(--border);}
+
+/* ── LAYOUT ── */
+.content{display:grid;grid-template-columns:1fr 280px;gap:0;margin-top:32px;}
+.main-col{padding:0 48px 80px;min-width:0;}
+.side-col{border-left:1px solid var(--border);padding:24px 28px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;}
+.side-col::-webkit-scrollbar{width:3px;}
+.side-col::-webkit-scrollbar-thumb{background:var(--border2);}
+
+/* ── SECTION ── */
+.bp-section{margin-bottom:40px;animation:fadeUp .5s ease both;}
+.bp-section:nth-child(2){animation-delay:.05s;}
+.bp-section:nth-child(3){animation-delay:.1s;}
+.bp-section:nth-child(4){animation-delay:.15s;}
+.bp-section:nth-child(5){animation-delay:.2s;}
+.bp-section:nth-child(6){animation-delay:.25s;}
+.section-hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.section-num{font-size:9px;color:var(--ink3);letter-spacing:.5px;min-width:24px;}
+.section-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;}
+.section-badge{font-size:8px;padding:2px 8px;border-radius:3px;border:1px solid;letter-spacing:.5px;margin-left:auto;}
+
+/* ── CONTENT BLOCKS ── */
+.bp-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin-bottom:12px;}
+.bp-card-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;}
+.bp-card-val{font-size:11px;color:var(--ink2);line-height:1.75;}
+.bp-card-val strong{color:var(--ink);}
+
+.bp-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.bp-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+
+/* DATA SOURCE TABLE */
+.ds-table{width:100%;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px;}
+.ds-table-hdr{display:grid;grid-template-columns:2fr 1.5fr 1.5fr;background:var(--surface2);border-bottom:1px solid var(--border);}
+.ds-table-hdr-cell{padding:8px 14px;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);}
+.ds-table-row{display:grid;grid-template-columns:2fr 1.5fr 1.5fr;border-bottom:1px solid var(--border);}
+.ds-table-row:last-child{border-bottom:none;}
+.ds-table-cell{padding:10px 14px;font-size:10px;color:var(--ink2);}
+.ds-table-cell.name{color:var(--ink);}
+.ds-empty{padding:16px 14px;font-size:10px;color:var(--ink3);font-style:italic;}
+
+/* CAPABILITY CARDS */
+.cap-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+.cap-card{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.cap-card-hdr{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);}
+.cap-tier-pill{font-size:8px;padding:2px 8px;border-radius:2px;border:1px solid;letter-spacing:.5px;}
+.cap-card-body{padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.cap-body-label{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
+.cap-body-val{font-size:10px;color:var(--ink2);line-height:1.6;}
+.oversight-pill{display:inline-block;font-size:9px;padding:3px 10px;border-radius:3px;border:1px solid;}
+
+/* ROLES */
+.roles-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.role-pill{padding:5px 12px;border:1px solid var(--border2);border-radius:20px;font-size:10px;color:var(--ink2);}
+
+/* RECOMMENDATION BLOCK */
+.rec-block{background:var(--surface);border:1px solid;border-radius:8px;padding:18px 22px;margin-bottom:12px;}
+.rec-block.green{border-color:#4a8c6a40;background:#4a8c6a08;}
+.rec-block.amber{border-color:var(--amber-g);background:var(--amber-b);}
+.rec-block.red{border-color:#9a404040;background:#9a404008;}
+.rec-icon{font-size:16px;margin-bottom:8px;}
+.rec-title{font-size:11px;font-weight:500;margin-bottom:6px;}
+.rec-block.green .rec-title{color:#4a8c6a;}
+.rec-block.amber .rec-title{color:var(--amber);}
+.rec-block.red .rec-title{color:#c07070;}
+.rec-body{font-size:10px;color:var(--ink2);line-height:1.7;}
+
+/* TIER BADGE */
+.tier-sense{color:#2d6ea0;border-color:#2d6ea040;background:#2d6ea010;}
+.tier-interpret{color:#a07830;border-color:#a0783040;background:#a0783010;}
+.tier-act{color:#c05030;border-color:#c0503040;background:#c0503010;}
+.tier-learn{color:#2a8060;border-color:#2a806040;background:#2a806010;}
+
+/* ── SIDEBAR ── */
+.side-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px;}
+.side-toc{display:flex;flex-direction:column;gap:2px;margin-bottom:28px;}
+.toc-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:5px;cursor:pointer;transition:background .15s;font-size:10px;color:var(--ink3);border-left:2px solid transparent;}
+.toc-item:hover{background:var(--surface);color:var(--ink2);}
+.toc-item.active{background:var(--surface);color:var(--amber);border-left-color:var(--amber);}
+.toc-num{font-size:9px;color:var(--ink4);min-width:18px;}
+
+.side-quality{margin-bottom:24px;}
+.sq-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.sq-label{font-size:9px;color:var(--ink3);}
+.sq-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin:0 10px;}
+.sq-fill{height:100%;border-radius:2px;transition:width .6s ease;}
+.sq-val{font-size:9px;color:var(--ink3);min-width:24px;text-align:right;}
+
+.side-actions{display:flex;flex-direction:column;gap:8px;}
+.side-btn{padding:9px 0;border-radius:5px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;transition:all .2s;letter-spacing:.4px;border:1px solid;text-align:center;width:100%;}
+.side-btn.ghost{background:none;border-color:var(--border2);color:var(--ink2);}
+.side-btn.ghost:hover{border-color:var(--border3);color:var(--ink);}
+.side-btn.cta{background:var(--amber);border-color:var(--amber);color:#0e0d0b;font-weight:500;}
+.side-btn.cta:hover{background:var(--amber2);}
+
+@media(max-width:900px){
+  nav,.hero,content{padding-left:20px;padding-right:20px;}
+  .readiness-banner{margin-left:20px;margin-right:20px;}
+  .content{grid-template-columns:1fr;}
+  .side-col{border-left:none;border-top:1px solid var(--border);position:static;height:auto;}
+  .main-col{padding:0 20px 60px;}
+  .cap-card-body{grid-template-columns:1fr;}
+  .bp-grid-2,.bp-grid-3{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">AI<em>telier</em></div>
+  <div class="nav-pagenav">
+    <a class="nav-page-link" href="index.html">Dashboard</a>
+    <span class="nav-page-sep">·</span>
+    <a class="nav-page-link" href="aitelier-canvas-T1-flow.html">Canvas</a>
+    <span class="nav-page-sep">·</span>
+    <a class="nav-page-link active" href="aitelier-blueprint.html">Blueprint</a>
+    <span class="nav-page-sep">·</span>
+    <a class="nav-page-link" href="aitelier-survey.html">Readiness</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-team">
+      <div class="nav-av you" title="Marie Rousseau (you)">MR</div>
+      <div class="nav-av other" title="Jean Dupont">JD</div>
+      <div class="nav-av other" title="Sophie Chen">SC</div>
+      <div class="nav-av other" title="Lucas Martin">LM</div>
+    </div>
+    <div class="nav-sep"></div>
+    <button class="nav-logout">Sign out</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-eyebrow"><div class="hero-dot"></div>AI Decision Blueprint · Generated</div>
+    <h1 class="hero-title" id="bpTitle">Your AI Transformation<br/><em>Initiative Blueprint</em></h1>
+    <div class="hero-meta">
+      <span id="bpSession">Session —</span>
+      <div class="hero-meta-sep"></div>
+      <span id="bpDate">—</span>
+      <div class="hero-meta-sep"></div>
+      <span id="bpFields">10 fields synthesised</span>
+    </div>
+  </div>
+</div>
+
+<!-- READINESS BANNER -->
+<div class="readiness-banner">
+  <div class="rb-left">
+    <div class="rb-score-ring">
+      <svg viewBox="0 0 72 72">
+        <circle cx="36" cy="36" r="30" fill="none" stroke="#2a2820" stroke-width="5"/>
+        <circle cx="36" cy="36" r="30" fill="none" stroke="#c8922a" stroke-width="5"
+          stroke-dasharray="188.5" id="scoreArc" stroke-dashoffset="188.5"
+          stroke-linecap="round"/>
+      </svg>
+      <div>
+        <div class="rb-score-num" id="scoreNum">—</div>
+        <div class="rb-score-label">/ 5.0</div>
+      </div>
+    </div>
+    <div class="rb-text">
+      <div class="rb-title" id="rbTitle">Implementation Readiness Score</div>
+      <div class="rb-desc" id="rbDesc">Assessing your blueprint across completeness, governance clarity, oversight design, and initiative scope…</div>
+    </div>
+  </div>
+  <div class="rb-right">
+    <div class="rb-stat"><div class="rb-stat-num" id="statFields">—</div><div class="rb-stat-label">Canvas complete</div></div>
+    <div class="rb-stat-sep"></div>
+    <button onclick="window.print()" style="padding:10px 0;width:100%;background:var(--navy);border:none;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#fff;cursor:pointer;letter-spacing:.2px;transition:background .15s;" onmouseover="this.style.background='#1a3150'" onmouseout="this.style.background='var(--navy)'">Export PDF</button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+  <div class="main-col">
+
+    <!-- 1. Initiative Overview -->
+    <div class="bp-section" id="sec-1">
+      <div class="section-hdr">
+        <span class="section-num">01</span>
+        <span class="section-title">Initiative Overview</span>
+      </div>
+      <div class="bp-grid-2">
+        <div class="bp-card">
+          <div class="bp-card-label">Scope</div>
+          <div class="bp-card-val" id="bpScope">—</div>
+        </div>
+        <div class="bp-card">
+          <div class="bp-card-label">Human roles involved</div>
+          <div id="bpRoles" class="roles-wrap"></div>
+        </div>
+      </div>
+      <div class="bp-card">
+        <div class="bp-card-label">Systems & infrastructure</div>
+        <div class="bp-card-val" id="bpSystems">—</div>
+      </div>
+      <div class="bp-card">
+        <div class="bp-card-label">Tacit constraints identified</div>
+        <div class="bp-card-val" id="bpTacit">—</div>
+      </div>
+    </div>
+
+    <!-- 2. Data Architecture -->
+    <div class="bp-section" id="sec-2">
+      <div class="section-hdr">
+        <span class="section-num">02</span>
+        <span class="section-title">Data Architecture</span>
+      </div>
+      <div class="ds-table" id="dsTable">
+        <div class="ds-table-hdr">
+          <div class="ds-table-hdr-cell">Source</div>
+          <div class="ds-table-hdr-cell">Owner</div>
+          <div class="ds-table-hdr-cell">Format / Freshness</div>
+        </div>
+        <div id="dsTableBody"></div>
+      </div>
+    </div>
+
+    <!-- 3. AI Capability Stack -->
+    <div class="bp-section" id="sec-3">
+      <div class="section-hdr">
+        <span class="section-num">03</span>
+        <span class="section-title">AI Capability Stack</span>
+        <span class="section-badge" id="capBadge" style="color:var(--purple);border-color:#7a4a9a40;background:var(--purple-b)">— capabilities</span>
+      </div>
+      <div class="cap-grid" id="capGrid"></div>
+    </div>
+
+    <!-- 4. Oversight Design -->
+    <div class="bp-section" id="sec-4">
+      <div class="section-hdr">
+        <span class="section-num">04</span>
+        <span class="section-title">Oversight Design</span>
+      </div>
+      <div class="bp-grid-3" id="oversightSummary"></div>
+      <div id="oversightRecs"></div>
+    </div>
+
+    <!-- 5. Feedback & KPIs -->
+    <div class="bp-section" id="sec-5">
+      <div class="section-hdr">
+        <span class="section-num">05</span>
+        <span class="section-title">Feedback Loops &amp; KPIs</span>
+      </div>
+      <div class="bp-grid-2">
+        <div class="bp-card">
+          <div class="bp-card-label">Outcome capture</div>
+          <div class="bp-card-val" id="bpCapture">—</div>
+        </div>
+        <div class="bp-card">
+          <div class="bp-card-label">Review cadence</div>
+          <div class="bp-card-val" id="bpCadence">—</div>
+        </div>
+      </div>
+      <div class="bp-card">
+        <div class="bp-card-label">Business outcomes & KPIs</div>
+        <div class="bp-card-val" id="bpKPIs">—</div>
+      </div>
+    </div>
+
+    <!-- 6. Governance -->
+    <div class="bp-section" id="sec-6">
+      <div class="section-hdr">
+        <span class="section-num">06</span>
+        <span class="section-title">Governance &amp; Accountability</span>
+      </div>
+      <div class="bp-grid-3">
+        <div class="bp-card">
+          <div class="bp-card-label">Model owner</div>
+          <div class="bp-card-val" id="bpOwner">—</div>
+        </div>
+        <div class="bp-card">
+          <div class="bp-card-label">Retraining authority</div>
+          <div class="bp-card-val" id="bpRetrain">—</div>
+        </div>
+        <div class="bp-card">
+          <div class="bp-card-label">Shutdown authority</div>
+          <div class="bp-card-val" id="bpShutdown">—</div>
+        </div>
+      </div>
+      <div class="bp-card">
+        <div class="bp-card-label">Governance structure</div>
+        <div class="bp-card-val" id="bpGov">—</div>
+      </div>
+    </div>
+
+    <!-- 7. Assessments -->
+    <div class="bp-section" id="sec-7">
+      <div class="section-hdr">
+        <span class="section-num">07</span>
+        <span class="section-title">Readiness Assessment</span>
+      </div>
+      <div id="assessmentBlocks"></div>
+    </div>
+
+  </div><!-- main-col -->
+
+  <!-- SIDEBAR -->
+  <div class="side-col">
+    <div class="side-label">Contents</div>
+    <div class="side-toc">
+      <div class="toc-item active" onclick="scrollTo('sec-1')"><span class="toc-num">01</span>Initiative Overview</div>
+      <div class="toc-item" onclick="scrollTo('sec-2')"><span class="toc-num">02</span>Data Architecture</div>
+      <div class="toc-item" onclick="scrollTo('sec-3')"><span class="toc-num">03</span>Capability Stack</div>
+      <div class="toc-item" onclick="scrollTo('sec-4')"><span class="toc-num">04</span>Oversight Design</div>
+      <div class="toc-item" onclick="scrollTo('sec-5')"><span class="toc-num">05</span>Feedback & KPIs</div>
+      <div class="toc-item" onclick="scrollTo('sec-6')"><span class="toc-num">06</span>Governance</div>
+      <div class="toc-item" onclick="scrollTo('sec-7')"><span class="toc-num">07</span>Assessment</div>
+    </div>
+
+    <div class="side-label">Quality signals</div>
+    <div class="side-quality" id="qualityBars"></div>
+
+    <div class="side-label">Actions</div>
+    <div class="side-actions">
+      <button class="side-btn ghost" onclick="window.location.href='aitelier-canvas-T1-flow.html'">← Edit canvas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── LOAD STATE ──
+let S = null;
+try { S = JSON.parse(sessionStorage.getItem('aitelier_state')); } catch(e){}
+
+// Demo fallback state if no session data
+if(!S) {
+  S = {
+    sessionId:'S-MR2604',
+    scope:'multi',
+    dataSources:[
+      {id:1,name:'Treasury ERP Ledger',owner:'Finance Ops',format:'SQL · daily refresh'},
+      {id:2,name:'Bloomberg Market Feed',owner:'Risk Team',format:'API · real-time'},
+      {id:3,name:'Internal Reconciliation DB',owner:'Data Engineering',format:'CSV · overnight batch'},
+    ],
+    roles:['CFO','Risk Manager','Finance Analyst','Data Engineering'],
+    fields:{
+      F3:'Power BI dashboards (cannot replace until Q3 2026), SAP ERP integrated with Oracle. All outputs must route through existing ServiceNow approval workflow. No direct database writes permitted from AI systems.',
+      F4:'Month-end P&L figures are patched by treasury before the 9am board review — the 3pm version is never used for decisions. CFO informally reviews all exposure changes >€50M regardless of delegation policy. The Bloomberg feed drops connection on ECB announcement days — everyone switches to manual Reuters checks.',
+      'F7-capture':'',
+      'F7-cadence':'',
+      'F7-notes':'',
+      F8:'',
+      'F9-owner':'',
+      'F9-retrain':'',
+      'F9-shutdown':'',
+      F9:''
+    },
+    capabilities:['Pattern Recognition','Retrieval & Synthesis','Prediction'],
+    chains:{
+      'Pattern Recognition':{tier:'sense',input:'Treasury ERP ledger, Bloomberg feed',judgment:'Analyst reviews all flagged anomalies before escalation',oversight:'Augment'},
+      'Retrieval & Synthesis':{tier:'sense',input:'All three data sources, internal policy documents',judgment:'CFO approves any output used in board materials',oversight:'Supervise'},
+      'Prediction':{tier:'interpret',input:'Pattern Recognition outputs, historical reconciliation data',judgment:'Risk Manager signs off all predictions used in exposure calculations',oversight:'Supervise'},
+    }
+  };
+}
+
+// ── RENDER ──
+document.getElementById('bpSession').textContent = 'Session · ' + (S.sessionId||'—');
+document.getElementById('bpDate').textContent = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+const TIER_C = {sense:'#2d6ea0',interpret:'#a07830',act:'#c05030',learn:'#2a8060'};
+const TIER_N = {sense:'Tier 1 · Sense',interpret:'Tier 2 · Interpret',act:'Tier 3 · Act',learn:'Tier 4 · Learn'};
+const SCOPE_N = {single:'Single Task',multi:'Multi-capability Programme',enterprise:'Enterprise Transformation'};
+
+// Scope
+document.getElementById('bpScope').textContent = SCOPE_N[S.scope] || '— Not specified';
+
+// Roles
+const rolesEl = document.getElementById('bpRoles');
+if(S.roles && S.roles.length) {
+  rolesEl.innerHTML = S.roles.map(r=>`<span class="role-pill">${r}</span>`).join('');
+} else {
+  rolesEl.innerHTML = '<span style="font-size:10px;color:var(--ink3);font-style:italic">No roles specified</span>';
+}
+
+// Systems & Tacit
+document.getElementById('bpSystems').innerHTML = fmt(S.fields['F3']);
+document.getElementById('bpTacit').innerHTML = fmt(S.fields['F4']);
+
+// Data sources
+const dsBody = document.getElementById('dsTableBody');
+if(S.dataSources && S.dataSources.length) {
+  dsBody.innerHTML = S.dataSources.map(d=>`
+    <div class="ds-table-row">
+      <div class="ds-table-cell name">${d.name||'—'}</div>
+      <div class="ds-table-cell">${d.owner||'—'}</div>
+      <div class="ds-table-cell">${d.format||'—'}</div>
+    </div>`).join('');
+} else {
+  dsBody.innerHTML = '<div class="ds-empty">No data sources specified</div>';
+}
+
+// Capabilities
+const caps = S.capabilities || [];
+document.getElementById('capBadge').textContent = caps.length + ' capabilit' + (caps.length===1?'y':'ies');
+// statCaps removed (score shown in ring)
+const capGrid = document.getElementById('capGrid');
+if(caps.length) {
+  capGrid.innerHTML = caps.map(cap => {
+    const ch = (S.chains||{})[cap] || {};
+    const tc = TIER_C[ch.tier] || 'var(--ink3)';
+    const ovClass = ch.oversight==='Automate'?'background:#4a8c6a20;border-color:#4a8c6a60;color:#4a8c6a':ch.oversight==='Augment'?'background:#c8922a14;border-color:#c8922a40;color:#c8922a':'background:#c0503014;border-color:#c0503040;color:#c05030';
+    return `<div class="cap-card">
+      <div class="cap-card-hdr">
+        <span style="font-size:12px;font-weight:500;color:var(--ink)">${cap}</span>
+        <span class="cap-tier-pill tier-${ch.tier||'sense'}">${TIER_N[ch.tier]||'—'}</span>
+      </div>
+      <div class="cap-card-body">
+        <div>
+          <div class="cap-body-label">Input sources</div>
+          <div class="cap-body-val">${ch.input||'<span style="color:var(--ink3);font-style:italic">Not specified</span>'}</div>
+        </div>
+        <div>
+          <div class="cap-body-label">Human judgment required</div>
+          <div class="cap-body-val">${ch.judgment||'<span style="color:var(--ink3);font-style:italic">Not specified</span>'}</div>
+        </div>
+        <div>
+          <div class="cap-body-label">Oversight level</div>
+          <div class="cap-body-val"><span class="oversight-pill" style="${ovClass}">${ch.oversight||'— Not set'}</span></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+} else {
+  capGrid.innerHTML = '<div style="font-size:10px;color:var(--ink3);font-style:italic;padding:16px 0">No capabilities selected</div>';
+}
+
+// Oversight summary
+const counts = {Automate:0,Augment:0,Supervise:0};
+caps.forEach(c=>{ const ov=(S.chains||{})[c]?.oversight; if(ov) counts[ov]++; });
+document.getElementById('oversightSummary').innerHTML = [
+  {k:'Automate',c:'#4a8c6a',bg:'#4a8c6a14',bc:'#4a8c6a40'},
+  {k:'Augment',c:'#c8922a',bg:'#c8922a14',bc:'#c8922a40'},
+  {k:'Supervise',c:'#c05030',bg:'#c0503014',bc:'#c0503040'},
+].map(({k,c,bg,bc})=>`
+  <div class="bp-card" style="border-color:${bc};background:${bg};text-align:center">
+    <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:400;color:${c};margin-bottom:6px">${counts[k]}</div>
+    <div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:${c}">${k}</div>
+    <div style="font-size:9px;color:var(--ink3);margin-top:2px">capabilit${counts[k]===1?'y':'ies'}</div>
+  </div>`).join('');
+
+// Oversight recommendations
+const recs = [];
+if(counts.Automate > 0 && caps.some(c=>{const ch=(S.chains||{})[c];return ch?.oversight==='Automate'&&(ch?.tier==='act'||ch?.tier==='interpret');}))
+  recs.push({type:'amber',icon:'⚠',title:'High-tier capabilities set to Automate',body:'One or more Interpret or Act capabilities are set to Automate oversight. These tiers typically require human judgment before outputs are used in decisions. Review whether full automation is appropriate.'});
+if(counts.Supervise === caps.length && caps.length > 2)
+  recs.push({type:'amber',icon:'◎',title:'All capabilities fully supervised',body:'Every capability requires human approval before acting. This may be the right choice — but review whether this level of oversight is operationally sustainable at scale.'});
+if(!S.fields['F9-owner'])
+  recs.push({type:'red',icon:'✕',title:'No model owner specified',body:'Governance accountability is incomplete. An orphaned AI system without a named owner is the leading cause of AI initiative failure after deployment.'});
+if(caps.length > 0 && !caps.some(c=>(S.chains||{})[c]?.tier==='learn'))
+  recs.push({type:'green',icon:'✓',title:'No Learn-tier capabilities selected',body:'Your initiative does not include self-improving capabilities. This keeps governance complexity lower — but ensure you have a manual process for model updates over time.'});
+if(recs.length === 0)
+  recs.push({type:'green',icon:'✓',title:'No significant oversight concerns identified',body:'Your oversight design appears consistent with the capabilities selected. An expert reviewer will validate this assessment.'});
+
+document.getElementById('oversightRecs').innerHTML = recs.map(r=>`
+  <div class="rec-block ${r.type}">
+    <div class="rec-icon">${r.icon}</div>
+    <div class="rec-title">${r.title}</div>
+    <div class="rec-body">${r.body}</div>
+  </div>`).join('');
+
+// Feedback & KPIs
+document.getElementById('bpCapture').textContent = S.fields['F7-capture'] || '— Not specified';
+document.getElementById('bpCadence').textContent = S.fields['F7-cadence'] || '— Not specified';
+document.getElementById('bpKPIs').innerHTML = fmt(S.fields['F8']);
+
+// Governance
+document.getElementById('bpOwner').innerHTML = `<strong>${S.fields['F9-owner']||'— Not specified'}</strong>`;
+document.getElementById('bpRetrain').innerHTML = `<strong>${S.fields['F9-retrain']||'— Not specified'}</strong>`;
+document.getElementById('bpShutdown').innerHTML = `<strong>${S.fields['F9-shutdown']||'— Not specified'}</strong>`;
+document.getElementById('bpGov').innerHTML = fmt(S.fields['F9']);
+
+// ── READINESS SCORE ──
+function computeScore() {
+  let score = 0;
+  if(S.scope) score += 0.3;
+  if(S.dataSources?.length > 0) score += 0.5;
+  if(S.roles?.length > 0) score += 0.3;
+  if((S.fields['F3']||'').length > 20) score += 0.3;
+  if((S.fields['F4']||'').length > 30) score += 0.5; // tacit = high value
+  if(caps.length > 0) score += 0.5;
+  if(caps.every(c=>(S.chains||{})[c]?.oversight)) score += 0.5;
+  if(S.fields['F7-capture'] && S.fields['F7-cadence']) score += 0.3;
+  if((S.fields['F8']||'').length > 30) score += 0.4;
+  if(S.fields['F9-owner'] && S.fields['F9-shutdown']) score += 0.5;
+  if((S.fields['F9']||'').length > 30) score += 0.4;
+  return Math.min(5, Math.round(score * 10) / 10);
+}
+const score = computeScore();
+const done = ['F0','F1','F2','F3','F4','F5','F6','F7','F8','F9'].filter(f=>{
+  switch(f){
+    case 'F0':return!!S.scope;case 'F1':return S.dataSources?.length>0;
+    case 'F2':return S.roles?.length>0;case 'F3':return(S.fields?.F3||'').length>10;
+    case 'F4':return(S.fields?.F4||'').length>20;case 'F5':return caps.length>0;
+    case 'F6':return caps.length>0&&caps.every(c=>(S.chains||{})[c]?.oversight);
+    case 'F7':return!!(S.fields?.['F7-capture']&&S.fields?.['F7-cadence']);
+    case 'F8':return(S.fields?.F8||'').length>30;
+    case 'F9':return(S.fields?.F9||'').length>30&&!!S.fields?.['F9-owner'];
+  }
+}).length;
+document.getElementById('statFields').textContent = done + '/10';
+document.getElementById('bpFields').textContent = done + ' of 10 fields completed';
+document.getElementById('scoreNum').textContent = score.toFixed(1);
+// Blueprint quality shown in score ring — no duplicate stat needed
+
+// Animate ring
+setTimeout(()=>{
+  const circ = 188.5;
+  const offset = circ - (score/5)*circ;
+  document.getElementById('scoreArc').style.transition = 'stroke-dashoffset 1.2s ease';
+  document.getElementById('scoreArc').style.strokeDashoffset = offset;
+  const color = score >= 4 ? '#4a8c6a' : score >= 2.5 ? '#c8922a' : '#9a4040';
+  document.getElementById('scoreArc').style.stroke = color;
+  document.getElementById('scoreNum').style.color = color;
+},200);
+
+const rbTexts = [
+  [4,'Strong foundation — this blueprint is ready for expert review. Key areas to strengthen: governance specificity and KPI ownership.'],
+  [2.5,'Partial readiness — several key sections have gaps. Complete the flagged fields before expert review to maximise scoring quality.'],
+  [0,'Significant gaps detected — this blueprint needs more work before it can be meaningfully evaluated. Focus on capability chains and governance first.'],
+];
+const rbText = rbTexts.find(([t])=>score>=t);
+document.getElementById('rbTitle').textContent = score >= 4 ? 'Strong readiness · Blueprint complete' : score >= 2.5 ? 'Partial readiness · Some gaps remain' : 'Early stage · Significant gaps';
+document.getElementById('rbDesc').textContent = rbText?rbText[1]:'';
+
+// Quality bars
+const qualities = [
+  {l:'Context depth'   , v: Math.min(100, ((S.fields?.F3||'').split(' ').filter(Boolean).length / 50)*100)},
+  {l:'Tacit knowledge' , v: Math.min(100, ((S.fields?.F4||'').split(' ').filter(Boolean).length / 60)*100)},
+  {l:'Oversight design', v: caps.length ? (caps.filter(c=>(S.chains||{})[c]?.oversight).length/caps.length)*100 : 0},
+  {l:'KPI specificity' , v: Math.min(100, ((S.fields?.F8||'').split(' ').filter(Boolean).length / 80)*100)},
+  {l:'Governance'      , v: S.fields?.['F9-owner'] && S.fields?.['F9-shutdown'] ? Math.min(100,((S.fields?.F9||'').split(' ').filter(Boolean).length/60)*100) : 20},
+];
+document.getElementById('qualityBars').innerHTML = qualities.map(q=>{
+  const c = q.v>=70?'#4a8c6a':q.v>=35?'#c8922a':'#9a4040';
+  return `<div class="sq-row">
+    <div class="sq-label">${q.l}</div>
+    <div class="sq-track"><div class="sq-fill" style="width:${q.v}%;background:${c}"></div></div>
+    <div class="sq-val">${Math.round(q.v)}%</div>
+  </div>`;
+}).join('');
+
+// Assessment blocks
+const assessments = [
+  { title:'Governance completeness', pass: !!(S.fields?.['F9-owner'] && S.fields?.['F9-retrain'] && S.fields?.['F9-shutdown'] && (S.fields?.F9||'').length>30), passText:'Named owners for model accountability, retraining, and shutdown.', failText:'Governance roles incomplete — this blueprint cannot be approved for production without named accountability.' },
+  { title:'Oversight alignment', pass: caps.every(c=>{ const ch=(S.chains||{})[c]; return ch?.oversight && !(ch.oversight==='Automate'&&(ch.tier==='act'||ch.tier==='learn')); }), passText:'Oversight levels are consistent with capability tiers.', failText:'One or more capabilities have oversight levels that may not align with their accountability requirements.' },
+  { title:'Feedback loop defined', pass: !!(S.fields?.['F7-capture'] && S.fields?.['F7-cadence']), passText:'Outcome capture method and review cadence specified.', failText:'No feedback loop defined — model performance will not be monitored over time.' },
+  { title:'Tacit knowledge captured', pass: (S.fields?.F4||'').length > 30, passText:'Tacit constraints documented — this reduces AI deployment risk.', failText:'Tacit constraints field is sparse. This is the most common cause of AI initiative failure in practice.' },
+];
+document.getElementById('assessmentBlocks').innerHTML = assessments.map(a=>`
+  <div class="rec-block ${a.pass?'green':'red'}" style="margin-bottom:10px">
+    <div class="rec-icon">${a.pass?'✓':'✕'}</div>
+    <div class="rec-title">${a.title}</div>
+    <div class="rec-body">${a.pass?a.passText:a.failText}</div>
+  </div>`).join('');
+
+// ── UTILS ──
+function fmt(val) {
+  if(!val || !val.trim()) return '<span style="color:var(--ink3);font-style:italic">Not specified</span>';
+  return val.replace(/\n/g,'<br/>');
+}
+function scrollTo(id) {
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.toc-item').forEach(t=>t.classList.remove('active'));
+  event.target.closest('.toc-item')?.classList.add('active');
+}
+function goToSurvey() {
+  window.location.href = 'aitelier-survey.html';
+}
+</script>
+</body>
+</html>

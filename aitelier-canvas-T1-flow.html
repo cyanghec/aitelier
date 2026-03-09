@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AItelier · AI Transformation Canvas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #f4f3f0;
+  --surface:  #ffffff;
+  --surface2: #f7f6f3;
+  --border:   #e2dfd8;
+  --border2:  #ccc8c0;
+  --border3:  #b0aba0;
+  --ink:      #141624;
+  --ink2:     #3e4260;
+  --ink3:     #505470;
+  --ink4:     #9095b0;
+  --navy:     #1E2761;
+  --navy2:    #2A3580;
+  --navy-b:   #1E276112;
+  --navy-g:   #1E276130;
+  --gold:     #C8922A;
+  --gold-b:   #C8922A18;
+  --green:    #1a7a4a;
+  --phase-1:  #2d6ea0;
+  --phase-2:  #7a4a9a;
+  --phase-3:  #2a8060;
+  --phase-4:  #c05030;
+  --accent:   #C8922A;
+  --ai-bg:#0f0f16;--ai-surface:#14141e;--ai-border:#22222e;
+  --ai-text:#e0dcea;--ai-text2:#8888a8;--ai-accent:#d4a843;
+  --panel-w:340px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+
+/* ── NAV ── */
+nav.top-nav{position:sticky;top:0;z-index:200;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:var(--navy);}
+.nav-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:#fff;}
+.nav-logo em{font-style:italic;color:var(--gold);}
+.nav-pagenav{display:flex;align-items:center;gap:2px;position:absolute;left:50%;transform:translateX(-50%);}
+.nav-page-link{font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;letter-spacing:.5px;padding:6px 8px;border-radius:4px;transition:all .15s;}
+.nav-page-link:hover{color:#fff;background:rgba(255,255,255,.08);}
+.nav-page-link.active{color:#fff;background:rgba(255,255,255,.14);font-weight:500;}
+.nav-page-sep{font-size:12px;color:rgba(255,255,255,.18);}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.phase-progress{display:flex;align-items:center;gap:10px;margin-left:auto;padding:0 0 0 24px;width:calc(var(--panel-w) - 48px);flex-shrink:0;border-left:1px solid var(--border);}
+.nav-prog-label{font-size:11px;color:var(--ink3);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
+.nav-prog-bar{width:120px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;flex-shrink:0;}
+.nav-prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s ease;width:0%;}
+.nav-prog-pct{font-size:13px;color:var(--navy);font-weight:600;min-width:36px;}
+.nav-sep{width:1px;height:18px;background:rgba(255,255,255,.15);}
+.nav-save{padding:6px 14px;background:none;border:1px solid rgba(255,255,255,.25);border-radius:5px;font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,.7);cursor:pointer;transition:all .15s;}
+.nav-save:hover{border-color:rgba(255,255,255,.6);color:#fff;}
+.nav-submit{padding:6px 16px;background:var(--gold);border:none;border-radius:5px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:background .15s;display:none;}
+.nav-submit:hover{background:#e0a830;}
+/* Team avatars in nav */
+.nav-team{display:flex;align-items:center;gap:5px;}
+.nav-av{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.3px;}
+.nav-av.you{background:var(--gold);color:var(--navy);}
+.nav-av.other{background:rgba(255,255,255,.15);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.2);}
+.nav-logout{font-size:13px;color:rgba(255,255,255,.4);cursor:pointer;transition:color .15s;background:none;border:none;font-family:'Inter',sans-serif;}
+.nav-logout:hover{color:rgba(255,255,255,.8);}
+
+/* ── PHASE NAV ── */
+.phase-nav{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 48px;
+  display:flex;align-items:stretch;gap:0;
+  overflow-x:auto;
+  position:sticky;top:56px;z-index:90;
+}
+.phase-tab{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 24px 14px 0;
+  border:none;background:none;cursor:pointer;
+  border-bottom:2px solid transparent;
+  font-family:'Inter',sans-serif;font-size:10px;
+  color:var(--ink3);letter-spacing:.5px;
+  transition:all .18s;white-space:nowrap;
+  margin-bottom:-1px;
+}
+.phase-tab:hover{color:var(--ink2);}
+.phase-tab.active{color:var(--ink);border-bottom-color:var(--accent);}
+.phase-num{
+  width:20px;height:20px;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:500;border:1px solid;
+  flex-shrink:0;
+}
+.phase-fields{font-size:9px;color:var(--ink4);margin-left:2px;}
+
+/* ── LAYOUT ── */
+.layout{display:flex;position:fixed;top:107px;left:0;right:0;bottom:0;}
+.canvas-pane{display:flex;flex:1;overflow:hidden;min-width:0;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:200px;flex-shrink:0;
+  border-right:1px solid var(--border);
+  background:var(--surface);
+  padding:20px 0;
+  overflow-y:auto;
+}
+.sidebar::-webkit-scrollbar{width:3px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.sb-phase{margin-bottom:6px;}
+.sb-phase-label{
+  font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  padding:6px 20px 4px;color:var(--ink4);
+}
+.sb-field{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 20px;cursor:pointer;
+  font-size:10px;color:var(--ink3);
+  transition:all .15s;border-left:2px solid transparent;
+  letter-spacing:.3px;
+}
+.sb-field:hover{color:var(--ink2);background:var(--surface2);}
+.sb-field.active{color:var(--ink);background:var(--surface2);border-left-color:var(--accent);}
+.sb-field.done .sb-check{opacity:1;}
+.sb-check{
+  width:14px;height:14px;border-radius:3px;
+  border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;flex-shrink:0;opacity:0;transition:opacity .2s;
+  color:var(--gold);
+}
+.sb-field.done .sb-check{opacity:1;background:var(--gold-b);border-color:var(--gold);}
+.sb-fid{font-size:9px;color:var(--ink4);min-width:20px;}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;padding:36px 44px 80px;}
+.main::-webkit-scrollbar{width:4px;}
+.main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ── AI PANEL ── */
+.ai-panel{
+  width:var(--panel-w);flex-shrink:0;
+  background:var(--ai-bg);
+  border-left:1px solid var(--ai-border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.ap-hdr{padding:14px 16px 10px;border-bottom:1px solid var(--ai-border);flex-shrink:0;}
+.ap-hdr-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.ap-title{font-size:11px;font-weight:500;color:var(--ai-text);}
+.ap-agent-tag{font-size:8px;padding:2px 8px;border-radius:2px;letter-spacing:.5px;border:1px solid;}
+.ap-field-ctx{font-size:9px;color:var(--ai-text2);font-style:italic;}
+.ap-tabs{display:flex;border-bottom:1px solid var(--ai-border);flex-shrink:0;}
+.ap-tab{flex:1;padding:9px 0;border:none;background:none;font-family:'Inter',sans-serif;font-size:9px;color:var(--ai-text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.3px;}
+.ap-tab:hover{color:var(--ai-text);}
+.ap-tab.active{color:var(--ai-accent);border-bottom-color:var(--ai-accent);}
+.ap-body{flex:1;overflow-y:auto;padding:14px 16px;}
+.ap-body::-webkit-scrollbar{width:3px;}
+.ap-body::-webkit-scrollbar-thumb{background:var(--ai-border);border-radius:2px;}
+.ap-view{display:none;}
+.ap-view.active{display:block;}
+.ai-msg{margin-bottom:14px;animation:fadeUp .3s ease both;}
+.ai-msg-hdr{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
+.ai-avatar{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.ai-sender{font-size:9px;letter-spacing:.5px;text-transform:uppercase;}
+.ai-bubble{background:var(--ai-surface);border:1px solid var(--ai-border);border-radius:6px;padding:10px 12px;font-size:10px;color:var(--ai-text2);line-height:1.7;}
+.ai-bubble strong{color:var(--ai-text);font-weight:500;}
+.ai-bubble em{font-style:italic;color:var(--ai-accent);}
+.ai-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.ai-act-btn{padding:5px 11px;border-radius:3px;font-family:'Inter',sans-serif;font-size:9px;cursor:pointer;border:1px solid;transition:all .15s;}
+.ai-act-accept{background:var(--ai-accent);border-color:var(--ai-accent);color:#1a1200;}
+.ai-act-accept:hover{background:#e8c058;}
+.ai-act-ignore{background:none;border-color:var(--ai-border);color:#44445a;}
+.ai-act-ignore:hover{border-color:#44445a;color:var(--ai-text2);}
+.typing{display:flex;align-items:center;gap:4px;padding:8px 0;}
+.typing-dot{width:5px;height:5px;border-radius:50%;background:var(--ai-text2);animation:tpulse 1.2s ease infinite;}
+.typing-dot:nth-child(2){animation-delay:.2s;}
+.typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes tpulse{0%,60%,100%{opacity:.3;transform:scale(.8);}30%{opacity:1;transform:scale(1.1);}}
+.viz-section{margin-bottom:20px;}
+.viz-title{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ai-text2);margin-bottom:10px;}
+.tier-wheel{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.tier-cell{border:1px solid var(--ai-border);border-radius:6px;padding:10px;transition:all .15s;}
+.tier-cell.lit{border-color:var(--tc);background:color-mix(in srgb,var(--tc) 10%,transparent);}
+.tier-cell-top{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.tier-cell-name{font-size:9px;font-weight:500;color:var(--ai-text);}
+.tier-cell-desc{font-size:8px;color:var(--ai-text2);line-height:1.5;}
+.tier-caps{display:flex;flex-direction:column;gap:3px;margin-top:6px;}
+.tier-cap-item{display:flex;align-items:center;gap:5px;font-size:8px;color:var(--ai-text2);}
+.tier-cap-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;}
+.tier-cap-item.selected{color:var(--ai-text);}
+.ov-matrix{display:flex;flex-direction:column;gap:6px;}
+.ov-row{display:flex;align-items:center;gap:8px;}
+.ov-cap-name{font-size:9px;color:var(--ai-text2);min-width:85px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ov-bar-wrap{flex:1;height:18px;background:var(--ai-border);border-radius:3px;overflow:hidden;}
+.ov-bar{height:100%;border-radius:3px;transition:width .5s ease;display:flex;align-items:center;padding-left:8px;}
+.ov-bar-label{font-size:8px;font-weight:500;white-space:nowrap;}
+.ov-empty{font-size:9px;color:#44445a;font-style:italic;text-align:center;padding:16px 0;}
+.cb-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.cb-label{font-size:9px;color:var(--ai-text2);min-width:80px;}
+.cb-track{flex:1;height:5px;background:var(--ai-border);border-radius:3px;overflow:hidden;}
+.cb-fill{height:100%;border-radius:3px;background:var(--ai-accent);transition:width .4s;}
+.cb-pct{font-size:9px;color:var(--ai-text2);min-width:22px;text-align:right;}
+.radar-wrap{position:relative;width:100%;padding-bottom:100%;}
+.radar-svg{position:absolute;inset:0;width:100%;height:100%;}
+
+/* ── PHASE HEADER ── */
+.phase-hdr{margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+.phase-hdr-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.phase-eyebrow{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink4);margin-bottom:8px;}
+.phase-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:400;line-height:1.2;}
+.phase-title em{font-style:italic;color:var(--ink2);}
+.phase-desc{font-size:11px;color:var(--ink2);line-height:1.75;max-width:560px;margin-top:8px;}
+.phase-badge{
+  font-size:9px;padding:4px 12px;border-radius:3px;
+  border:1px solid;letter-spacing:.5px;white-space:nowrap;flex-shrink:0;margin-top:4px;
+}
+
+/* ── FIELD BLOCKS ── */
+.field{margin-bottom:40px;scroll-margin-top:120px;}
+.field-hdr{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;}
+.field-id{
+  font-size:9px;font-weight:500;letter-spacing:1px;
+  padding:3px 8px;border-radius:3px;border:1px solid;
+  flex-shrink:0;margin-top:2px;
+}
+.field-meta{flex:1;}
+.field-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;line-height:1.3;margin-bottom:4px;}
+.field-desc{font-size:10px;color:var(--ink2);line-height:1.65;}
+.field-required{font-size:9px;color:var(--ink4);margin-top:2px;}
+
+/* INPUTS */
+textarea{
+  width:100%;border:1px solid var(--border);background:var(--surface);
+  border-radius:6px;padding:14px 16px;
+  font-family:'DM Mono',monospace;font-size:11px;color:var(--ink);
+  line-height:1.7;resize:vertical;min-height:100px;
+  transition:border-color .15s,box-shadow .15s;outline:none;
+}
+textarea:focus{border-color:var(--border2);box-shadow:0 0 0 3px rgba(160,120,48,.08);}
+textarea::placeholder{color:var(--ink4);}
+.char-count{font-size:9px;color:var(--ink4);text-align:right;margin-top:5px;}
+
+/* SCOPE SELECTOR */
+.scope-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px;}
+.scope-card{
+  border:1px solid var(--border);border-radius:7px;padding:14px;
+  cursor:pointer;transition:all .18s;background:var(--surface);
+}
+.scope-card:hover{border-color:var(--border2);}
+.scope-card.selected{border-color:var(--gold);background:var(--gold-b);}
+.scope-icon{font-size:18px;margin-bottom:7px;}
+.scope-label{font-size:11px;font-weight:500;color:var(--ink);margin-bottom:3px;}
+.scope-desc{font-size:9px;color:var(--ink3);line-height:1.5;}
+
+/* DATA SOURCE CARDS */
+.ds-list{display:flex;flex-direction:column;gap:10px;margin-bottom:10px;}
+.ds-card{
+  border:1px solid var(--border);border-radius:7px;padding:14px 16px;
+  background:var(--surface);display:grid;
+  grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:start;
+}
+.ds-field-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink4);margin-bottom:4px;}
+.ds-input{
+  width:100%;border:none;border-bottom:1px solid var(--border);background:none;
+  font-family:'Inter',sans-serif;font-size:10px;color:var(--ink);
+  padding:3px 0;outline:none;transition:border-color .15s;
+}
+.ds-input:focus{border-bottom-color:var(--gold);}
+.ds-input::placeholder{color:var(--ink4);}
+.ds-remove{
+  background:none;border:none;cursor:pointer;
+  font-size:14px;color:var(--ink4);padding:2px 4px;
+  transition:color .15s;align-self:center;margin-top:12px;
+}
+.ds-remove:hover{color:var(--ink2);}
+.add-btn{
+  display:flex;align-items:center;gap:7px;padding:8px 14px;
+  border:1px dashed var(--border2);border-radius:6px;
+  background:none;cursor:pointer;font-family:'Inter',sans-serif;
+  font-size:10px;color:var(--ink3);transition:all .15s;
+}
+.add-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* HUMAN ROLES */
+.role-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.role-chip{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 10px 5px 12px;border:1px solid var(--border);
+  border-radius:20px;background:var(--surface);font-size:10px;color:var(--ink2);
+}
+.role-remove{background:none;border:none;cursor:pointer;color:var(--ink4);font-size:12px;padding:0 2px;line-height:1;}
+.role-remove:hover{color:var(--ink);}
+.role-input-row{display:flex;gap:8px;}
+.role-input{
+  flex:1;border:1px solid var(--border);border-radius:6px;padding:8px 12px;
+  font-family:'Inter',sans-serif;font-size:10px;color:var(--ink);
+  background:var(--surface);outline:none;transition:border-color .15s;
+}
+.role-input:focus{border-color:var(--border2);}
+.role-input::placeholder{color:var(--ink4);}
+
+/* CAPABILITY SELECTOR */
+.cap-tiers{display:flex;flex-direction:column;gap:12px;}
+.tier-block{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.tier-hdr{
+  padding:10px 14px;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--border);
+}
+.tier-label{font-size:10px;font-weight:500;letter-spacing:.5px;}
+.tier-desc-small{font-size:9px;color:var(--ink3);flex:1;}
+.cap-options{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.cap-opt{
+  padding:10px 14px;border-right:1px solid var(--border);
+  border-bottom:1px solid var(--border);cursor:pointer;
+  transition:background .15s;display:flex;align-items:flex-start;gap:9px;
+}
+.cap-opt:last-child{border-right:none;}
+.cap-opt:nth-child(n+3){border-bottom:none;}
+.cap-opt:hover{background:var(--surface2);}
+.cap-opt.selected{background:var(--gold-b);}
+.cap-checkbox{
+  width:14px;height:14px;border:1px solid var(--border2);border-radius:3px;
+  flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;
+  font-size:9px;transition:all .15s;
+}
+.cap-opt.selected .cap-checkbox{background:var(--gold);border-color:var(--gold);color:white;}
+.cap-opt-text{}
+.cap-opt-name{font-size:10px;font-weight:500;color:var(--ink);margin-bottom:1px;}
+.cap-opt-desc{font-size:9px;color:var(--ink3);line-height:1.4;}
+
+/* PER-CAPABILITY CHAINS */
+.chain-list{display:flex;flex-direction:column;gap:14px;}
+.chain-card{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.chain-hdr{
+  padding:10px 14px;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--border);background:var(--surface2);
+}
+.chain-cap-name{font-size:11px;font-weight:500;color:var(--ink);}
+.chain-tier-badge{font-size:8px;padding:2px 7px;border-radius:2px;border:1px solid;letter-spacing:.5px;}
+.chain-body{padding:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.chain-field-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink4);margin-bottom:5px;}
+.oversight-opts{display:flex;gap:6px;}
+.ov-opt{
+  flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;
+  cursor:pointer;font-size:9px;text-align:center;transition:all .15s;
+  color:var(--ink3);background:var(--surface);
+}
+.ov-opt:hover{border-color:var(--border2);color:var(--ink2);}
+.ov-opt.sel-automate{background:#e8f4e8;border-color:#60b870;color:#2a7a2a;}
+.ov-opt.sel-augment{background:var(--gold-b);border-color:var(--gold);color:var(--gold);}
+.ov-opt.sel-supervise{background:#fce8e8;border-color:#c05050;color:#903030;}
+
+/* FEEDBACK LOOPS */
+.feedback-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.fb-card{
+  border:1px solid var(--border);border-radius:7px;padding:12px 14px;
+  background:var(--surface);
+}
+.fb-card-title{font-size:10px;font-weight:500;color:var(--ink);margin-bottom:5px;}
+.fb-card-desc{font-size:9px;color:var(--ink3);line-height:1.5;margin-bottom:8px;}
+
+/* SELECT */
+select{
+  width:100%;border:1px solid var(--border);background:var(--surface);
+  border-radius:6px;padding:8px 12px;
+  font-family:'Inter',sans-serif;font-size:10px;color:var(--ink);
+  outline:none;cursor:pointer;transition:border-color .15s;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239a9690'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;
+}
+select:focus{border-color:var(--border2);}
+
+/* DIVIDER */
+.field-divider{height:1px;background:var(--border);margin:40px 0;}
+
+/* NAV BUTTONS */
+.nav-btns{display:flex;justify-content:space-between;align-items:center;margin-top:40px;padding-top:24px;border-top:1px solid var(--border);}
+.nav-btn{
+  padding:10px 24px;border-radius:5px;
+  font-family:'Inter',sans-serif;font-size:11px;
+  cursor:pointer;transition:all .2s;letter-spacing:.5px;
+  border:1px solid;
+}
+.nav-btn.back{background:none;border-color:var(--border2);color:var(--ink2);}
+.nav-btn.back:hover{border-color:var(--ink2);color:var(--ink);}
+.nav-btn.next{background:var(--ink);border-color:var(--ink);color:var(--bg);}
+.nav-btn.next:hover{background:var(--gold);border-color:var(--gold);}
+.nav-btn.submit{background:var(--gold);border-color:var(--gold);color:white;}
+.nav-btn.submit:hover{background:var(--ink);border-color:var(--ink);}
+.nav-phase-info{font-size:10px;color:var(--ink3);}
+
+/* ── PHASE VIEWS ── */
+.phase-view{display:none;}
+.phase-view.active{display:block;}
+
+/* ── COMPLETION ── */
+.completion{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  min-height:60vh;text-align:center;padding:60px 40px;
+}
+.completion.show{display:flex;}
+.completion-icon{font-size:48px;margin-bottom:24px;opacity:.8;}
+.completion-title{font-family:'Playfair Display',serif;font-size:36px;font-weight:400;margin-bottom:12px;}
+.completion-title em{font-style:italic;color:var(--gold);}
+.completion-desc{font-size:12px;color:var(--ink2);line-height:1.75;max-width:480px;margin-bottom:32px;}
+.completion-btn{padding:12px 32px;background:var(--ink);border:none;border-radius:5px;color:var(--bg);font-family:'Inter',sans-serif;font-size:11px;cursor:pointer;letter-spacing:.5px;transition:background .2s;}
+.completion-btn:hover{background:var(--gold);}
+
+/* TOOLTIP hints */
+.hint{
+  display:flex;gap:8px;padding:10px 14px;border-radius:5px;
+  background:var(--surface2);border:1px solid var(--border);
+  font-size:10px;color:var(--ink2);line-height:1.6;margin-bottom:14px;
+}
+.hint-icon{flex-shrink:0;color:var(--ink4);}
+
+@media(max-width:900px){
+  .layout{flex-direction:column;position:static;top:auto;}
+  .canvas-pane{flex-direction:column;}
+  .sidebar{width:100%;height:auto;border-right:none;border-bottom:1px solid var(--border);padding:12px 0;}
+  .main{padding:24px;overflow-y:visible;}
+  .ai-panel{width:100%;height:300px;border-left:none;border-top:1px solid var(--ai-border);}
+  .top-nav{padding:0 20px;}
+  .nav-pagenav{display:none;}
+  .phase-nav{padding:0 20px;}
+  .cap-options{grid-template-columns:1fr;}
+  .chain-body{grid-template-columns:1fr;}
+  .scope-grid{grid-template-columns:1fr;}
+  .feedback-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+  <div class="nav-logo">AI<em>telier</em></div>
+  <div class="nav-pagenav">
+    <a class="nav-page-link" href="index.html">Dashboard</a>
+    <span class="nav-page-sep">·</span>
+    <a class="nav-page-link active" href="aitelier-canvas-T1-flow.html">Canvas</a>
+    <span class="nav-page-sep">·</span>
+    <a class="nav-page-link" href="aitelier-blueprint.html">Blueprint</a>
+    <span class="nav-page-sep">·</span>
+    <a class="nav-page-link" href="aitelier-survey.html">Readiness</a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-save" onclick="saveDraft()">Save draft</button>
+    <button class="nav-submit" id="hdrSubmit" onclick="submitCanvas()">Generate blueprint →</button>
+    <div class="nav-sep"></div>
+    <div class="nav-team">
+      <div class="nav-av you" title="Marie Rousseau (you)">MR</div>
+      <div class="nav-av other" title="Jean Dupont">JD</div>
+      <div class="nav-av other" title="Sophie Chen">SC</div>
+      <div class="nav-av other" title="Lucas Martin">LM</div>
+    </div>
+    <div class="nav-sep"></div>
+    <button class="nav-logout">Sign out</button>
+  </div>
+</nav>
+
+<!-- PHASE NAV -->
+<nav class="phase-nav">
+  <button class="phase-tab active" id="ptab-1" onclick="goToPhase(1)">
+    <span class="phase-num" style="background:#2d6ea015;border-color:#2d6ea040;color:var(--phase-1)">1</span>
+    Inputs &amp; Context
+    <span class="phase-fields">F0–F4</span>
+  </button>
+  <button class="phase-tab" id="ptab-2" onclick="goToPhase(2)">
+    <span class="phase-num" style="background:#7a4a9a15;border-color:#7a4a9a40;color:var(--phase-2)">2</span>
+    AI Capabilities
+    <span class="phase-fields">F5–F6</span>
+  </button>
+  <button class="phase-tab" id="ptab-3" onclick="goToPhase(3)">
+    <span class="phase-num" style="background:#2a806015;border-color:#2a806040;color:var(--phase-3)">3</span>
+    Decision &amp; Oversight
+    <span class="phase-fields">F7–F8</span>
+  </button>
+  <button class="phase-tab" id="ptab-4" onclick="goToPhase(4)">
+    <span class="phase-num" style="background:#c0503015;border-color:#c0503040;color:var(--phase-4)">4</span>
+    Impact &amp; Governance
+    <span class="phase-fields">F9</span>
+  </button>
+  <div class="phase-progress">
+    <span class="nav-prog-label">Progress</span>
+    <div class="nav-prog-bar"><div class="nav-prog-fill" id="progFill"></div></div>
+    <span class="nav-prog-pct" id="progPct">0%</span>
+  </div>
+</nav>
+
+<div class="layout">
+<div class="canvas-pane">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <!-- injected by JS -->
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="mainContent">
+
+    <!-- ══════════ PHASE 1 ══════════ -->
+    <div class="phase-view active" id="phase-1">
+      <div class="phase-hdr">
+        <div class="phase-hdr-top">
+          <div>
+            <div class="phase-eyebrow">Phase 1 of 4</div>
+            <div class="phase-title">Inputs &amp; <em>Context</em></div>
+            <div class="phase-desc">Define the scope of your initiative and map everything that flows into it — data, people, systems, and the tacit knowledge that rarely gets documented.</div>
+          </div>
+          <span class="phase-badge" style="color:var(--phase-1);border-color:#2d6ea040;background:#2d6ea010">5 fields</span>
+        </div>
+      </div>
+
+      <!-- F0: Initiative Scope -->
+      <div class="field" id="field-F0">
+        <div class="field-hdr">
+          <span class="field-id" style="color:var(--phase-1);border-color:#2d6ea030;background:#2d6ea010">F0</span>
+          <div class="field-meta">
+            <div class="field-title">Initiative Scope</div>
+            <div class="field-desc">What is the scale of this AI initiative? This determines how the rest of the canvas unfolds.</div>
+          </div>
+        </div>
+        <div class="scope-grid">
+          <div class="scope-card" onclick="focusField('F0');selectScope(this,'single')" id="scope-single">
+            <div class="scope-icon">◎</div>
+            <div class="scope-label">Single Task</div>
+            <div class="scope-desc">One specific decision or process augmented by AI</div>
+          </div>
+          <div class="scope-card" onclick="focusField('F0');selectScope(this,'multi')" id="scope-multi">
+            <div class="scope-icon">◈</div>
+            <div class="scope-label">Multi-capability Programme</div>
+            <div class="scope-desc">Several AI capabilities coordinated around a business domain</div>
+          </div>
+          <div class="scope-card" onclick="focusField('F0');selectScope(this,'enterprise')" id="scope-enterprise">
+            <div class="scope-icon">◉</div>
+            <div class="scope-label">Enterprise Transformation</div>
+            <div class="scope-desc">Organisation-wide AI adoption with cross-functional impact</div>
+          </div>
+        </div>
+        <div class="field-required" id="f0-status">— Select one to continue</div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <!-- F1: Data Inputs -->
+      <div class="field" id="field-F1">
+        <div class="field-hdr">
+          <span class="field-id" style="color:var(--phase-1);border-color:#2d6ea030;background:#2d6ea010">F1</span>
+          <div class="field-meta">
+            <div class="field-title">Data Inputs</div>
+            <div class="field-desc">Map every data source that feeds this initiative. For each: who owns it, how fresh it is, what format it's in, and known quality issues.</div>
+          </div>
+        </div>
+        <div class="hint"><span class="hint-icon">◆</span>Be specific — "our CRM" is not enough. Name the system, the table, the team that maintains it. Quality issues are more important than you think.</div>
+        <div class="ds-list" id="ds-list"></div>
+        <button class="add-btn" onclick="focusField('F1');addDataSource()">＋ Add data source</button>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <!-- F2: Human Inputs -->
+      <div class="field" id="field-F2">
+        <div class="field-hdr">
+          <span class="field-id" style="color:var(--phase-1);border-color:#2d6ea030;background:#2d6ea010">F2</span>
+          <div class="field-meta">
+            <div class="field-title">Human Inputs</div>
+            <div class="field-desc">Who currently contributes knowledge, judgment, or approval to this process? Name the roles — not the people.</div>
+          </div>
+        </div>
+        <div class="role-list" id="role-list"></div>
+        <div class="role-input-row">
+          <input class="role-input" type="text" id="roleInput" placeholder="e.g. Risk Manager, CFO, Data Analyst…" onkeydown="if(event.key==='Enter')addRole()"/>
+          <button class="add-btn" style="white-space:nowrap" onclick="addRole()">＋ Add role</button>
+        </div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <!-- F3: Systems & Infrastructure -->
+      <div class="field" id="field-F3">
+        <div class="field-hdr">
+          <span class="field-id" style="color:var(--phase-1);border-color:#2d6ea030;background:#2d6ea010">F3</span>
+          <div class="field-meta">
+            <div class="field-title">Systems &amp; Infrastructure</div>
+            <div class="field-desc">What existing tools, platforms, or systems does this initiative plug into or replace? Include constraints — what cannot change.</div>
+          </div>
+        </div>
+        <textarea id="f3" placeholder="e.g. Power BI dashboards (cannot be replaced until Q3), SAP ERP, internal Python pipeline managed by data engineering…&#10;&#10;Integration constraints: all outputs must flow through existing approval workflow in ServiceNow." onfocus="focusField('F3')" oninput="updateField('F3',this.value)" rows="5"></textarea>
+        <div class="char-count"><span id="f3-count">0</span> words</div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <!-- F4: Tacit Constraints -->
+      <div class="field" id="field-F4">
+        <div class="field-hdr">
+          <span class="field-id" style="color:var(--phase-1);border-color:#2d6ea030;background:#2d6ea010">F4</span>
+          <div class="field-meta">
+            <div class="field-title">Tacit Constraints</div>
+            <div class="field-desc">What are the unwritten rules, informal vetoes, and edge cases that never appear in documentation but everyone knows about? This is the hardest field — and the most important.</div>
+          </div>
+        </div>
+        <div class="hint"><span class="hint-icon">◆</span>Think about: decisions that are technically delegated but always escalated in practice. Data that is technically correct but everyone knows it's unreliable on certain dates. Approvals that require a specific person even though it's not in the process map.</div>
+        <textarea id="f4" placeholder="e.g. Month-end P&L figures are correct by 3pm on the 3rd but everyone knows the treasury team patches them again before the 9am board review on the 4th — the first version is never used for decisions.&#10;&#10;The CFO informally reviews all exposure changes >€50M regardless of formal delegation policy." onfocus="focusField('F4')" oninput="updateField('F4',this.value)" rows="7"></textarea>
+        <div class="char-count"><span id="f4-count">0</span> words</div>
+      </div>
+
+      <div class="nav-btns">
+        <span class="nav-phase-info">Phase 1 of 4 · F0–F4</span>
+        <button class="nav-btn next" onclick="goToPhase(2)">AI Capabilities →</button>
+      </div>
+    </div>
+
+    <!-- ══════════ PHASE 2 ══════════ -->
+    <div class="phase-view" id="phase-2">
+      <div class="phase-hdr">
+        <div class="phase-hdr-top">
+          <div>
+            <div class="phase-eyebrow">Phase 2 of 4</div>
+            <div class="phase-title">AI <em>Capabilities</em></div>
+            <div class="phase-desc">Select which AI capabilities this initiative requires, then design the decision and oversight chain for each one. Each capability you add increases governance complexity.</div>
+          </div>
+          <span class="phase-badge" style="color:var(--phase-2);border-color:#7a4a9a40;background:#7a4a9a10">2 fields</span>
+        </div>
+      </div>
+
+      <!-- F5: Capability Type -->
+      <div class="field" id="field-F5">
+        <div class="field-hdr">
+          <span class="field-id" style="color:var(--phase-2);border-color:#7a4a9a30;background:#7a4a9a10">F5</span>
+          <div class="field-meta">
+            <div class="field-title">Capability Type</div>
+            <div class="field-desc">Select all AI capabilities this initiative will use. Each tier represents a fundamentally different role — and a different level of accountability.</div>
+          </div>
+        </div>
+        <div class="cap-tiers" id="capTiers">
+
+          <div class="tier-block">
+            <div class="tier-hdr" style="background:#2d6ea010;border-color:#2d6ea030">
+              <span class="tier-label" style="color:#2d6ea0">Tier 1 · Sense</span>
+              <span class="tier-desc-small">AI finds signal — no meaning assigned, no action proposed</span>
+            </div>
+            <div class="cap-options">
+              <div class="cap-opt" onclick="toggleCap(this,'Pattern Recognition','sense')" data-cap="Pattern Recognition" data-tier="sense">
+                <div class="cap-checkbox">✓</div>
+                <div class="cap-opt-text">
+                  <div class="cap-opt-name">Pattern Recognition</div>
+                  <div class="cap-opt-desc">Classification · Anomaly detection</div>
+                </div>
+              </div>
+              <div class="cap-opt" onclick="toggleCap(this,'Retrieval & Synthesis','sense')" data-cap="Retrieval & Synthesis" data-tier="sense">
+                <div class="cap-checkbox">✓</div>
+                <div class="cap-opt-text">
+                  <div class="cap-opt-name">Retrieval &amp; Synthesis</div>
+                  <div class="cap-opt-desc">Ad-hoc query · Cross-system answers</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tier-block">
+            <div class="tier-hdr" style="background:#a0783010;border-color:#a0783030">
+              <span class="tier-label" style="color:#a07830">Tier 2 · Interpret</span>
+              <span class="tier-desc-small">AI assigns meaning — always requires human judgment</span>
+            </div>
+            <div class="cap-options">
+              <div class="cap-opt" onclick="toggleCap(this,'Prediction','interpret')" data-cap="Prediction" data-tier="interpret">
+                <div class="cap-checkbox">✓</div>
+                <div class="cap-opt-text">
+                  <div class="cap-opt-name">Prediction</div>
+                  <div class="cap-opt-desc">Forecasting · Probability estimation</div>
+                </div>
+              </div>
+              <div class="cap-opt" onclick="toggleCap(this,'KPI Generation','interpret')" data-cap="KPI Generation" data-tier="interpret">
+                <div class="cap-checkbox">✓</div>
+                <div class="cap-opt-text">
+                  <div class="cap-opt-name">KPI Generation</div>
+                  <div class="cap-opt-desc">Metric definition · Threshold proposal</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tier-block">
+            <div class="tier-hdr" style="background:#c0503010;border-color:#c0503030">
+              <span class="tier-label" style="color:#c05030">Tier 3 · Act</span>
+              <span class="tier-desc-small">AI enters the real world — highest accountability</span>
+            </div>
+            <div class="cap-options">
+              <div class="cap-opt" onclick="toggleCap(this,'Recommendation','act')" data-cap="Recommendation" data-tier="act">
+                <div class="cap-checkbox">✓</div>
+                <div class="cap-opt-text">
+                  <div class="cap-opt-name">Recommendation</div>
+                  <div class="cap-opt-desc">Action proposal · Decision support</div>
+                </div>
+              </div>
+              <div class="cap-opt" onclick="toggleCap(this,'Generation','act')" data-cap="Generation" data-tier="act">
+                <div class="cap-checkbox">✓</div>
+                <div class="cap-opt-text">
+                  <div class="cap-opt-name">Generation</div>
+                  <div class="cap-opt-desc">Report drafting · Narrative synthesis</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tier-block">
+            <div class="tier-hdr" style="background:#2a806010;border-color:#2a806030">
+              <span class="tier-label" style="color:#2a8060">Tier 4 · Learn</span>
+              <span class="tier-desc-small">System improves over time — most under-governed</span>
+            </div>
+            <div class="cap-options">
+              <div class="cap-opt" onclick="toggleCap(this,'Feedback & Adaptation','learn')" data-cap="Feedback & Adaptation" data-tier="learn">
+                <div class="cap-checkbox">✓</div>
+                <div class="cap-opt-text">
+                  <div class="cap-opt-name">Feedback &amp; Adaptation</div>
+                  <div class="cap-opt-desc">Outcome logging · Model improvement</div>
+                </div>
+              </div>
+              <div class="cap-opt" onclick="toggleCap(this,'Model Governance','learn')" data-cap="Model Governance" data-tier="learn">
+                <div class="cap-checkbox">✓</div>
+                <div class="cap-opt-text">
+                  <div class="cap-opt-name">Model Governance</div>
+                  <div class="cap-opt-desc">Drift monitoring · Ownership · Shutdown protocol</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <!-- F6: Per-capability Chains -->
+      <div class="field" id="field-F6">
+        <div class="field-hdr">
+          <span class="field-id" style="color:var(--phase-2);border-color:#7a4a9a30;background:#7a4a9a10">F6</span>
+          <div class="field-meta">
+            <div class="field-title">Per-capability Chains</div>
+            <div class="field-desc">For each selected capability: define the input, what human judgment is required, and what oversight level you're assigning.</div>
+          </div>
+        </div>
+        <div id="chainList">
+          <div style="font-size:11px;color:var(--ink4);font-style:italic;padding:20px 0;">← Select capabilities in F5 to build chains here.</div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="nav-btn back" onclick="goToPhase(1)">← Inputs &amp; Context</button>
+        <span class="nav-phase-info">Phase 2 of 4 · F5–F6</span>
+        <button class="nav-btn next" onclick="goToPhase(3)">Decision &amp; Oversight →</button>
+      </div>
+    </div>
+
+    <!-- ══════════ PHASE 3 ══════════ -->
+    <div class="phase-view" id="phase-3">
+      <div class="phase-hdr">
+        <div class="phase-hdr-top">
+          <div>
+            <div class="phase-eyebrow">Phase 3 of 4</div>
+            <div class="phase-title">Decision &amp; <em>Oversight</em></div>
+            <div class="phase-desc">Design how the system learns from outcomes and how the organisation retains meaningful control. This is where most AI initiatives are vague — be specific.</div>
+          </div>
+          <span class="phase-badge" style="color:var(--phase-3);border-color:#2a806040;background:#2a806010">2 fields</span>
+        </div>
+      </div>
+
+      <!-- F7: Feedback Loops -->
+      <div class="field" id="field-F7">
+        <div class="field-hdr">
+          <span class="field-id" style="color:var(--phase-3);border-color:#2a806030;background:#2a806010">F7</span>
+          <div class="field-meta">
+            <div class="field-title">Feedback Loops</div>
+            <div class="field-desc">How do outcomes feed back into the system? Who captures them, how often, and what triggers a model update?</div>
+          </div>
+        </div>
+        <div class="feedback-grid">
+          <div class="fb-card">
+            <div class="fb-card-title">Outcome capture method</div>
+            <div class="fb-card-desc">How are real-world outcomes recorded against AI outputs?</div>
+            <select id="f7-capture" onfocus="focusField('F7')" onchange="updateField('F7-capture',this.value)">
+              <option value="">— Select method</option>
+              <option>Manual logging by analyst</option>
+              <option>Automated system comparison</option>
+              <option>Human-in-loop override tracking</option>
+              <option>Structured post-decision review</option>
+              <option>Not yet defined</option>
+            </select>
+          </div>
+          <div class="fb-card">
+            <div class="fb-card-title">Review cadence</div>
+            <div class="fb-card-desc">How often are feedback signals reviewed for model improvement?</div>
+            <select id="f7-cadence" onfocus="focusField('F7')" onchange="updateField('F7-cadence',this.value)">
+              <option value="">— Select cadence</option>
+              <option>Continuous / real-time</option>
+              <option>Weekly</option>
+              <option>Monthly</option>
+              <option>Quarterly</option>
+              <option>Event-triggered only</option>
+            </select>
+          </div>
+        </div>
+        <textarea id="f7-notes" placeholder="Describe any additional feedback mechanisms, known gaps, or plans for closing the loop between AI outputs and real outcomes…" oninput="updateField('F7-notes',this.value)" rows="4"></textarea>
+        <div class="char-count"><span id="f7-count">0</span> words</div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <!-- F8: Business Outcomes & KPIs -->
+      <div class="field" id="field-F8">
+        <div class="field-hdr">
+          <span class="field-id" style="color:var(--phase-3);border-color:#2a806030;background:#2a806010">F8</span>
+          <div class="field-meta">
+            <div class="field-title">Business Outcomes &amp; KPIs</div>
+            <div class="field-desc">What does success look like in 12 months? Define measurable targets — not aspirations. Include both the outcome you're optimising for and the risks you're guarding against.</div>
+          </div>
+        </div>
+        <div class="hint"><span class="hint-icon">◆</span>A KPI without an owner and a review date is decoration. For each metric, ask: who will be accountable if this number moves in the wrong direction?</div>
+        <textarea id="f8" placeholder="e.g. Primary outcome: reduce time-to-insight for management meetings from 4 hours to 20 minutes.&#10;&#10;KPIs:&#10;— Retrieval accuracy > 95% (measured against analyst spot-checks, monthly)&#10;— False positive rate on anomaly detection < 2% (weekly)&#10;— CFO satisfaction score > 4.0/5.0 (quarterly survey)&#10;&#10;Guard rails:&#10;— Zero unreviewed AI outputs distributed to external parties&#10;— No KPI changes without CFO sign-off" onfocus="focusField('F8')" oninput="updateField('F8',this.value)" rows="9"></textarea>
+        <div class="char-count"><span id="f8-count">0</span> words</div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="nav-btn back" onclick="goToPhase(2)">← AI Capabilities</button>
+        <span class="nav-phase-info">Phase 3 of 4 · F7–F8</span>
+        <button class="nav-btn next" onclick="goToPhase(4)">Impact &amp; Governance →</button>
+      </div>
+    </div>
+
+    <!-- ══════════ PHASE 4 ══════════ -->
+    <div class="phase-view" id="phase-4">
+      <div class="phase-hdr">
+        <div class="phase-hdr-top">
+          <div>
+            <div class="phase-eyebrow">Phase 4 of 4</div>
+            <div class="phase-title">Impact &amp; <em>Governance</em></div>
+            <div class="phase-desc">Define accountability before anything goes live. Who owns each capability? Who can shut it down? How does governance evolve as the system learns?</div>
+          </div>
+          <span class="phase-badge" style="color:var(--phase-4);border-color:#c0503040;background:#c0503010">1 field</span>
+        </div>
+      </div>
+
+      <!-- F9: Governance & Accountability -->
+      <div class="field" id="field-F9">
+        <div class="field-hdr">
+          <span class="field-id" style="color:var(--phase-4);border-color:#c0503030;background:#c0503010">F9</span>
+          <div class="field-meta">
+            <div class="field-title">Governance &amp; Accountability</div>
+            <div class="field-desc">Name the people, roles, and processes that will keep this initiative aligned over time. Orphaned AI systems are the primary failure mode of deployed AI.</div>
+          </div>
+        </div>
+
+        <div class="feedback-grid" style="grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div class="fb-card">
+            <div class="fb-card-title">Model owner</div>
+            <div class="fb-card-desc">Who is accountable for this system's outputs?</div>
+            <input class="ds-input" type="text" placeholder="Role or name" id="f9-owner" oninput="updateField('F9-owner',this.value)" style="font-size:11px;padding:6px 0;"/>
+          </div>
+          <div class="fb-card">
+            <div class="fb-card-title">Retraining authority</div>
+            <div class="fb-card-desc">Who can approve a model update?</div>
+            <input class="ds-input" type="text" placeholder="Role or name" id="f9-retrain" oninput="updateField('F9-retrain',this.value)" style="font-size:11px;padding:6px 0;"/>
+          </div>
+          <div class="fb-card">
+            <div class="fb-card-title">Shutdown authority</div>
+            <div class="fb-card-desc">Who can halt the system if something goes wrong?</div>
+            <input class="ds-input" type="text" placeholder="Role or name" id="f9-shutdown" oninput="updateField('F9-shutdown',this.value)" style="font-size:11px;padding:6px 0;"/>
+          </div>
+        </div>
+
+        <textarea id="f9" placeholder="Describe the governance structure in full. Include:&#10;— Review committee composition and meeting cadence&#10;— Conditions that trigger an emergency review&#10;— How accountability changes as capabilities move from pilot to production&#10;— Escalation path if a capability produces a systematic error&#10;— Sunset criteria: under what conditions would you retire this initiative?" onfocus="focusField('F9')" oninput="updateField('F9',this.value)" rows="9"></textarea>
+        <div class="char-count"><span id="f9-count">0</span> words</div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="nav-btn back" onclick="goToPhase(3)">← Decision &amp; Oversight</button>
+        <span class="nav-phase-info">Phase 4 of 4 · Final field</span>
+        <button class="nav-btn submit" onclick="submitCanvas()">Generate AI Decision Blueprint →</button>
+      </div>
+    </div>
+
+    <!-- COMPLETION -->
+    <div class="completion" id="completion">
+      <div class="completion-icon">◈</div>
+      <div class="completion-title">Blueprint <em>Generated</em></div>
+      <div class="completion-desc">Your AI Decision Blueprint is being synthesised from all 10 fields. It will be ready for review in a moment. Before you continue to the readiness check, take a moment to reflect on what surprised you most.</div>
+      <button class="completion-btn" onclick="goToSurvey()">Continue to readiness →</button>
+    </div>
+
+  </main>
+</div><!-- /canvas-pane -->
+
+<!-- ══ AI PANEL ══ -->
+<div class="ai-panel">
+  <div class="ap-hdr">
+    <div class="ap-hdr-row">
+      <div class="ap-title" id="apTitle">AI Assistant</div>
+      <span class="ap-agent-tag" id="apTag" style="color:#d4a843;border-color:#d4a843;background:#d4a84312">Ready</span>
+    </div>
+    <div class="ap-field-ctx" id="apCtx">Click into a field to activate guidance.</div>
+  </div>
+  <div class="ap-tabs">
+    <button class="ap-tab active" onclick="setAITab('feedback',this)">Guidance</button>
+    <button class="ap-tab" onclick="setAITab('decision',this)">Decision Support</button>
+    <button class="ap-tab" onclick="setAITab('viz',this)">Visualise</button>
+  </div>
+  <div class="ap-body" id="apBody">
+    <div class="ap-view active" id="tab-feedback">
+      <div id="feedbackMessages"><div style="font-size:9px;color:#44445a;font-style:italic;padding:20px 0;text-align:center">Click into a field to activate AI guidance.</div></div>
+    </div>
+    <div class="ap-view" id="tab-decision">
+      <div id="decisionContent"><div style="font-size:9px;color:#44445a;font-style:italic;padding:20px 0;text-align:center">Focus on a field to see decision support.</div></div>
+    </div>
+    <div class="ap-view" id="tab-viz">
+      <div id="vizContent"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /layout -->
+
+<script>
+// ── STATE ──
+const state = {
+  phase: 1,
+  fields: {},
+  scope: null,
+  dataSources: [],
+  roles: [],
+  capabilities: [],
+  chains: {},
+  sessionId: 'S-MR2604',
+};
+
+// ── FIELD REGISTRY ──
+const FIELDS = ['F0','F1','F2','F3','F4','F5','F6','F7','F8','F9'];
+const PHASE_FIELDS = {1:['F0','F1','F2','F3','F4'],2:['F5','F6'],3:['F7','F8'],4:['F9']};
+
+function isFieldDone(f) {
+  switch(f) {
+    case 'F0': return !!state.scope;
+    case 'F1': return state.dataSources.length > 0;
+    case 'F2': return state.roles.length > 0;
+    case 'F3': return (state.fields['F3']||'').trim().length > 10;
+    case 'F4': return (state.fields['F4']||'').trim().length > 20;
+    case 'F5': return state.capabilities.length > 0;
+    case 'F6': return state.capabilities.length > 0 && state.capabilities.every(c => state.chains[c] && state.chains[c].oversight);
+    case 'F7': return !!(state.fields['F7-capture'] && state.fields['F7-cadence']);
+    case 'F8': return (state.fields['F8']||'').trim().length > 30;
+    case 'F9': return (state.fields['F9']||'').trim().length > 30 && !!(state.fields['F9-owner']);
+    default: return false;
+  }
+}
+
+function updateProgress() {
+  const done = FIELDS.filter(f => isFieldDone(f)).length;
+  const pct = Math.round(done / FIELDS.length * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progPct').textContent = pct + '%';
+  if(pct === 100) document.getElementById('hdrSubmit').style.display = 'block';
+  renderSidebar();
+}
+
+// ── SIDEBAR ──
+const PHASE_COLORS = {1:'var(--phase-1)',2:'var(--phase-2)',3:'var(--phase-3)',4:'var(--phase-4)'};
+const FIELD_NAMES = {
+  F0:'Initiative Scope', F1:'Data Inputs', F2:'Human Inputs',
+  F3:'Systems & Infra', F4:'Tacit Constraints',
+  F5:'Capability Type', F6:'Per-capability Chains',
+  F7:'Feedback Loops', F8:'Business Outcomes & KPIs',
+  F9:'Governance & Accountability'
+};
+
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = '';
+  for(let p=1;p<=4;p++) {
+    html += `<div class="sb-phase">
+      <div class="sb-phase-label">Phase ${p}</div>`;
+    PHASE_FIELDS[p].forEach(f => {
+      const done = isFieldDone(f);
+      const active = state.phase === p;
+      html += `<div class="sb-field${done?' done':''}" onclick="jumpToField('${f}')">
+        <div class="sb-check">✓</div>
+        <span class="sb-fid" style="color:${PHASE_COLORS[p]}">${f}</span>
+        <span>${FIELD_NAMES[f]}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  sb.innerHTML = html;
+}
+
+function jumpToField(fid) {
+  const phaseNum = parseInt(Object.entries(PHASE_FIELDS).find(([p,fs])=>fs.includes(fid))[0]);
+  goToPhase(phaseNum);
+  setTimeout(() => {
+    const el = document.getElementById('field-'+fid);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+  }, 80);
+}
+
+// ── PHASE NAVIGATION ──
+function goToPhase(n) {
+  state.phase = n;
+  document.querySelectorAll('.phase-view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.phase-tab').forEach(t=>t.classList.remove('active'));
+  const pv = document.getElementById('phase-'+n);
+  if(pv) pv.classList.add('active');
+  document.getElementById('ptab-'+n)?.classList.add('active');
+  document.getElementById('mainContent').scrollTop = 0;
+  window.scrollTo(0,0);
+  renderSidebar();
+}
+
+// ── F0: SCOPE ──
+function selectScope(el, val) {
+  document.querySelectorAll('.scope-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.scope = val;
+  document.getElementById('f0-status').textContent = '✓ ' + el.querySelector('.scope-label').textContent + ' selected';
+  document.getElementById('f0-status').style.color = 'var(--gold)';
+  logEvent('field.change', {field:'F0', value:val});
+  updateProgress();
+}
+
+// ── F1: DATA SOURCES ──
+function addDataSource() {
+  const id = Date.now();
+  state.dataSources.push({id, name:'', owner:'', format:'', quality:''});
+  renderDataSources();
+  logEvent('field.change', {field:'F1', action:'add_source'});
+  updateProgress();
+}
+function removeDataSource(id) {
+  state.dataSources = state.dataSources.filter(d=>d.id!==id);
+  renderDataSources();
+  updateProgress();
+}
+function updateDs(id, key, val) {
+  const ds = state.dataSources.find(d=>d.id===id);
+  if(ds) ds[key] = val;
+  updateProgress();
+}
+function renderDataSources() {
+  const list = document.getElementById('ds-list');
+  list.innerHTML = state.dataSources.map(ds => `
+    <div class="ds-card">
+      <div>
+        <div class="ds-field-label">Data source</div>
+        <input class="ds-input" type="text" placeholder="e.g. Treasury ERP ledger" value="${ds.name}" oninput="updateDs(${ds.id},'name',this.value)"/>
+      </div>
+      <div>
+        <div class="ds-field-label">Owner / team</div>
+        <input class="ds-input" type="text" placeholder="e.g. Finance Ops" value="${ds.owner}" oninput="updateDs(${ds.id},'owner',this.value)"/>
+      </div>
+      <div>
+        <div class="ds-field-label">Format / freshness</div>
+        <input class="ds-input" type="text" placeholder="e.g. SQL · daily refresh" value="${ds.format}" oninput="updateDs(${ds.id},'format',this.value)"/>
+      </div>
+      <button class="ds-remove" onclick="removeDataSource(${ds.id})">✕</button>
+    </div>`).join('');
+}
+
+// ── F2: ROLES ──
+function addRole() {
+  const input = document.getElementById('roleInput');
+  const val = input.value.trim();
+  if(!val) return;
+  state.roles.push(val);
+  input.value = '';
+  renderRoles();
+  updateProgress();
+  logEvent('field.change', {field:'F2', action:'add_role', value:val});
+}
+function removeRole(i) {
+  state.roles.splice(i,1);
+  renderRoles();
+  updateProgress();
+}
+function renderRoles() {
+  document.getElementById('role-list').innerHTML =
+    state.roles.map((r,i) => `<div class="role-chip">${r}<button class="role-remove" onclick="removeRole(${i})">✕</button></div>`).join('');
+}
+
+// ── F3/F4/F7/F8/F9: TEXT FIELDS ──
+function updateField(key, val) {
+  state.fields[key] = val;
+  const base = key.split('-')[0];
+  const countEl = document.getElementById(base.toLowerCase()+'-count') || document.getElementById(key.toLowerCase()+'-count');
+  if(countEl) countEl.textContent = val.trim().split(/\s+/).filter(Boolean).length;
+  updateProgress();
+  logEvent('field.change', {field:key, wordCount: val.trim().split(/\s+/).filter(Boolean).length});
+}
+
+// ── F5/F6: CAPABILITIES ──
+function toggleCap(el, capName, tier) {
+  el.classList.toggle('selected');
+  if(el.classList.contains('selected')) {
+    if(!state.capabilities.includes(capName)) state.capabilities.push(capName);
+    if(!state.chains[capName]) state.chains[capName] = {tier, input:'', judgment:'', oversight:''};
+    logEvent('capability.selected', {capability:capName, tier});
+  } else {
+    state.capabilities = state.capabilities.filter(c=>c!==capName);
+    delete state.chains[capName];
+    logEvent('capability.deselected', {capability:capName});
+  }
+  renderChains();
+  updateProgress();
+}
+
+const TIER_COLORS = {sense:'#2d6ea0',interpret:'#a07830',act:'#c05030',learn:'#2a8060'};
+
+function renderChains() {
+  const cl = document.getElementById('chainList');
+  if(state.capabilities.length === 0) {
+    cl.innerHTML = '<div style="font-size:11px;color:var(--ink4);font-style:italic;padding:20px 0;">← Select capabilities in F5 to build chains here.</div>';
+    return;
+  }
+  cl.innerHTML = state.capabilities.map(cap => {
+    const ch = state.chains[cap] || {};
+    const tc = TIER_COLORS[ch.tier] || 'var(--ink3)';
+    return `<div class="chain-card">
+      <div class="chain-hdr">
+        <span class="chain-cap-name">${cap}</span>
+        <span class="chain-tier-badge" style="color:${tc};border-color:${tc}40;background:${tc}10">Tier ${ch.tier||'?'} · ${ch.tier ? ch.tier.charAt(0).toUpperCase()+ch.tier.slice(1) : '?'}</span>
+      </div>
+      <div class="chain-body">
+        <div>
+          <div class="chain-field-label">What feeds this capability?</div>
+          <textarea style="min-height:72px;font-size:10px" placeholder="Data sources, upstream outputs…" oninput="updateChain('${cap}','input',this.value)">${ch.input||''}</textarea>
+        </div>
+        <div>
+          <div class="chain-field-label">Human judgment required</div>
+          <textarea style="min-height:72px;font-size:10px" placeholder="What decisions stay with humans?" oninput="updateChain('${cap}','judgment',this.value)">${ch.judgment||''}</textarea>
+        </div>
+        <div>
+          <div class="chain-field-label">Oversight level</div>
+          <div class="oversight-opts">
+            <div class="ov-opt${ch.oversight==='Automate'?' sel-automate':''}" onclick="setOversight('${cap}','Automate',this)">Automate</div>
+            <div class="ov-opt${ch.oversight==='Augment'?' sel-augment':''}" onclick="setOversight('${cap}','Augment',this)">Augment</div>
+            <div class="ov-opt${ch.oversight==='Supervise'?' sel-supervise':''}" onclick="setOversight('${cap}','Supervise',this)">Supervise</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateChain(cap, key, val) {
+  if(!state.chains[cap]) return;
+  state.chains[cap][key] = val;
+  updateProgress();
+  logEvent('field.change', {field:'F6', capability:cap, subfield:key});
+}
+function setOversight(cap, level, el) {
+  if(!state.chains[cap]) return;
+  state.chains[cap].oversight = level;
+  const parent = el.parentElement;
+  parent.querySelectorAll('.ov-opt').forEach(o => o.className='ov-opt');
+  const cls = level==='Automate'?'sel-automate':level==='Augment'?'sel-augment':'sel-supervise';
+  el.classList.add(cls);
+  updateProgress();
+  logEvent('oversight.set', {field:'F6', capability:cap, oversight:level});
+}
+
+// ── SUBMIT ──
+function submitCanvas() {
+  document.querySelectorAll('.phase-view').forEach(v=>v.style.display='none');
+  document.getElementById('completion').classList.add('show');
+  logEvent('session.canvas_complete', {fields_done: FIELDS.filter(f=>isFieldDone(f)).length});
+}
+function goToSurvey() {
+  alert('Survey would launch here in the live platform. Session data has been captured.');
+}
+function saveDraft() {
+  logEvent('session.draft_saved', {progress: document.getElementById('progPct').textContent});
+  const btn = document.querySelector('.nav-save');
+  btn.textContent = 'Saved ✓';
+  setTimeout(()=>btn.textContent='Save draft', 1500);
+}
+
+// ── LOGGING (stub — replace with real API call) ──
+function logEvent(type, data) {
+  const ev = {
+    session_id: state.sessionId,
+    treatment: 'T1',
+    event_type: type,
+    timestamp: new Date().toISOString(),
+    ...data
+  };
+  console.log('[AItelier log]', ev);
+  // In production: POST /api/events { ...ev }
+}
+
+// ── DEMO DATA (Marie Rousseau · S-MR2604) ──
+function loadDemoData() {
+  // F0: scope
+  state.scope = 'multi';
+  const sc = document.getElementById('scope-multi');
+  if(sc) { sc.classList.add('selected'); document.getElementById('f0-status').textContent = '✓ Multi-capability Programme selected'; document.getElementById('f0-status').style.color = 'var(--gold)'; }
+
+  // F1: data sources
+  state.dataSources = [
+    {id:1, name:'Treasury ERP Ledger', owner:'Finance Ops', format:'SQL · daily refresh', quality:''},
+    {id:2, name:'Bloomberg Market Feed', owner:'Risk team', format:'API · real-time', quality:''},
+    {id:3, name:'Internal Reconciliation DB', owner:'Data Engineering', format:'PostgreSQL · monthly', quality:''},
+  ];
+  renderDataSources();
+
+  // F2: roles
+  state.roles = ['CFO', 'Risk Manager', 'Finance Analyst', 'Data Engineering'];
+  renderRoles();
+
+  // F3
+  state.fields['F3'] = 'Power BI dashboards (cannot be replaced until Q3 2026) · SAP ERP · ServiceNow approval workflow\n\nIntegration constraints: all AI outputs must flow through the existing ServiceNow approval workflow before distribution.';
+  const f3el = document.getElementById('f3');
+  if(f3el) { f3el.value = state.fields['F3']; document.getElementById('f3-count').textContent = state.fields['F3'].trim().split(/\s+/).filter(Boolean).length; }
+
+  // F4
+  state.fields['F4'] = 'Month-end P&L figures are patched by treasury before 9am board review — the first version is never used for decisions.\n\nThe CFO informally reviews all exposure changes >€50M regardless of formal delegation policy.';
+  const f4el = document.getElementById('f4');
+  if(f4el) { f4el.value = state.fields['F4']; document.getElementById('f4-count').textContent = state.fields['F4'].trim().split(/\s+/).filter(Boolean).length; }
+
+  // F5: capabilities
+  const caps = [
+    {name:'Pattern Recognition', tier:'sense'},
+    {name:'Retrieval & Synthesis', tier:'sense'},
+    {name:'Prediction', tier:'interpret'},
+  ];
+  caps.forEach(c => {
+    state.capabilities.push(c.name);
+    state.chains[c.name] = {tier:c.tier, input:'', judgment:'', oversight:''};
+    const el = document.querySelector(`[data-cap="${c.name}"]`);
+    if(el) el.classList.add('selected');
+  });
+  // F6: oversight levels
+  state.chains['Pattern Recognition'].oversight = 'Augment';
+  state.chains['Retrieval & Synthesis'].oversight = 'Supervise';
+  state.chains['Prediction'].oversight = 'Supervise';
+  renderChains();
+}
+
+// ── INIT ──
+(function(){
+  const navs = document.querySelectorAll('nav');
+  let totalH = 0;
+  navs.forEach(n => { totalH += n.getBoundingClientRect().height; });
+  const sb = document.getElementById('sidebar');
+  if(sb){ sb.style.top = totalH+'px'; sb.style.height = 'calc(100vh - '+totalH+'px)'; }
+})();
+
+loadDemoData();
+renderSidebar();
+renderDataSources();
+renderRoles();
+renderChains();
+updateProgress();
+logEvent('session.start', {rq: 'RQ1', treatment: 'T1'});
+
+// ══════════════════════════════════
+// AI PANEL
+// ══════════════════════════════════
+const TIER_C = {sense:'#2d6ea0',interpret:'#a07830',act:'#c05030',learn:'#2a8060'};
+const TIER_N = {sense:'Sense',interpret:'Interpret',act:'Act',learn:'Learn'};
+const AGENT_MAP = {
+  F1:{name:'Context Agent',color:'#2d9ecf'},
+  F4:{name:'Tacit Elicitor',color:'#da6090'},
+  F5:{name:'Capability Advisor',color:'#9b72cf'},
+  F6:{name:'Capability Advisor',color:'#9b72cf'},
+  F7:{name:'Oversight Advisor',color:'#e8a030'},
+  F8:{name:'Oversight Advisor',color:'#e8a030'},
+  F9:{name:'Governance Advisor',color:'#e8a030'},
+};
+const DEFAULT_AGENT = {name:'AI Assistant',color:'#d4a843'};
+
+const AI_PROBES = {
+  F0:[`Select the scale that best matches your initiative. <strong>This shapes every subsequent field</strong> — a Single Task canvas is fundamentally different from an Enterprise Transformation.`],
+  F1:[
+    `Before adding sources, ask yourself: <strong>has this data ever been technically correct but contextually wrong?</strong> Those edge cases belong in F4 — but start by naming every source you'd need, even ones with known issues.`,
+    `For each source: <em>who would you call at 8am on a Monday if the data was wrong?</em> That's your real data owner — not the team listed in the system catalog.`,
+  ],
+  F2:[`Name the roles — not the people. <strong>Think about who currently holds knowledge, not just who holds authority.</strong> The person who actually knows why a process works is often not the most senior.`],
+  F3:[`Be specific about what <em>cannot</em> change. Infrastructure constraints are the most common reason AI initiatives stall post-design. <strong>If something is locked until a specific date, name that date.</strong>`],
+  F4:[
+    `This is the most important field in the canvas. I need the constraints that would <strong>never appear in a process document</strong> — informal vetoes, known workarounds, decisions that are delegated in theory but always escalated in practice.`,
+    `Think about the last time an AI tool gave a technically correct answer that <em>no one acted on</em>. What was the real reason? That's what belongs here.`,
+  ],
+  F5:[
+    `<strong>Sense capabilities can often be automated. Act capabilities almost never should be.</strong> If you're considering Recommendation or Generation, think carefully about who owns accountability for the outputs.`,
+    `Each tier multiplies governance complexity. A Sense + Act + Learn stack is significantly harder to govern than Sense alone. <em>Is each tier genuinely necessary, or aspirational?</em>`,
+  ],
+  F6:[
+    `The oversight level is a <strong>statement about accountability</strong>. "Automate" means the organisation accepts the AI's output without review. Are you certain that's appropriate for this capability?`,
+    `For Act-tier capabilities: <em>who bears professional responsibility if the AI recommendation causes harm?</em> That answer should determine your oversight level.`,
+  ],
+  F7:[`Most AI initiatives define feedback loops in theory but not in practice. Name <strong>a specific role whose job it is to capture outcomes</strong> — not a team, not a process. A role.`],
+  F8:[`A KPI without an owner and a review date is decoration. For each metric: <strong>who gets called if this number moves in the wrong direction?</strong>`],
+  F9:[
+    `Orphaned AI systems are the primary cause of AI failure. Before submitting: <strong>if this system produced a systematic error for six months unnoticed, who would be responsible?</strong>`,
+    `Your shutdown authority and model owner should be different people. If the same person decides when to retrain and when to shut down, <em>the incentive to shut down is structurally compromised</em>.`,
+  ],
+};
+
+let activeField = null;
+let aiTab = 'feedback';
+
+function focusField(fid) {
+  if(activeField === fid) return;
+  activeField = fid;
+  document.querySelectorAll('.field').forEach(f=>f.classList.remove('field-focused'));
+  const fel = document.getElementById('field-'+fid);
+  if(fel) fel.classList.add('field-focused');
+  const agent = AGENT_MAP[fid] || DEFAULT_AGENT;
+  document.getElementById('apTitle').textContent = agent.name;
+  document.getElementById('apTag').textContent = agent.name;
+  document.getElementById('apTag').style.color = agent.color;
+  document.getElementById('apTag').style.borderColor = agent.color;
+  document.getElementById('apTag').style.background = agent.color+'18';
+  document.getElementById('apCtx').textContent = 'Active: ' + fid + ' · ' + FIELD_NAMES[fid];
+  fireFeedback(fid);
+  if(aiTab === 'decision') renderDecisionSupport(fid);
+  if(aiTab === 'viz') renderViz();
+}
+
+function fireFeedback(fid) {
+  const container = document.getElementById('feedbackMessages');
+  const probes = AI_PROBES[fid];
+  if(!probes) { container.innerHTML = `<div style="font-size:9px;color:#44445a;font-style:italic;padding:16px 0;text-align:center">Fill this field freely — no specific guidance needed here.</div>`; return; }
+  const probe = probes[Math.floor(Math.random()*probes.length)];
+  const agent = AGENT_MAP[fid] || DEFAULT_AGENT;
+  container.innerHTML = '';
+  const typing = document.createElement('div');
+  typing.className='typing';
+  typing.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  container.appendChild(typing);
+  setTimeout(()=>{
+    container.innerHTML = '';
+    const msg = document.createElement('div');
+    msg.className='ai-msg';
+    msg.innerHTML=`<div class="ai-msg-hdr">
+      <div class="ai-avatar" style="background:${agent.color}20;color:${agent.color}">${agent.name[0]}</div>
+      <span class="ai-sender" style="color:${agent.color}">${agent.name}</span>
+    </div>
+    <div class="ai-bubble">${probe}</div>
+    <div class="ai-actions">
+      <button class="ai-act-btn ai-act-accept" onclick="noteGuidance('${fid}')">Noted ✓</button>
+      <button class="ai-act-btn ai-act-ignore" onclick="skipGuidance('${fid}')">Skip</button>
+    </div>`;
+    container.appendChild(msg);
+    logEvent('agent.suggestion', {agent:agent.name, field:fid});
+  }, 800);
+}
+
+function noteGuidance(fid){ logEvent('suggestion.accepted',{field:fid}); showAck('Noted — guidance acknowledged.'); }
+function skipGuidance(fid){ logEvent('suggestion.ignored',{field:fid}); showAck('Skipped.','#444460'); }
+function showAck(text,color='#2a8060'){
+  const ack = document.createElement('div');
+  ack.className='ai-msg';
+  ack.innerHTML=`<div class="ai-bubble" style="border-color:${color}40;background:${color}10"><span style="color:${color}">${text}</span></div>`;
+  document.getElementById('feedbackMessages').appendChild(ack);
+}
+
+function renderDecisionSupport(fid) {
+  const el = document.getElementById('decisionContent');
+  let html = '';
+  if(fid==='F5'||fid==='F6') {
+    html += `<div class="viz-section"><div class="viz-title">Default oversight by tier</div>
+      ${[['#2d6ea0','Sense','Automatable'],['#a07830','Interpret','Augment'],['#c05030','Act','Supervise'],['#2a8060','Learn','Govern']].map(([c,n,r])=>`
+      <div class="cb-row"><div class="cb-label" style="color:${c}">${n}</div><div class="cb-track"><div class="cb-fill" style="background:${c};width:${n==='Sense'?85:n==='Interpret'?55:n==='Act'?20:30}%"></div></div><div class="cb-pct" style="color:${c}">${r}</div></div>`).join('')}
+      <div style="font-size:9px;color:#44445a;margin-top:8px;line-height:1.6">Deviations from defaults require explicit justification.</div>
+    </div>`;
+    if(state.capabilities.length>0) {
+      html += `<div class="viz-section"><div class="viz-title">Selected capabilities (${state.capabilities.length})</div><div class="ov-matrix">${renderOvMatrix()}</div></div>`;
+    }
+  } else if(fid==='F7'||fid==='F8') {
+    html += `<div class="viz-section"><div class="viz-title">Feedback loop completeness</div>
+      <div class="cb-row"><div class="cb-label">Capture method</div><div class="cb-track"><div class="cb-fill" style="width:${state.fields['F7-capture']?100:0}%"></div></div><div class="cb-pct">${state.fields['F7-capture']?'✓':'—'}</div></div>
+      <div class="cb-row"><div class="cb-label">Review cadence</div><div class="cb-track"><div class="cb-fill" style="width:${state.fields['F7-cadence']?100:0}%"></div></div><div class="cb-pct">${state.fields['F7-cadence']?'✓':'—'}</div></div>
+      <div class="cb-row"><div class="cb-label">Loop narrative</div><div class="cb-track"><div class="cb-fill" style="width:${Math.min(100,((state.fields['F7-notes']||'').split(' ').length/20)*100)}%"></div></div><div class="cb-pct">${(state.fields['F7-notes']||'').split(' ').filter(Boolean).length}w</div></div>
+    </div>${renderReadinessBars()}`;
+  } else if(fid==='F9') {
+    html += `<div class="viz-section"><div class="viz-title">Governance roles</div>
+      <div class="cb-row"><div class="cb-label">Model owner</div><div class="cb-track"><div class="cb-fill" style="width:${state.fields['F9-owner']?100:0}%"></div></div><div class="cb-pct">${state.fields['F9-owner']?'✓':'—'}</div></div>
+      <div class="cb-row"><div class="cb-label">Retrain auth.</div><div class="cb-track"><div class="cb-fill" style="width:${state.fields['F9-retrain']?100:0}%"></div></div><div class="cb-pct">${state.fields['F9-retrain']?'✓':'—'}</div></div>
+      <div class="cb-row"><div class="cb-label">Shutdown auth.</div><div class="cb-track"><div class="cb-fill" style="width:${state.fields['F9-shutdown']?100:0}%"></div></div><div class="cb-pct">${state.fields['F9-shutdown']?'✓':'—'}</div></div>
+    </div>${renderReadinessBars()}`;
+  } else if(fid==='F4') {
+    html += `<div class="viz-section"><div class="viz-title">Tacit knowledge categories</div>
+      <div style="font-size:9px;color:#666680;line-height:1.7;margin-bottom:10px">Common categories — check what applies:</div>
+      ${['Data quality workarounds','Informal approval chains','Calendar / timing exceptions','Person-specific knowledge','Regulatory grey areas','Political constraints'].map(cat=>`
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer" onclick="this.querySelector('.tck').style.background=this.querySelector('.tck').style.background?'':'#d4a84330';this.querySelector('.tck').style.borderColor=this.querySelector('.tck').style.borderColor==='#d4a843'?'#333345':'#d4a843';logEvent('tacit_category',{cat:'${cat}'})">
+          <div class="tck" style="width:13px;height:13px;border:1px solid #333345;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;color:#d4a843">✓</div>
+          <span style="font-size:9px;color:#888898">${cat}</span>
+        </div>`).join('')}
+    </div>`;
+  } else {
+    html = `<div style="font-size:9px;color:#44445a;font-style:italic;padding:20px 0;text-align:center">Focus on F4–F9 to see decision support.</div>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderOvMatrix() {
+  if(!state.capabilities.length) return '<div class="ov-empty">No capabilities selected yet.</div>';
+  return state.capabilities.map(cap=>{
+    const ch = state.chains[cap]||{};
+    const ov = ch.oversight;
+    const tc = TIER_C[ch.tier]||'#888';
+    const barW = ov==='Automate'?90:ov==='Augment'?55:20;
+    const barC = ov==='Automate'?'#60b870':ov==='Augment'?'#d4a843':'#c05050';
+    return `<div class="ov-row">
+      <div class="ov-cap-name" style="color:${tc}" title="${cap}">${cap.length>13?cap.slice(0,13)+'…':cap}</div>
+      <div class="ov-bar-wrap">
+        <div class="ov-bar" style="width:${ov?barW:8}%;background:${ov?barC:barC+'40'}">
+          <span class="ov-bar-label" style="color:${ov?'white':'transparent'}">${ov||'not set'}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderReadinessBars() {
+  const prog = state.canvasProgress;
+  const items = [
+    {l:'Scope',done:!!state.scope},
+    {l:'Data',done:state.dataSources.length>0},
+    {l:'Roles',done:state.roles.length>0},
+    {l:'Systems',done:(state.fields['F3']||'').length>10},
+    {l:'Tacit',done:(state.fields['F4']||'').length>20},
+    {l:'Capabilities',done:state.capabilities.length>0},
+    {l:'Chains',done:state.capabilities.length>0&&state.capabilities.every(c=>state.chains[c]&&state.chains[c].oversight)},
+    {l:'Feedback',done:!!(state.fields['F7-capture']&&state.fields['F7-cadence'])},
+    {l:'KPIs',done:(state.fields['F8']||'').length>30},
+    {l:'Governance',done:(state.fields['F9']||'').length>30&&!!state.fields['F9-owner']},
+  ];
+  const pct = Math.round(items.filter(i=>i.done).length/items.length*100);
+  return `<div class="viz-section"><div class="viz-title">Blueprint readiness</div>
+    <div style="font-size:10px;color:${pct===100?'#60b870':'#d4a843'};margin-bottom:8px;font-weight:500">${pct}% complete</div>
+    ${items.map(i=>`<div class="cb-row"><div class="cb-label">${i.l}</div><div class="cb-track"><div class="cb-fill" style="width:${i.done?100:0}%;background:${i.done?'#60b870':'#333345'}"></div></div><div class="cb-pct">${i.done?'✓':'—'}</div></div>`).join('')}
+  </div>`;
+}
+
+function renderViz() {
+  const el = document.getElementById('vizContent');
+  let html = '';
+  html += `<div class="viz-section"><div class="viz-title">Capability tier map</div><div class="tier-wheel">`;
+  [['sense','👁','Sense'],['interpret','🧠','Interpret'],['act','⚡','Act'],['learn','🔄','Learn']].forEach(([t,ic,nm])=>{
+    const caps = state.capabilities.filter(c=>state.chains[c]&&state.chains[c].tier===t);
+    const lit = caps.length>0;
+    html += `<div class="tier-cell${lit?' lit':''}" style="--tc:${TIER_C[t]}">
+      <div class="tier-cell-top"><span>${ic}</span><span class="tier-cell-name" style="color:${TIER_C[t]}">${nm}</span></div>
+      <div class="tier-cell-desc" style="color:${lit?TIER_C[t]+'aa':'#44445a'}">${caps.length?caps.length+' selected':'none'}</div>
+      <div class="tier-caps">${caps.map(c=>`<div class="tier-cap-item selected"><div class="tier-cap-dot" style="background:${TIER_C[t]}"></div>${c}</div>`).join('')}</div>
+    </div>`;
+  });
+  html += `</div></div>`;
+  if(state.capabilities.length>0) {
+    html += `<div class="viz-section"><div class="viz-title">Oversight allocation</div><div class="ov-matrix">${renderOvMatrix()}</div></div>`;
+  }
+  // Radar
+  const items = [
+    {l:'Scope',done:!!state.scope},{l:'Data',done:state.dataSources.length>0},
+    {l:'Roles',done:state.roles.length>0},{l:'Systems',done:(state.fields['F3']||'').length>10},
+    {l:'Tacit',done:(state.fields['F4']||'').length>20},{l:'Capabilities',done:state.capabilities.length>0},
+    {l:'Chains',done:state.capabilities.length>0&&state.capabilities.every(c=>state.chains[c]&&state.chains[c].oversight)},
+    {l:'Feedback',done:!!(state.fields['F7-capture']&&state.fields['F7-cadence'])},
+    {l:'KPIs',done:(state.fields['F8']||'').length>30},{l:'Governance',done:(state.fields['F9']||'').length>30&&!!state.fields['F9-owner']},
+  ];
+  const N=items.length,R=75,CX=105,CY=105;
+  const pts=items.map((f,i)=>{const a=(i/N)*Math.PI*2-Math.PI/2;const r=f.done?R:6;return[CX+Math.cos(a)*r,CY+Math.sin(a)*r];});
+  const bgPts=items.map((_,i)=>{const a=(i/N)*Math.PI*2-Math.PI/2;return[CX+Math.cos(a)*R,CY+Math.sin(a)*R];});
+  const lPts=items.map((f,i)=>{const a=(i/N)*Math.PI*2-Math.PI/2;return{x:CX+Math.cos(a)*(R+14),y:CY+Math.sin(a)*(R+14),l:f.l,done:f.done};});
+  const pct=Math.round(items.filter(f=>f.done).length/N*100);
+  html += `<div class="viz-section"><div class="viz-title">Blueprint completeness</div>
+    <div class="radar-wrap"><svg class="radar-svg" viewBox="0 0 210 210">
+      ${[.25,.5,.75,1].map(r=>`<polygon points="${bgPts.map(([x,y])=>{const dx=x-CX,dy=y-CY;return`${CX+dx*r},${CY+dy*r}`;}).join(' ')}" fill="none" stroke="#22222e" stroke-width="1"/>`).join('')}
+      ${bgPts.map(([x,y])=>`<line x1="${CX}" y1="${CY}" x2="${x}" y2="${y}" stroke="#1e1e2a" stroke-width="1"/>`).join('')}
+      <polygon points="${pts.map(([x,y])=>`${x},${y}`).join(' ')}" fill="#d4a84320" stroke="#d4a843" stroke-width="1.5"/>
+      ${pts.map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="3" fill="${items[i].done?'#d4a843':'#333345'}"/>`).join('')}
+      ${lPts.map(p=>`<text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="middle" font-family="Inter,sans-serif" font-size="7" fill="${p.done?'#d4a843':'#555570'}">${p.l}</text>`).join('')}
+      <text x="${CX}" y="${CY-6}" text-anchor="middle" font-family="Inter,sans-serif" font-size="18" font-weight="600" fill="#d4a843">${pct}%</text>
+      <text x="${CX}" y="${CY+10}" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#666680">complete</text>
+    </svg></div></div>`;
+  el.innerHTML = html;
+}
+
+function setAITab(tab, btn) {
+  aiTab = tab;
+  document.querySelectorAll('.ap-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.ap-view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='viz') renderViz();
+  if(tab==='decision'&&activeField) renderDecisionSupport(activeField);
+}
+
+// Add field-focused highlight style
+const focusStyle = document.createElement('style');
+focusStyle.textContent = '.field-focused{outline:2px solid var(--navy-g);outline-offset:4px;border-radius:8px;}';
+document.head.appendChild(focusStyle);
+
+// Init viz
+renderViz();
+</script>
+</body>
+</html>

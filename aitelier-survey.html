@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AItelier · Readiness Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --navy:#1E2761; --navy2:#2A3580; --navy3:#3A4898;
+  --navy-b:#1E276112; --navy-g:#1E276130;
+  --bg:#f4f3f0; --surface:#ffffff; --surface2:#f7f6f3;
+  --border:#e2dfd8; --border2:#ccc8c0; --border3:#b0aba0;
+  --ink:#141624; --ink2:#3e4260; --ink3:#505470; --ink4:#9095b0;
+  --amber:#1E2761; --amber2:#2A3580; --amber-b:#1E276112; --amber-g:#1E276130;
+  --green:#1a7a4a; --green-b:#1a7a4a12;
+  --gold:#C8922A; --gold-b:#C8922A18;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+
+
+/* ── NAV ── */
+nav{
+  height:56px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;background:var(--navy);flex-shrink:0;
+}
+.nav-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:#fff;}
+.nav-logo em{font-style:italic;color:var(--gold);}
+.nav-pagenav{display:flex;align-items:center;gap:6px;position:absolute;left:50%;transform:translateX(-50%);}
+.nav-page-link{font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;letter-spacing:.4px;padding:6px 12px;border-radius:4px;transition:all .15s;}
+.nav-page-link:hover{color:#fff;background:rgba(255,255,255,.08);}
+.nav-page-link.active{color:#fff;background:rgba(255,255,255,.14);font-weight:500;}
+.nav-page-sep{font-size:12px;color:rgba(255,255,255,.18);}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-user{display:flex;align-items:center;gap:8px;}
+.nav-avatar{width:30px;height:30px;border-radius:6px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--navy);}
+.nav-name{font-size:13px;color:rgba(255,255,255,.7);}
+.nav-sep{width:1px;height:18px;background:rgba(255,255,255,.15);}
+.nav-logout{font-size:13px;color:rgba(255,255,255,.4);cursor:pointer;transition:color .15s;background:none;border:none;font-family:'Inter',sans-serif;}
+.nav-logout:hover{color:rgba(255,255,255,.8);}
+.nav-team{display:flex;align-items:center;gap:5px;}
+.nav-av{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.3px;}
+.nav-av.you{background:var(--gold);color:var(--navy);}
+.nav-av.other{background:rgba(255,255,255,.15);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.2);}
+
+/* ── MAIN ── */
+main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:56px 20px 80px;overflow-y:auto;}
+.survey-wrap{width:100%;max-width:640px;}
+
+/* ── HEADER ── */
+.survey-hdr{margin-bottom:48px;animation:fadeUp .6s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.survey-eyebrow{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--navy);margin-bottom:14px;}
+.survey-title{font-family:'Playfair Display',serif;font-size:38px;font-weight:400;line-height:1.2;margin-bottom:12px;}
+.survey-title em{font-style:italic;}
+.survey-sub{font-size:11px;color:var(--ink2);line-height:1.75;max-width:480px;}
+
+/* PROGRESS DOTS */
+.survey-progress{display:flex;align-items:center;gap:8px;margin-bottom:48px;animation:fadeUp .6s ease .1s both;}
+.sp-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);transition:all .3s;}
+.sp-dot.done{background:var(--green);}
+.sp-dot.active{background:var(--navy);width:20px;border-radius:4px;}
+.sp-label{font-size:10px;color:var(--ink3);margin-left:8px;}
+
+/* ── QUESTION CARDS ── */
+.q-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:28px 28px 24px;margin-bottom:20px;
+  transition:border-color .2s;
+  animation:fadeUp .5s ease both;
+}
+.q-card:nth-child(1){animation-delay:.15s;}
+.q-card:nth-child(2){animation-delay:.2s;}
+.q-card:nth-child(3){animation-delay:.25s;}
+.q-card:nth-child(4){animation-delay:.3s;}
+.q-card:nth-child(5){animation-delay:.35s;}
+.q-card.answered{border-color:var(--border2);}
+.q-num{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;}
+.q-text{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;line-height:1.4;margin-bottom:6px;}
+.q-sub{font-size:10px;color:var(--ink3);margin-bottom:20px;line-height:1.6;}
+
+/* LIKERT SCALE */
+.likert{display:flex;flex-direction:column;gap:0;}
+.likert-labels{display:flex;justify-content:space-between;margin-bottom:10px;}
+.likert-label{font-size:9px;color:var(--ink3);letter-spacing:.3px;}
+.likert-options{display:flex;gap:8px;}
+.likert-opt{
+  flex:1;aspect-ratio:1;border:1px solid var(--border2);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Playfair Display',serif;font-size:16px;cursor:pointer;
+  transition:all .18s;color:var(--ink2);background:var(--bg3);
+  position:relative;
+}
+.likert-opt:hover{border-color:var(--border3);color:var(--ink);}
+.likert-opt.selected{background:var(--navy);border-color:var(--navy);color:#ffffff;}
+.likert-opt .lo-val{font-size:13px;font-weight:500;}
+.lo-label{position:absolute;bottom:-18px;font-size:8px;color:var(--ink3);white-space:nowrap;left:50%;transform:translateX(-50%);letter-spacing:.3px;}
+
+/* OPEN TEXT */
+.open-textarea{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;
+  padding:14px 16px;font-family:'Inter',sans-serif;font-size:12px;color:var(--ink);
+  line-height:1.75;resize:vertical;min-height:100px;outline:none;
+  transition:border-color .15s;
+}
+.open-textarea:focus{border-color:var(--border3);}
+.open-textarea::placeholder{color:var(--ink4);}
+.char-hint{font-size:9px;color:var(--ink3);text-align:right;margin-top:6px;}
+
+/* SUBMIT */
+.submit-row{margin-top:36px;display:flex;align-items:center;justify-content:space-between;animation:fadeUp .5s ease .4s both;}
+.submit-info{font-size:10px;color:var(--ink3);line-height:1.6;}
+.submit-btn{
+  padding:13px 32px;background:var(--navy);border:none;border-radius:7px;
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#fff;
+  cursor:pointer;transition:all .2s;letter-spacing:.2px;
+  box-shadow:0 2px 8px rgba(30,39,97,.25);
+}
+.submit-btn:hover{background:var(--navy2);transform:translateY(-1px);}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ── COMPLETION ── */
+.completion{
+  display:none;width:100%;max-width:640px;
+  flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:40px 20px;
+}
+.completion.show{display:flex;}
+.co-check{
+  width:80px;height:80px;border-radius:50%;
+  border:2px solid var(--navy);
+  display:flex;align-items:center;justify-content:center;
+  font-size:32px;color:var(--navy);margin-bottom:28px;
+  animation:checkIn .6s ease both;
+}
+@keyframes checkIn{from{transform:scale(.6);opacity:0;}to{transform:scale(1);opacity:1;}}
+.co-title{font-family:'Playfair Display',serif;font-size:36px;font-weight:400;line-height:1.2;margin-bottom:14px;}
+.co-title em{font-style:italic;color:var(--navy);}
+.co-desc{font-size:11px;color:var(--ink2);line-height:1.8;max-width:440px;margin-bottom:32px;}
+.co-session{
+  background:var(--surface);border:1px solid var(--border2);border-radius:8px;
+  padding:16px 24px;margin-bottom:32px;width:100%;max-width:380px;
+}
+.co-session-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.co-session-id{font-size:13px;color:var(--navy);font-weight:500;}
+.co-next{
+  font-size:11px;color:var(--ink2);line-height:1.7;
+  border-top:1px solid var(--border);padding-top:24px;max-width:440px;
+}
+.co-next strong{color:var(--ink);}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">AI<em>telier</em></div>
+  <div class="nav-pagenav">
+    <a class="nav-page-link" href="index.html">Dashboard</a>
+    <span class="nav-page-sep">·</span>
+    <a class="nav-page-link" href="aitelier-canvas-T1-flow.html">Canvas</a>
+    <span class="nav-page-sep">·</span>
+    <a class="nav-page-link" href="aitelier-blueprint.html">Blueprint</a>
+    <span class="nav-page-sep">·</span>
+    <a class="nav-page-link active" href="aitelier-survey.html">Readiness</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-team">
+      <div class="nav-av you" title="Marie Rousseau (you)">MR</div>
+      <div class="nav-av other" title="Jean Dupont">JD</div>
+      <div class="nav-av other" title="Sophie Chen">SC</div>
+      <div class="nav-av other" title="Lucas Martin">LM</div>
+    </div>
+    <div class="nav-sep"></div>
+    <button class="nav-logout">Sign out</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- SURVEY FORM -->
+  <div class="survey-wrap" id="surveyWrap">
+
+    <div class="survey-hdr">
+      <div class="survey-eyebrow">Readiness Check · Final step</div>
+      <h1 class="survey-title">Five decisions.<br/><em>Your honest read.</em></h1>
+      <p class="survey-sub">Each question mirrors a real leadership call. Your responses calibrate how ready your organisation is to act on the initiative you've designed — there are no right answers, only candid ones.</p>
+    </div>
+
+    <div class="survey-progress" id="surveyProgress">
+      <div class="sp-dot active" id="dot-1"></div>
+      <div class="sp-dot" id="dot-2"></div>
+      <div class="sp-dot" id="dot-3"></div>
+      <div class="sp-dot" id="dot-4"></div>
+      <div class="sp-dot" id="dot-5"></div>
+      <span class="sp-label" id="progText">0 of 5 answered</span>
+    </div>
+
+    <!-- Q1: Decision confidence -->
+    <div class="q-card" id="qcard-1">
+      <div class="q-num">01 · Strategic confidence</div>
+      <div class="q-text">How confident are you that this initiative is ready to be presented to your leadership team for resourcing?</div>
+      <div class="q-sub">Consider design completeness — scope, capabilities, governance, and oversight.</div>
+      <div class="likert">
+        <div class="likert-labels">
+          <span class="likert-label">Not investment-ready</span>
+          <span class="likert-label">Ready to commit</span>
+        </div>
+        <div class="likert-options" id="likert-1">
+          <div class="likert-opt" onclick="selectLikert(1,1,this)"><span class="lo-val">1</span></div>
+          <div class="likert-opt" onclick="selectLikert(1,2,this)"><span class="lo-val">2</span></div>
+          <div class="likert-opt" onclick="selectLikert(1,3,this)"><span class="lo-val">3</span></div>
+          <div class="likert-opt" onclick="selectLikert(1,4,this)"><span class="lo-val">4</span></div>
+          <div class="likert-opt" onclick="selectLikert(1,5,this)"><span class="lo-val">5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2: Advice-seeking -->
+    <div class="q-card" id="qcard-2">
+      <div class="q-num">02 · External validation</div>
+      <div class="q-text">Before committing organisational resources, how much additional expert input would you require?</div>
+      <div class="q-sub">Consider specialist advice, peer benchmarks, or independent risk review.</div>
+      <div class="likert">
+        <div class="likert-labels">
+          <span class="likert-label">None — I would proceed now</span>
+          <span class="likert-label">Substantial review needed</span>
+        </div>
+        <div class="likert-options" id="likert-2">
+          <div class="likert-opt" onclick="selectLikert(2,1,this)"><span class="lo-val">1</span></div>
+          <div class="likert-opt" onclick="selectLikert(2,2,this)"><span class="lo-val">2</span></div>
+          <div class="likert-opt" onclick="selectLikert(2,3,this)"><span class="lo-val">3</span></div>
+          <div class="likert-opt" onclick="selectLikert(2,4,this)"><span class="lo-val">4</span></div>
+          <div class="likert-opt" onclick="selectLikert(2,5,this)"><span class="lo-val">5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q3: Delegation comfort -->
+    <div class="q-card" id="qcard-3">
+      <div class="q-num">03 · Delegation clarity</div>
+      <div class="q-text">Could you confidently delegate execution ownership of this initiative to a direct report today?</div>
+      <div class="q-sub">Not whether you would — whether the design is defined clearly enough to make it possible.</div>
+      <div class="likert">
+        <div class="likert-labels">
+          <span class="likert-label">Too ambiguous to delegate</span>
+          <span class="likert-label">Fully delegable</span>
+        </div>
+        <div class="likert-options" id="likert-3">
+          <div class="likert-opt" onclick="selectLikert(3,1,this)"><span class="lo-val">1</span></div>
+          <div class="likert-opt" onclick="selectLikert(3,2,this)"><span class="lo-val">2</span></div>
+          <div class="likert-opt" onclick="selectLikert(3,3,this)"><span class="lo-val">3</span></div>
+          <div class="likert-opt" onclick="selectLikert(3,4,this)"><span class="lo-val">4</span></div>
+          <div class="likert-opt" onclick="selectLikert(3,5,this)"><span class="lo-val">5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q4: Implementation intention -->
+    <div class="q-card" id="qcard-4">
+      <div class="q-num">04 · Implementation intent</div>
+      <div class="q-text">How likely is it that this initiative, or one closely aligned with it, enters active development within your organisation in the next 12 months?</div>
+      <div class="q-sub">Your honest strategic read — not a commitment.</div>
+      <div class="likert">
+        <div class="likert-labels">
+          <span class="likert-label">Not on the roadmap</span>
+          <span class="likert-label">Already in planning</span>
+        </div>
+        <div class="likert-options" id="likert-4">
+          <div class="likert-opt" onclick="selectLikert(4,1,this)"><span class="lo-val">1</span></div>
+          <div class="likert-opt" onclick="selectLikert(4,2,this)"><span class="lo-val">2</span></div>
+          <div class="likert-opt" onclick="selectLikert(4,3,this)"><span class="lo-val">3</span></div>
+          <div class="likert-opt" onclick="selectLikert(4,4,this)"><span class="lo-val">4</span></div>
+          <div class="likert-opt" onclick="selectLikert(4,5,this)"><span class="lo-val">5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q5: Open reflection -->
+    <div class="q-card" id="qcard-5">
+      <div class="q-num">05 · Critical risk</div>
+      <div class="q-text">What single factor poses the greatest risk to this initiative's success if left unaddressed?</div>
+      <div class="q-sub">This may be organisational, political, technical, or cultural. Specific answers are most useful — this field is optional.</div>
+      <textarea class="open-textarea" id="openReflection" placeholder="e.g. The governance model assumes C-suite sponsorship that isn't yet secured — without a named executive owner, the oversight structure is aspirational at best…" oninput="updateOpen(this)" rows="5"></textarea>
+      <div class="char-hint"><span id="openCount">0</span> words · optional</div>
+    </div>
+
+    <div class="submit-row">
+      <div class="submit-info">Your assessment is anonymised before analysis.<br/>This session is complete once submitted.</div>
+      <button class="submit-btn" id="submitBtn" onclick="submitSurvey()" disabled>Submit assessment →</button>
+    </div>
+
+  </div><!-- survey-wrap -->
+
+  <!-- COMPLETION -->
+  <div class="completion" id="completion">
+    <div class="co-check">✓</div>
+    <h1 class="co-title">Session <em>Complete</em></h1>
+    <p class="co-desc">Thank you — your canvas, blueprint, and readiness responses have been recorded. An expert reviewer will evaluate your AI initiative design independently, without knowing which process you followed.</p>
+    <div class="co-session">
+      <div class="co-session-label">Your session reference</div>
+      <div class="co-session-id" id="coSessionId">—</div>
+    </div>
+    <div class="co-next">
+      <strong>What happens next:</strong> Your blueprint will be reviewed by an expert panel using a structured scoring rubric. You may receive a summary of the expert evaluation after the research wave closes. Your facilitator will confirm the timeline.
+    </div>
+  </div>
+
+</main>
+
+<script>
+const answers = {1:null, 2:null, 3:null, 4:null, open:''};
+let S = null;
+try { S = JSON.parse(sessionStorage.getItem('aitelier_state')); } catch(e){}
+const sessionId = S?.sessionId || 'T1-DEMO01';
+document.getElementById('coSessionId').textContent = sessionId;
+
+function selectLikert(qNum, val, el) {
+  document.querySelectorAll('#likert-'+qNum+' .likert-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[qNum] = val;
+  document.getElementById('qcard-'+qNum).classList.add('answered');
+  updateProgress();
+  logEvent('survey.answer', {question:qNum, value:val});
+}
+
+function updateOpen(el) {
+  const words = el.value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('openCount').textContent = words;
+  answers.open = el.value;
+  document.getElementById('qcard-5').classList.add('answered');
+  updateProgress();
+}
+
+function updateProgress() {
+  const likertDone = [1,2,3,4].filter(q=>answers[q]!==null).length;
+  const total = likertDone + (answers.open.trim().length > 0 ? 1 : 0);
+  const dots = [1,2,3,4,5];
+  dots.forEach((d,i)=>{
+    const dot = document.getElementById('dot-'+d);
+    if(i < likertDone) { dot.className='sp-dot done'; }
+    else if(i === likertDone) { dot.className='sp-dot active'; }
+    else { dot.className='sp-dot'; }
+  });
+  if(answers.open.trim().length>0) document.getElementById('dot-5').className='sp-dot done';
+  document.getElementById('progText').textContent = total + ' of 5 answered';
+  document.getElementById('submitBtn').disabled = likertDone < 4;
+}
+
+function submitSurvey() {
+  logEvent('survey.complete', {
+    q1_confidence: answers[1],
+    q2_advice_seeking: answers[2],
+    q3_delegation: answers[3],
+    q4_implementation: answers[4],
+    open_reflection_words: answers.open.split(/\s+/).filter(Boolean).length,
+    session_id: sessionId,
+  });
+  document.getElementById('surveyWrap').style.display = 'none';
+  document.getElementById('completion').classList.add('show');
+  sessionStorage.removeItem('aitelier_state'); // clean up
+}
+
+function logEvent(type, data) {
+  console.log('[AItelier Survey]', {event_type:type, ts:new Date().toISOString(), ...data});
+}
+</script>
+</body>
+</html>
