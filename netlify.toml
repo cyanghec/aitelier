@@ -1,10 +1,2 @@
 [build]
   publish = "frontend"
-
-# Production context
-[context.production]
-  command = "echo 'Production build'"
-
-# Staging/Test context
-[context.staging]
-  command = "echo 'Staging build'"
