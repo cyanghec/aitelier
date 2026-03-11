@@ -1,8 +1,2 @@
 [build]
-  publish = "."
-
-# Exclude backend Python files from the static deploy
-[[headers]]
-  for = "/backend/*"
-  [headers.values]
-    X-Robots-Tag = "noindex"
+  publish = "frontend"
