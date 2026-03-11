@@ -327,11 +327,11 @@ footer{padding:28px 40px 24px;margin-top:auto;display:flex;align-items:center;ju
   <div class="nav-pagenav">
     <a class="nav-page-link active" href="index.html">Dashboard</a>
     <span class="nav-page-sep">·</span>
-    <a class="nav-page-link" href="aitelier-canvas-T1-flow.html">Canvas</a>
+    <a class="nav-page-link" href="canvas.html">Canvas</a>
     <span class="nav-page-sep">·</span>
-    <a class="nav-page-link" href="aitelier-blueprint.html">Blueprint</a>
+    <a class="nav-page-link" href="blueprint.html">Blueprint</a>
     <span class="nav-page-sep">·</span>
-    <a class="nav-page-link" href="aitelier-survey.html">Readiness</a>
+    <a class="nav-page-link" href="survey.html">Readiness</a>
   </div>
   <div class="nav-right">
     <div class="nav-team">
@@ -507,7 +507,7 @@ footer{padding:28px 40px 24px;margin-top:auto;display:flex;align-items:center;ju
           </div>
         </div>
         <div class="cs-action">
-          <button class="btn btn-ghost btn-sm" onclick="window.location.href='aitelier-blueprint.html'">View blueprint →</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.location.href='blueprint.html'">View blueprint →</button>
         </div>
       </div>
       <div class="bp-quality" id="bpQuality">
@@ -533,7 +533,7 @@ footer{padding:28px 40px 24px;margin-top:auto;display:flex;align-items:center;ju
           </div>
         </div>
         <div class="cs-action">
-          <button class="btn btn-ghost btn-sm" onclick="window.location.href='aitelier-survey.html'">Continue →</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.location.href='survey.html'">Continue →</button>
         </div>
       </div>
       <div class="survey-progress" id="surveyProgress">
@@ -735,7 +735,7 @@ function render(){
     btn.onclick = enterCanvas;
   } else if (pct===100) {
     btn.textContent = 'Generate blueprint →';
-    btn.onclick = ()=>{ window.location.href='aitelier-blueprint.html'; };
+    btn.onclick = ()=>{ window.location.href='blueprint.html'; };
   } else {
     btn.textContent = 'Continue canvas →';
     btn.onclick = enterCanvas;
@@ -801,13 +801,13 @@ function finishIntake(){
   render();
   setTimeout(()=>{
     sessionStorage.setItem('aitelier_session',JSON.stringify({sessionId:SESSION.id,participant:SESSION.participant,intakeSummary:SESSION.intakeSummary}));
-    window.location.href='aitelier-canvas-T1-flow.html';
+    window.location.href='canvas.html';
   },400);
 }
 
 function enterCanvas(){
   sessionStorage.setItem('aitelier_session',JSON.stringify({sessionId:SESSION.id,participant:SESSION.participant,intakeSummary:SESSION.intakeSummary}));
-  window.location.href='aitelier-canvas-T1-flow.html';
+  window.location.href='canvas.html';
 }
 
 render();

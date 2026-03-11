@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AItelier · AI Transformation Canvas</title>
+<title>AItelier · RQ3 Canvas</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -432,6 +432,8 @@ select:focus{border-color:var(--border2);}
   .feedback-grid{grid-template-columns:1fr;}
 }
 </style>
+<!-- API endpoint config — set window.AITELIER_API in config.js for production -->
+<script src="config.js"></script>
 </head>
 <body>
 
@@ -441,11 +443,11 @@ select:focus{border-color:var(--border2);}
   <div class="nav-pagenav">
     <a class="nav-page-link" href="index.html">Dashboard</a>
     <span class="nav-page-sep">·</span>
-    <a class="nav-page-link active" href="aitelier-canvas-T1-flow.html">Canvas</a>
+    <a class="nav-page-link active" href="canvas.html">Canvas</a>
     <span class="nav-page-sep">·</span>
-    <a class="nav-page-link" href="aitelier-blueprint.html">Blueprint</a>
+    <a class="nav-page-link" href="blueprint.html">Blueprint</a>
     <span class="nav-page-sep">·</span>
-    <a class="nav-page-link" href="aitelier-survey.html">Readiness</a>
+    <a class="nav-page-link" href="survey.html">Readiness</a>
   </div>
   <div class="nav-right">
     <button class="nav-save" onclick="saveDraft()">Save draft</button>
@@ -924,6 +926,34 @@ select:focus{border-color:var(--border2);}
 </div><!-- /layout -->
 
 <script>
+// ── RQ3 SESSION INIT ──
+const API = (window.AITELIER_API || 'http://localhost:8000').replace(/\/$/, '');
+const urlParams = new URLSearchParams(window.location.search);
+let sessionArm = 'T1'; // resolved on load
+
+function getSessionId() {
+  const fromUrl = urlParams.get('session');
+  if (fromUrl) return fromUrl;
+  const saved = sessionStorage.getItem('aitelier_session');
+  if (saved) {
+    try { return JSON.parse(saved).sessionId; } catch(e) {}
+  }
+  return 'S-DEMO';
+}
+
+async function resolveArm(sessionId) {
+  try {
+    const res = await fetch(`${API}/api/sessions/${sessionId}`);
+    if (res.ok) {
+      const data = await res.json();
+      sessionArm = data.arm || 'T1';
+      document.title = `AItelier · RQ3 Canvas · ${sessionArm}`;
+    }
+  } catch(e) {
+    console.warn('Could not resolve arm from API, defaulting to T1', e);
+  }
+}
+
 // ── STATE ──
 const state = {
   phase: 1,
@@ -933,7 +963,7 @@ const state = {
   roles: [],
   capabilities: [],
   chains: {},
-  sessionId: 'S-MR2604',
+  sessionId: getSessionId(),
 };
 
 // ── FIELD REGISTRY ──
@@ -1104,6 +1134,10 @@ function toggleCap(el, capName, tier) {
     if(!state.capabilities.includes(capName)) state.capabilities.push(capName);
     if(!state.chains[capName]) state.chains[capName] = {tier, input:'', judgment:'', oversight:''};
     logEvent('capability.selected', {capability:capName, tier});
+    // RQ3 · T2: Oversight Advisor fires after capability selected
+    if(sessionArm === 'T2') {
+      callOversightAdvisor(capName, tier);
+    }
   } else {
     state.capabilities = state.capabilities.filter(c=>c!==capName);
     delete state.chains[capName];
@@ -1111,6 +1145,137 @@ function toggleCap(el, capName, tier) {
   }
   renderChains();
   updateProgress();
+}
+
+// RQ3 · T2: Call Oversight Advisor for a selected capability
+async function callOversightAdvisor(capName, tier) {
+  showAgentTyping('Oversight Advisor', '#e8a030');
+  try {
+    const res = await fetch(`${API}/api/guidance/oversight-advisor`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        session_id: state.sessionId,
+        capability_name: capName,
+        capability_tier: tier,
+      }),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    showAgentMessage(
+      'Oversight Advisor', '#e8a030',
+      data.display_message || `Suggested level for <strong>${capName}</strong>: <strong>${data.suggested_level}</strong>. ${data.rationale}`,
+      [
+        {label: `Accept: ${data.suggested_level}`, cls: 'ai-act-accept', fn: `acceptOversightSuggestion('${capName}','${data.suggested_level}')`},
+        {label: 'Set different level', cls: 'ai-act-ignore', fn: `skipGuidance('F6')`},
+      ]
+    );
+    logEvent('agent.suggestion', {agent:'Oversight Advisor', field:'F6', capability:capName, suggested:data.suggested_level});
+  } catch(e) {
+    clearAgentPanel();
+  }
+}
+
+function acceptOversightSuggestion(capName, level) {
+  // Find the oversight option button for this cap and click it
+  const cards = document.getElementById('chainList').querySelectorAll('.chain-card');
+  cards.forEach(card => {
+    if(card.querySelector('.chain-cap-name')?.textContent === capName) {
+      const opts = card.querySelectorAll('.ov-opt');
+      opts.forEach(opt => {
+        if(opt.textContent.trim() === level) {
+          setOversight(capName, level, opt);
+        }
+      });
+    }
+  });
+  logEvent('suggestion.accepted', {field:'F6', capability:capName, accepted_level:level});
+  showAck(`Accepted — oversight set to ${level}.`);
+}
+
+// RQ3 · T3: Call Decision Challenger after oversight is set
+async function callDecisionChallenger(capName, level) {
+  showAgentTyping('Decision Challenger', '#da6090');
+  try {
+    const canvas_context = {
+      tacit_constraints: state.fields['F4'] || '',
+      governance_notes: state.fields['F9'] || '',
+    };
+    const res = await fetch(`${API}/api/guidance/decision-challenger`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        session_id: state.sessionId,
+        capability_name: capName,
+        oversight_chosen: level,
+        canvas_context,
+      }),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    showAgentMessage(
+      'Decision Challenger', '#da6090',
+      data.challenge,
+      [
+        {label: 'Reconsider', cls: 'ai-act-ignore', fn: `logEvent('challenge.reconsidered',{capability:'${capName}',original_level:'${level}'})`},
+        {label: 'Confirm choice', cls: 'ai-act-accept', fn: `confirmOversight('${capName}','${level}')`},
+      ]
+    );
+    logEvent('agent.suggestion', {agent:'Decision Challenger', field:'F6', capability:capName, oversight_challenged:level});
+  } catch(e) {
+    clearAgentPanel();
+  }
+}
+
+function confirmOversight(capName, level) {
+  logEvent('challenge.confirmed', {capability:capName, confirmed_level:level});
+  showAck(`Confirmed — oversight level ${level} locked.`);
+}
+
+// ── Agent panel helpers ──
+function showAgentTyping(agentName, color) {
+  if(aiTab !== 'feedback') switchTab('feedback');
+  const container = document.getElementById('feedbackMessages');
+  container.innerHTML = '';
+  const typing = document.createElement('div');
+  typing.className = 'typing';
+  typing.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  container.appendChild(typing);
+  document.getElementById('apTitle').textContent = agentName;
+  document.getElementById('apTag').textContent = agentName;
+  document.getElementById('apTag').style.color = color;
+  document.getElementById('apTag').style.borderColor = color;
+  document.getElementById('apTag').style.background = color + '18';
+}
+
+function showAgentMessage(agentName, color, text, actions) {
+  const container = document.getElementById('feedbackMessages');
+  container.innerHTML = '';
+  const actionsHtml = actions.map(a =>
+    `<button class="ai-act-btn ${a.cls}" onclick="${a.fn}">${a.label}</button>`
+  ).join('');
+  const msg = document.createElement('div');
+  msg.className = 'ai-msg';
+  msg.innerHTML = `<div class="ai-msg-hdr">
+    <div class="ai-avatar" style="background:${color}20;color:${color}">${agentName[0]}</div>
+    <span class="ai-sender" style="color:${color}">${agentName}</span>
+  </div>
+  <div class="ai-bubble">${text}</div>
+  <div class="ai-actions">${actionsHtml}</div>`;
+  container.appendChild(msg);
+}
+
+function clearAgentPanel() {
+  document.getElementById('feedbackMessages').innerHTML = '';
+}
+
+function switchTab(tab) {
+  aiTab = tab;
+  document.querySelectorAll('.ap-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.ap-tab[data-tab="${tab}"]`)?.classList.add('active');
+  document.querySelectorAll('.ap-panel').forEach(p => p.style.display = 'none');
+  const panel = document.getElementById('panel-' + tab);
+  if (panel) panel.style.display = 'block';
 }
 
 const TIER_COLORS = {sense:'#2d6ea0',interpret:'#a07830',act:'#c05030',learn:'#2a8060'};
@@ -1159,42 +1324,73 @@ function updateChain(cap, key, val) {
 }
 function setOversight(cap, level, el) {
   if(!state.chains[cap]) return;
+  const previousLevel = state.chains[cap].oversight;
   state.chains[cap].oversight = level;
   const parent = el.parentElement;
   parent.querySelectorAll('.ov-opt').forEach(o => o.className='ov-opt');
   const cls = level==='Automate'?'sel-automate':level==='Augment'?'sel-augment':'sel-supervise';
   el.classList.add(cls);
   updateProgress();
-  logEvent('oversight.set', {field:'F6', capability:cap, oversight:level});
+  logEvent('oversight.set', {field:'F6', capability:cap, oversight:level, 'F6.choice.before': previousLevel});
+  // RQ3 · T3: Decision Challenger fires after oversight is set
+  if(sessionArm === 'T3') {
+    callDecisionChallenger(cap, level);
+  }
 }
 
 // ── SUBMIT ──
-function submitCanvas() {
+async function submitCanvas() {
+  // Persist final canvas state then mark complete
+  await saveCanvasToApi();
+  await fetch(`${API}/api/canvas/${state.sessionId}/complete`, {method:'POST'}).catch(()=>{});
   document.querySelectorAll('.phase-view').forEach(v=>v.style.display='none');
   document.getElementById('completion').classList.add('show');
   logEvent('session.canvas_complete', {fields_done: FIELDS.filter(f=>isFieldDone(f)).length});
 }
 function goToSurvey() {
-  alert('Survey would launch here in the live platform. Session data has been captured.');
+  window.location.href = 'survey.html?session=' + state.sessionId;
 }
-function saveDraft() {
+async function saveDraft() {
+  await saveCanvasToApi();
   logEvent('session.draft_saved', {progress: document.getElementById('progPct').textContent});
   const btn = document.querySelector('.nav-save');
   btn.textContent = 'Saved ✓';
   setTimeout(()=>btn.textContent='Save draft', 1500);
 }
+function saveCanvasToApi() {
+  const canvasState = {
+    phase: state.phase,
+    fields: state.fields,
+    scope: state.scope,
+    dataSources: state.dataSources,
+    roles: state.roles,
+    capabilities: state.capabilities,
+    chains: state.chains,
+    sessionId: state.sessionId,
+    arm: sessionArm,
+  };
+  return fetch(`${API}/api/canvas/${state.sessionId}`, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(canvasState),
+  }).catch(() => {});
+}
 
-// ── LOGGING (stub — replace with real API call) ──
+// ── LOGGING ──
 function logEvent(type, data) {
   const ev = {
     session_id: state.sessionId,
-    treatment: 'T1',
+    treatment: sessionArm,
     event_type: type,
     timestamp: new Date().toISOString(),
     ...data
   };
   console.log('[AItelier log]', ev);
-  // In production: POST /api/events { ...ev }
+  fetch(`${API}/api/events`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(ev),
+  }).catch(() => {}); // fire-and-forget
 }
 
 // ── DEMO DATA (Marie Rousseau · S-MR2604) ──
@@ -1254,13 +1450,18 @@ function loadDemoData() {
   if(sb){ sb.style.top = totalH+'px'; sb.style.height = 'calc(100vh - '+totalH+'px)'; }
 })();
 
-loadDemoData();
+// Resolve arm from API, then init
+resolveArm(state.sessionId).then(() => {
+  logEvent('session.start', {rq: 'RQ3', treatment: sessionArm});
+});
+
+// Only load demo data if running with the default demo session
+if(state.sessionId === 'S-DEMO') loadDemoData();
 renderSidebar();
 renderDataSources();
 renderRoles();
 renderChains();
 updateProgress();
-logEvent('session.start', {rq: 'RQ1', treatment: 'T1'});
 
 // ══════════════════════════════════
 // AI PANEL
