@@ -188,53 +188,10 @@ Required environment variables (in `backend/.env`):
 ## Deployment
 
 ### Frontend (Netlify)
-
-#### Production Deployment
-The frontend is automatically deployed to your production site (aitelier.netlify.app) when you push to the `main` branch.
-
-#### Staging/Testing Deployment
-To deploy to your testing site (aitelier-test.netlify.app), use the `staging` branch:
-
-1. **Create and push to the staging branch**
-   ```bash
-   git checkout -b staging
-   git push origin staging
-   ```
-
-2. **Connect the staging branch to aitelier-test.netlify.app**
-   - Go to [Netlify Dashboard](https://app.netlify.com)
-   - Open aitelier-test.netlify.app site settings
-   - Go to **Build & Deploy** → **Deploy Context**
-   - Set the staging branch to deploy when you push to `staging`
-
-3. **Workflow for testing changes**
-   ```bash
-   # Make changes on main branch
-   git checkout main
-   # ... make your changes ...
-   git commit -m "Your changes"
-   
-   # Cherry-pick to staging for testing
-   git checkout staging
-   git merge main
-   git push origin staging
-   
-   # After testing, merge to main
-   git checkout main
-   git merge staging
-   git push origin main
-   ```
-
-Both sites currently use the same backend API. When you're ready to add a separate testing backend, update the API endpoint in `frontend/config.js` based on the environment.
+The frontend is automatically deployed to Netlify when you push to the main branch.
 
 ### Backend (Render)
 The backend is configured for deployment on Render. Update `render.yaml` with your service details.
-
-To deploy the backend:
-1. Connect your GitHub repository to Render
-2. Create a new Web Service pointing to the `./backend` directory
-3. Set the build command and start command in Render settings
-4. Add your `ANTHROPIC_API_KEY` environment variable in Render dashboard
 
 ## License
 
@@ -247,3 +204,4 @@ To deploy the backend:
 ## Contact
 
 For questions or issues, please contact [Add contact information].
+# Updated
