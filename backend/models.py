@@ -110,6 +110,8 @@ class OversightAdvisorRequest(SQLModel):
     session_id: str
     capability_name: str
     capability_tier: str  # sense | interpret | act | learn
+    capability_input: Optional[str] = None   # what feeds this capability
+    capability_output: Optional[str] = None  # expected output description
 
 
 class OversightAdvisorResponse(SQLModel):
@@ -122,7 +124,9 @@ class DecisionChallengerRequest(SQLModel):
     session_id: str
     capability_name: str
     oversight_chosen: str  # Automate | Augment | Supervise
-    canvas_context: Optional[dict] = None  # optional F3/F4/F8 context
+    capability_input: Optional[str] = None   # what feeds this capability
+    capability_output: Optional[str] = None  # expected output description
+    canvas_context: Optional[dict] = None    # optional F3/F4/F8 context
 
 
 class DecisionChallengerResponse(SQLModel):

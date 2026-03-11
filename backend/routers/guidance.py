@@ -95,6 +95,8 @@ def oversight_advisor(
         capability_name=body.capability_name,
         capability_tier=body.capability_tier,
         intake_summary=intake_summary,
+        capability_input=body.capability_input or "",
+        capability_output=body.capability_output or "",
     )
 
     # Log the agent event
@@ -133,6 +135,8 @@ def decision_challenger(
         capability_name=body.capability_name,
         oversight_chosen=body.oversight_chosen,
         intake_summary=intake_summary,
+        capability_input=body.capability_input or "",
+        capability_output=body.capability_output or "",
         canvas_context=body.canvas_context,
     )
 

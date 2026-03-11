@@ -1161,6 +1161,8 @@ async function callOversightAdvisor(capName, tier) {
         session_id: state.sessionId,
         capability_name: capName,
         capability_tier: tier,
+        capability_input:  (state.chains[capName] || {}).input  || '',
+        capability_output: (state.chains[capName] || {}).output || '',
       }),
     });
     if (!res.ok) return;
@@ -1211,6 +1213,8 @@ async function callDecisionChallenger(capName, level) {
         session_id: state.sessionId,
         capability_name: capName,
         oversight_chosen: level,
+        capability_input:  (state.chains[capName] || {}).input  || '',
+        capability_output: (state.chains[capName] || {}).output || '',
         canvas_context,
       }),
     });

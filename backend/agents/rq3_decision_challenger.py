@@ -31,10 +31,20 @@ def challenge(
     capability_name: str,
     oversight_chosen: str,
     intake_summary: dict,
+    capability_input: str = "",
+    capability_output: str = "",
     canvas_context: Optional[dict] = None,
 ) -> str:
     """Return the challenge message string."""
     intake_text = "\n".join(f"- {k}: {v}" for k, v in intake_summary.items())
+
+    io_section = ""
+    if capability_input or capability_output:
+        io_section = "\n\nCapability I/O (as described by the executive):"
+        if capability_input:
+            io_section += f"\n- Input: {capability_input}"
+        if capability_output:
+            io_section += f"\n- Expected output: {capability_output}"
 
     context_text = ""
     if canvas_context:
@@ -43,12 +53,12 @@ def challenge(
         )
 
     user_prompt = f"""Initiative context (from intake interview):
-{intake_text}{context_text}
+{intake_text}{io_section}{context_text}
 
 The executive has set the oversight level for "{capability_name}" to "{oversight_chosen}".
 
 Generate a challenge question that:
-- Describes a plausible failure mode for this specific capability in this domain
+- Grounds the failure scenario in the specific expected output (if provided) — what does it look like when THAT output is wrong?
 - Asks concretely: if this system produced systematic errors for 3 months before anyone noticed, who would be responsible and what would the remediation path look like?
 - Ends by asking whether knowing this changes their oversight choice
 

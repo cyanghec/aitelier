@@ -44,6 +44,8 @@ def advise(
     capability_name: str,
     capability_tier: str,
     intake_summary: dict,
+    capability_input: str = "",
+    capability_output: str = "",
 ) -> dict:
     """Return {suggested_level, rationale, display_message}."""
     tier_lower = capability_tier.lower()
@@ -53,17 +55,26 @@ def advise(
         f"- {k}: {v}" for k, v in intake_summary.items()
     )
 
+    io_section = ""
+    if capability_input or capability_output:
+        io_section = "\nCapability I/O (as described by the executive):"
+        if capability_input:
+            io_section += f"\n- Input: {capability_input}"
+        if capability_output:
+            io_section += f"\n- Expected output: {capability_output}"
+        io_section += "\n"
+
     user_prompt = f"""Initiative context (from intake interview):
 {intake_text}
-
+{io_section}
 The executive is designing an AI capability called "{capability_name}" (tier: {capability_tier}).
 The baseline heuristic for this tier is {tier_default}.
 
 Recommend the most appropriate oversight level for this specific capability in this specific context. Consider:
-1. The stakes of an incorrect decision
-2. How easily errors can be detected and reversed
-3. Who bears accountability if the AI is wrong
-4. Whether human judgment adds value in this specific case
+1. The stakes of an incorrect decision — especially given the expected output
+2. How easily errors in the output can be detected and reversed
+3. Who bears accountability if the AI produces a wrong output
+4. Whether the expected output implies autonomous action, human review, or advisory use
 
 Provide your structured output."""
 
