@@ -137,6 +137,36 @@ class SurveyRequest(SQLModel):
     open_reflection: Optional[str] = None
 
 
+class ReactiveQueryRequest(SQLModel):
+    session_id: str
+    question: str
+    canvas_context: Optional[dict] = None  # optional snapshot of current canvas fields
+
+
+class ReactiveQueryResponse(SQLModel):
+    answer: str
+
+
+# ── T2 outcome: did the executive accept or override the suggestion? ──────────
+
+class OversightAdvisorOutcomeRequest(SQLModel):
+    session_id: str
+    capability_name: str
+    F6_suggestion: str          # what the advisor suggested
+    F6_final: str               # what the executive actually set
+    accepted_suggestion: bool   # True if F6_final == F6_suggestion
+
+
+# ── T3 outcome: did the executive revise F6 after the challenge? ──────────────
+
+class DecisionChallengerOutcomeRequest(SQLModel):
+    session_id: str
+    capability_name: str
+    F6_choice_before: str       # oversight level set before challenge
+    F6_choice_after: str        # oversight level confirmed after challenge
+    revised_after_challenge: bool  # True if F6_choice_after != F6_choice_before
+
+
 # ── Helpers ────────────────────────────────────────────────────────────────
 
 ARMS = ["T1", "T2", "T3"]

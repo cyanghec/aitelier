@@ -11,6 +11,8 @@ backend/.env
 # SQLite database — stored on persistent disk in production
 backend/aitelier.db
 *.db
+*.db-shm
+*.db-wal
 
 # Python caches
 backend/__pycache__/

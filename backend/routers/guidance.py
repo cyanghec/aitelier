@@ -8,10 +8,13 @@ from models import (
     SessionDB, IntakeMessageDB,
     IntakeMessageRequest, IntakeMessageResponse,
     OversightAdvisorRequest, OversightAdvisorResponse,
+    OversightAdvisorOutcomeRequest,
     DecisionChallengerRequest, DecisionChallengerResponse,
+    DecisionChallengerOutcomeRequest,
+    ReactiveQueryRequest, ReactiveQueryResponse,
     EventDB,
 )
-from agents import intake, rq3_oversight_advisor, rq3_decision_challenger
+from agents import intake, rq3_oversight_advisor, rq3_decision_challenger, reactive
 
 router = APIRouter(prefix="/api/guidance", tags=["guidance"])
 
@@ -147,3 +150,97 @@ def decision_challenger(
     db.commit()
 
     return DecisionChallengerResponse(challenge=challenge)
+
+
+# ── Reactive Query (RQ3 · T1) ────────────────────────────────────────────────
+
+@router.post("/reactive-query", response_model=ReactiveQueryResponse)
+def reactive_query(
+    body: ReactiveQueryRequest,
+    db: Session = Depends(get_session),
+):
+    session = db.get(SessionDB, body.session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    if session.arm != "T1":
+        raise HTTPException(status_code=403, detail="Reactive Agent is only active for arm T1")
+
+    intake_summary = json.loads(session.intake_summary or "{}")
+
+    answer = reactive.answer(
+        question=body.question,
+        intake_summary=intake_summary,
+        canvas_context=body.canvas_context,
+    )
+
+    # Log the agent event
+    db.add(EventDB(
+        session_id=body.session_id,
+        treatment="T1",
+        event_type="agent.queried",
+        timestamp=datetime.now(timezone.utc).isoformat(),
+        data_json=json.dumps({
+            "query_content": body.question,
+        }),
+    ))
+    db.commit()
+
+    return ReactiveQueryResponse(answer=answer)
+
+
+# ── Oversight Advisor Outcome (RQ3 · T2) — primary DV ───────────────────────
+
+@router.post("/oversight-advisor-outcome")
+def oversight_advisor_outcome(
+    body: OversightAdvisorOutcomeRequest,
+    db: Session = Depends(get_session),
+):
+    session = db.get(SessionDB, body.session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    if session.arm != "T2":
+        raise HTTPException(status_code=403, detail="Oversight Advisor outcome is only for arm T2")
+
+    db.add(EventDB(
+        session_id=body.session_id,
+        treatment="T2",
+        event_type="oversight.outcome",
+        timestamp=datetime.now(timezone.utc).isoformat(),
+        data_json=json.dumps({
+            "capability": body.capability_name,
+            "F6.suggestion": body.F6_suggestion,
+            "F6.final": body.F6_final,
+            "accepted_suggestion": body.accepted_suggestion,
+        }),
+    ))
+    db.commit()
+    return {"status": "logged"}
+
+
+# ── Decision Challenger Outcome (RQ3 · T3) — primary DV ─────────────────────
+
+@router.post("/decision-challenger-outcome")
+def decision_challenger_outcome(
+    body: DecisionChallengerOutcomeRequest,
+    db: Session = Depends(get_session),
+):
+    session = db.get(SessionDB, body.session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    if session.arm != "T3":
+        raise HTTPException(status_code=403, detail="Decision Challenger outcome is only for arm T3")
+
+    db.add(EventDB(
+        session_id=body.session_id,
+        treatment="T3",
+        event_type="challenge.outcome",
+        timestamp=datetime.now(timezone.utc).isoformat(),
+        data_json=json.dumps({
+            "capability": body.capability_name,
+            "F6.choice.before": body.F6_choice_before,
+            "F6.choice.after": body.F6_choice_after,
+            "revised_after_challenge": body.revised_after_challenge,
+        }),
+    ))
+    db.commit()
+    return {"status": "logged"}
