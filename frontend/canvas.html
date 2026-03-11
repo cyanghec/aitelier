@@ -890,7 +890,7 @@ select:focus{border-color:var(--border2);}
       <div class="completion-icon">◈</div>
       <div class="completion-title">Blueprint <em>Generated</em></div>
       <div class="completion-desc">Your AI Decision Blueprint is being synthesised from all 10 fields. It will be ready for review in a moment. Before you continue to the readiness check, take a moment to reflect on what surprised you most.</div>
-      <button class="completion-btn" onclick="goToSurvey()">Continue to readiness →</button>
+      <button class="completion-btn" onclick="goToBlueprint()">View your Blueprint →</button>
     </div>
 
   </main>
@@ -1347,8 +1347,18 @@ async function submitCanvas() {
   document.getElementById('completion').classList.add('show');
   logEvent('session.canvas_complete', {fields_done: FIELDS.filter(f=>isFieldDone(f)).length});
 }
-function goToSurvey() {
-  window.location.href = 'survey.html?session=' + state.sessionId;
+function goToBlueprint() {
+  // Write canvas state to sessionStorage so blueprint.html can render it
+  sessionStorage.setItem('aitelier_state', JSON.stringify({
+    sessionId:    state.sessionId,
+    scope:        state.scope,
+    dataSources:  state.dataSources,
+    roles:        state.roles,
+    fields:       state.fields,
+    capabilities: state.capabilities,
+    chains:       state.chains,
+  }));
+  window.location.href = 'blueprint.html?session=' + state.sessionId;
 }
 async function saveDraft() {
   await saveCanvasToApi();

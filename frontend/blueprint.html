@@ -412,10 +412,14 @@ nav{
   </div>
 </div>
 
+<script src="config.js"></script>
 <script>
 // ── LOAD STATE ──
+const _urlSession = new URLSearchParams(window.location.search).get('session');
 let S = null;
 try { S = JSON.parse(sessionStorage.getItem('aitelier_state')); } catch(e){}
+// If URL param has a session ID but sessionStorage is stale/empty, patch the sessionId
+if (_urlSession) { if (!S) S = {}; S.sessionId = _urlSession; }
 
 // Demo fallback state if no session data
 if(!S) {
@@ -660,7 +664,7 @@ function scrollTo(id) {
   event.target.closest('.toc-item')?.classList.add('active');
 }
 function goToSurvey() {
-  window.location.href = 'survey.html';
+  window.location.href = 'survey.html?session=' + (S?.sessionId || '');
 }
 </script>
 </body>

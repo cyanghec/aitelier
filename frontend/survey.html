@@ -310,11 +310,14 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:5
 
 </main>
 
+<script src="config.js"></script>
 <script>
+const API = (window.AITELIER_API || 'http://localhost:8000').replace(/\/$/, '');
 const answers = {1:null, 2:null, 3:null, 4:null, open:''};
 let S = null;
 try { S = JSON.parse(sessionStorage.getItem('aitelier_state')); } catch(e){}
-const sessionId = S?.sessionId || 'T1-DEMO01';
+const _urlSession = new URLSearchParams(window.location.search).get('session');
+const sessionId = _urlSession || S?.sessionId || 'S-DEMO';
 document.getElementById('coSessionId').textContent = sessionId;
 
 function selectLikert(qNum, val, el) {
@@ -349,22 +352,45 @@ function updateProgress() {
   document.getElementById('submitBtn').disabled = likertDone < 4;
 }
 
-function submitSurvey() {
+async function submitSurvey() {
+  // Persist survey responses to backend
+  await fetch(`${API}/api/survey/${sessionId}`, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      q1_confidence:    answers[1],
+      q2_advice_seeking: answers[2],
+      q3_delegation:    answers[3],
+      q4_implementation: answers[4],
+      open_reflection:  answers.open || null,
+    }),
+  }).catch(e => console.warn('Survey save failed', e));
+
   logEvent('survey.complete', {
-    q1_confidence: answers[1],
+    q1_confidence:    answers[1],
     q2_advice_seeking: answers[2],
-    q3_delegation: answers[3],
+    q3_delegation:    answers[3],
     q4_implementation: answers[4],
     open_reflection_words: answers.open.split(/\s+/).filter(Boolean).length,
-    session_id: sessionId,
   });
+
   document.getElementById('surveyWrap').style.display = 'none';
   document.getElementById('completion').classList.add('show');
   sessionStorage.removeItem('aitelier_state'); // clean up
 }
 
 function logEvent(type, data) {
-  console.log('[AItelier Survey]', {event_type:type, ts:new Date().toISOString(), ...data});
+  const payload = {
+    session_id: sessionId,
+    event_type: type,
+    timestamp:  new Date().toISOString(),
+    ...data,
+  };
+  fetch(`${API}/api/events`, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload),
+  }).catch(() => {});
 }
 </script>
 </body>
