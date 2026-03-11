@@ -146,20 +146,34 @@ nav.top-nav{position:sticky;top:0;z-index:200;height:56px;display:flex;align-ite
   display:flex;flex-direction:column;
   overflow:hidden;
 }
+/* ── AI PANEL HEADER ── */
 .ap-hdr{padding:14px 16px 10px;border-bottom:1px solid var(--ai-border);flex-shrink:0;}
 .ap-hdr-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
 .ap-title{font-size:11px;font-weight:500;color:var(--ai-text);}
 .ap-agent-tag{font-size:8px;padding:2px 8px;border-radius:2px;letter-spacing:.5px;border:1px solid;}
 .ap-field-ctx{font-size:9px;color:var(--ai-text2);font-style:italic;}
-.ap-tabs{display:flex;border-bottom:1px solid var(--ai-border);flex-shrink:0;}
-.ap-tab{flex:1;padding:9px 0;border:none;background:none;font-family:'Inter',sans-serif;font-size:9px;color:var(--ai-text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.3px;}
-.ap-tab:hover{color:var(--ai-text);}
-.ap-tab.active{color:var(--ai-accent);border-bottom-color:var(--ai-accent);}
+/* ── PROFESSOR WIDGET (floating, independent) ── */
+.pw{position:fixed;bottom:28px;left:20px;z-index:200;display:flex;flex-direction:column;align-items:flex-start;gap:0;}
+.pw-card{background:#0d0e1a;border:1px solid rgba(200,146,42,.25);border-radius:14px;padding:12px 14px 10px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:border-color .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(0,0,0,.45);}
+.pw-card:hover{border-color:rgba(200,146,42,.55);box-shadow:0 4px 28px rgba(200,146,42,.15);}
+.pw-avatar{width:42px;height:42px;border-radius:10px;overflow:hidden;flex-shrink:0;border:1.5px solid rgba(200,146,42,.4);}
+.pw-avatar svg{display:block;width:100%;height:100%;}
+.pw-info{display:flex;flex-direction:column;gap:2px;}
+.pw-name{font-family:'Playfair Display',serif;font-size:12px;font-weight:600;color:#e8e8f0;white-space:nowrap;}
+.pw-role{font-size:8px;color:rgba(200,146,42,.8);letter-spacing:.5px;text-transform:uppercase;}
+.pw-group{display:flex;gap:4px;margin-top:6px;}
+.pw-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);}
+.pw-dot.active{background:#4caf7d;}
+.pw-bubble{background:#0d0e1a;border:1px solid rgba(200,146,42,.3);border-radius:10px;border-bottom-left-radius:2px;padding:10px 13px;max-width:220px;font-size:10px;color:#b0b0c8;line-height:1.6;margin-bottom:6px;animation:fadeUp .25s ease both;box-shadow:0 4px 18px rgba(0,0,0,.4);}
+.pw-bubble strong{color:#e8e8f0;font-weight:500;}
+.pw-bubble .pw-bbl-hdr{font-size:8px;letter-spacing:.5px;text-transform:uppercase;color:rgba(200,146,42,.7);margin-bottom:5px;}
+.pw-members{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
+.pw-member{padding:2px 7px;border-radius:4px;font-size:8px;font-weight:700;letter-spacing:.4px;}
+.pw-member.you{background:rgba(200,146,42,.2);color:#C8922A;border:1px solid rgba(200,146,42,.3);}
+.pw-member.other{background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1);}
 .ap-body{flex:1;overflow-y:auto;padding:14px 16px;}
 .ap-body::-webkit-scrollbar{width:3px;}
 .ap-body::-webkit-scrollbar-thumb{background:var(--ai-border);border-radius:2px;}
-.ap-view{display:none;}
-.ap-view.active{display:block;}
 .ai-msg{margin-bottom:14px;animation:fadeUp .3s ease both;}
 .ai-msg-hdr{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
 .ai-avatar{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
@@ -908,21 +922,8 @@ select:focus{border-color:var(--border2);}
     </div>
     <div class="ap-field-ctx" id="apCtx">Click into a field to activate guidance.</div>
   </div>
-  <div class="ap-tabs">
-    <button class="ap-tab active" onclick="setAITab('feedback',this)">Guidance</button>
-    <button class="ap-tab" onclick="setAITab('decision',this)">Decision Support</button>
-    <button class="ap-tab" onclick="setAITab('viz',this)">Visualise</button>
-  </div>
   <div class="ap-body" id="apBody">
-    <div class="ap-view active" id="tab-feedback">
-      <div id="feedbackMessages"><div style="font-size:9px;color:#44445a;font-style:italic;padding:20px 0;text-align:center">Click into a field to activate AI guidance.</div></div>
-    </div>
-    <div class="ap-view" id="tab-decision">
-      <div id="decisionContent"><div style="font-size:9px;color:#44445a;font-style:italic;padding:20px 0;text-align:center">Focus on a field to see decision support.</div></div>
-    </div>
-    <div class="ap-view" id="tab-viz">
-      <div id="vizContent"></div>
-    </div>
+    <div id="feedbackMessages"><div style="font-size:9px;color:#44445a;font-style:italic;padding:20px 0;text-align:center">Click into a field to activate AI guidance.</div></div>
   </div>
 </div>
 
@@ -1241,7 +1242,6 @@ function confirmOversight(capName, level) {
 
 // ── Agent panel helpers ──
 function showAgentTyping(agentName, color) {
-  if(aiTab !== 'feedback') switchTab('feedback');
   const container = document.getElementById('feedbackMessages');
   container.innerHTML = '';
   const typing = document.createElement('div');
@@ -1276,18 +1276,9 @@ function clearAgentPanel() {
   document.getElementById('feedbackMessages').innerHTML = '';
 }
 
-function switchTab(tab) {
-  aiTab = tab;
-  document.querySelectorAll('.ap-tab').forEach(t => t.classList.remove('active'));
-  document.querySelector(`.ap-tab[data-tab="${tab}"]`)?.classList.add('active');
-  document.querySelectorAll('.ap-panel').forEach(p => p.style.display = 'none');
-  const panel = document.getElementById('panel-' + tab);
-  if (panel) panel.style.display = 'block';
-}
 
 const TIER_COLORS = {sense:'#2d6ea0',interpret:'#a07830',act:'#c05030',learn:'#2a8060'};
 
-function renderChains() {
 // ── F6: I/O HINTS & CONSISTENCY ──
 const CAP_IO = {
   'Pattern Recognition':    { in: 'e.g. Transaction logs, sensor readings, image/text streams…',   out: 'e.g. Anomaly flags, pattern labels, confidence scores…' },
@@ -1309,7 +1300,8 @@ const TIER_MISMATCH = {
 function checkConsistency(cap) {
   const ch = state.chains[cap];
   if (!ch) return;
-  const hintEl = document.getElementById('io-hint-' + CSS.escape(cap));
+  const capId = cap.replace(/[^a-zA-Z0-9]/g, '_');
+  const hintEl = document.getElementById('io-hint-' + capId);
   if (!hintEl) return;
   const output = (ch.output || '').toLowerCase();
   const rules = TIER_MISMATCH[ch.tier];
@@ -1494,7 +1486,7 @@ function loadDemoData() {
   ];
   caps.forEach(c => {
     state.capabilities.push(c.name);
-    state.chains[c.name] = {tier:c.tier, input:'', judgment:'', oversight:''};
+    state.chains[c.name] = {tier:c.tier, input:'', output:'', judgment:'', oversight:''};
     const el = document.querySelector(`[data-cap="${c.name}"]`);
     if(el) el.classList.add('selected');
   });
@@ -1572,7 +1564,6 @@ const AI_PROBES = {
 };
 
 let activeField = null;
-let aiTab = 'feedback';
 
 function focusField(fid) {
   if(activeField === fid) return;
@@ -1588,8 +1579,6 @@ function focusField(fid) {
   document.getElementById('apTag').style.background = agent.color+'18';
   document.getElementById('apCtx').textContent = 'Active: ' + fid + ' · ' + FIELD_NAMES[fid];
   fireFeedback(fid);
-  if(aiTab === 'decision') renderDecisionSupport(fid);
-  if(aiTab === 'viz') renderViz();
 }
 
 function fireFeedback(fid) {
@@ -1630,146 +1619,10 @@ function showAck(text,color='#2a8060'){
   document.getElementById('feedbackMessages').appendChild(ack);
 }
 
-function renderDecisionSupport(fid) {
-  const el = document.getElementById('decisionContent');
-  let html = '';
-  if(fid==='F5'||fid==='F6') {
-    html += `<div class="viz-section"><div class="viz-title">Default oversight by tier</div>
-      ${[['#2d6ea0','Sense','Automatable'],['#a07830','Interpret','Augment'],['#c05030','Act','Supervise'],['#2a8060','Learn','Govern']].map(([c,n,r])=>`
-      <div class="cb-row"><div class="cb-label" style="color:${c}">${n}</div><div class="cb-track"><div class="cb-fill" style="background:${c};width:${n==='Sense'?85:n==='Interpret'?55:n==='Act'?20:30}%"></div></div><div class="cb-pct" style="color:${c}">${r}</div></div>`).join('')}
-      <div style="font-size:9px;color:#44445a;margin-top:8px;line-height:1.6">Deviations from defaults require explicit justification.</div>
-    </div>`;
-    if(state.capabilities.length>0) {
-      html += `<div class="viz-section"><div class="viz-title">Selected capabilities (${state.capabilities.length})</div><div class="ov-matrix">${renderOvMatrix()}</div></div>`;
-    }
-  } else if(fid==='F7'||fid==='F8') {
-    html += `<div class="viz-section"><div class="viz-title">Feedback loop completeness</div>
-      <div class="cb-row"><div class="cb-label">Capture method</div><div class="cb-track"><div class="cb-fill" style="width:${state.fields['F7-capture']?100:0}%"></div></div><div class="cb-pct">${state.fields['F7-capture']?'✓':'—'}</div></div>
-      <div class="cb-row"><div class="cb-label">Review cadence</div><div class="cb-track"><div class="cb-fill" style="width:${state.fields['F7-cadence']?100:0}%"></div></div><div class="cb-pct">${state.fields['F7-cadence']?'✓':'—'}</div></div>
-      <div class="cb-row"><div class="cb-label">Loop narrative</div><div class="cb-track"><div class="cb-fill" style="width:${Math.min(100,((state.fields['F7-notes']||'').split(' ').length/20)*100)}%"></div></div><div class="cb-pct">${(state.fields['F7-notes']||'').split(' ').filter(Boolean).length}w</div></div>
-    </div>${renderReadinessBars()}`;
-  } else if(fid==='F9') {
-    html += `<div class="viz-section"><div class="viz-title">Governance roles</div>
-      <div class="cb-row"><div class="cb-label">Model owner</div><div class="cb-track"><div class="cb-fill" style="width:${state.fields['F9-owner']?100:0}%"></div></div><div class="cb-pct">${state.fields['F9-owner']?'✓':'—'}</div></div>
-      <div class="cb-row"><div class="cb-label">Retrain auth.</div><div class="cb-track"><div class="cb-fill" style="width:${state.fields['F9-retrain']?100:0}%"></div></div><div class="cb-pct">${state.fields['F9-retrain']?'✓':'—'}</div></div>
-      <div class="cb-row"><div class="cb-label">Shutdown auth.</div><div class="cb-track"><div class="cb-fill" style="width:${state.fields['F9-shutdown']?100:0}%"></div></div><div class="cb-pct">${state.fields['F9-shutdown']?'✓':'—'}</div></div>
-    </div>${renderReadinessBars()}`;
-  } else if(fid==='F4') {
-    html += `<div class="viz-section"><div class="viz-title">Tacit knowledge categories</div>
-      <div style="font-size:9px;color:#666680;line-height:1.7;margin-bottom:10px">Common categories — check what applies:</div>
-      ${['Data quality workarounds','Informal approval chains','Calendar / timing exceptions','Person-specific knowledge','Regulatory grey areas','Political constraints'].map(cat=>`
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer" onclick="this.querySelector('.tck').style.background=this.querySelector('.tck').style.background?'':'#d4a84330';this.querySelector('.tck').style.borderColor=this.querySelector('.tck').style.borderColor==='#d4a843'?'#333345':'#d4a843';logEvent('tacit_category',{cat:'${cat}'})">
-          <div class="tck" style="width:13px;height:13px;border:1px solid #333345;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;color:#d4a843">✓</div>
-          <span style="font-size:9px;color:#888898">${cat}</span>
-        </div>`).join('')}
-    </div>`;
-  } else {
-    html = `<div style="font-size:9px;color:#44445a;font-style:italic;padding:20px 0;text-align:center">Focus on F4–F9 to see decision support.</div>`;
-  }
-  el.innerHTML = html;
-}
-
-function renderOvMatrix() {
-  if(!state.capabilities.length) return '<div class="ov-empty">No capabilities selected yet.</div>';
-  return state.capabilities.map(cap=>{
-    const ch = state.chains[cap]||{};
-    const ov = ch.oversight;
-    const tc = TIER_C[ch.tier]||'#888';
-    const barW = ov==='Automate'?90:ov==='Augment'?55:20;
-    const barC = ov==='Automate'?'#60b870':ov==='Augment'?'#d4a843':'#c05050';
-    return `<div class="ov-row">
-      <div class="ov-cap-name" style="color:${tc}" title="${cap}">${cap.length>13?cap.slice(0,13)+'…':cap}</div>
-      <div class="ov-bar-wrap">
-        <div class="ov-bar" style="width:${ov?barW:8}%;background:${ov?barC:barC+'40'}">
-          <span class="ov-bar-label" style="color:${ov?'white':'transparent'}">${ov||'not set'}</span>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function renderReadinessBars() {
-  const prog = state.canvasProgress;
-  const items = [
-    {l:'Scope',done:!!state.scope},
-    {l:'Data',done:state.dataSources.length>0},
-    {l:'Roles',done:state.roles.length>0},
-    {l:'Systems',done:(state.fields['F3']||'').length>10},
-    {l:'Tacit',done:(state.fields['F4']||'').length>20},
-    {l:'Capabilities',done:state.capabilities.length>0},
-    {l:'Chains',done:state.capabilities.length>0&&state.capabilities.every(c=>state.chains[c]&&state.chains[c].oversight)},
-    {l:'Feedback',done:!!(state.fields['F7-capture']&&state.fields['F7-cadence'])},
-    {l:'KPIs',done:(state.fields['F8']||'').length>30},
-    {l:'Governance',done:(state.fields['F9']||'').length>30&&!!state.fields['F9-owner']},
-  ];
-  const pct = Math.round(items.filter(i=>i.done).length/items.length*100);
-  return `<div class="viz-section"><div class="viz-title">Blueprint readiness</div>
-    <div style="font-size:10px;color:${pct===100?'#60b870':'#d4a843'};margin-bottom:8px;font-weight:500">${pct}% complete</div>
-    ${items.map(i=>`<div class="cb-row"><div class="cb-label">${i.l}</div><div class="cb-track"><div class="cb-fill" style="width:${i.done?100:0}%;background:${i.done?'#60b870':'#333345'}"></div></div><div class="cb-pct">${i.done?'✓':'—'}</div></div>`).join('')}
-  </div>`;
-}
-
-function renderViz() {
-  const el = document.getElementById('vizContent');
-  let html = '';
-  html += `<div class="viz-section"><div class="viz-title">Capability tier map</div><div class="tier-wheel">`;
-  [['sense','👁','Sense'],['interpret','🧠','Interpret'],['act','⚡','Act'],['learn','🔄','Learn']].forEach(([t,ic,nm])=>{
-    const caps = state.capabilities.filter(c=>state.chains[c]&&state.chains[c].tier===t);
-    const lit = caps.length>0;
-    html += `<div class="tier-cell${lit?' lit':''}" style="--tc:${TIER_C[t]}">
-      <div class="tier-cell-top"><span>${ic}</span><span class="tier-cell-name" style="color:${TIER_C[t]}">${nm}</span></div>
-      <div class="tier-cell-desc" style="color:${lit?TIER_C[t]+'aa':'#44445a'}">${caps.length?caps.length+' selected':'none'}</div>
-      <div class="tier-caps">${caps.map(c=>`<div class="tier-cap-item selected"><div class="tier-cap-dot" style="background:${TIER_C[t]}"></div>${c}</div>`).join('')}</div>
-    </div>`;
-  });
-  html += `</div></div>`;
-  if(state.capabilities.length>0) {
-    html += `<div class="viz-section"><div class="viz-title">Oversight allocation</div><div class="ov-matrix">${renderOvMatrix()}</div></div>`;
-  }
-  // Radar
-  const items = [
-    {l:'Scope',done:!!state.scope},{l:'Data',done:state.dataSources.length>0},
-    {l:'Roles',done:state.roles.length>0},{l:'Systems',done:(state.fields['F3']||'').length>10},
-    {l:'Tacit',done:(state.fields['F4']||'').length>20},{l:'Capabilities',done:state.capabilities.length>0},
-    {l:'Chains',done:state.capabilities.length>0&&state.capabilities.every(c=>state.chains[c]&&state.chains[c].oversight)},
-    {l:'Feedback',done:!!(state.fields['F7-capture']&&state.fields['F7-cadence'])},
-    {l:'KPIs',done:(state.fields['F8']||'').length>30},{l:'Governance',done:(state.fields['F9']||'').length>30&&!!state.fields['F9-owner']},
-  ];
-  const N=items.length,R=75,CX=105,CY=105;
-  const pts=items.map((f,i)=>{const a=(i/N)*Math.PI*2-Math.PI/2;const r=f.done?R:6;return[CX+Math.cos(a)*r,CY+Math.sin(a)*r];});
-  const bgPts=items.map((_,i)=>{const a=(i/N)*Math.PI*2-Math.PI/2;return[CX+Math.cos(a)*R,CY+Math.sin(a)*R];});
-  const lPts=items.map((f,i)=>{const a=(i/N)*Math.PI*2-Math.PI/2;return{x:CX+Math.cos(a)*(R+14),y:CY+Math.sin(a)*(R+14),l:f.l,done:f.done};});
-  const pct=Math.round(items.filter(f=>f.done).length/N*100);
-  html += `<div class="viz-section"><div class="viz-title">Blueprint completeness</div>
-    <div class="radar-wrap"><svg class="radar-svg" viewBox="0 0 210 210">
-      ${[.25,.5,.75,1].map(r=>`<polygon points="${bgPts.map(([x,y])=>{const dx=x-CX,dy=y-CY;return`${CX+dx*r},${CY+dy*r}`;}).join(' ')}" fill="none" stroke="#22222e" stroke-width="1"/>`).join('')}
-      ${bgPts.map(([x,y])=>`<line x1="${CX}" y1="${CY}" x2="${x}" y2="${y}" stroke="#1e1e2a" stroke-width="1"/>`).join('')}
-      <polygon points="${pts.map(([x,y])=>`${x},${y}`).join(' ')}" fill="#d4a84320" stroke="#d4a843" stroke-width="1.5"/>
-      ${pts.map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="3" fill="${items[i].done?'#d4a843':'#333345'}"/>`).join('')}
-      ${lPts.map(p=>`<text x="${p.x}" y="${p.y}" text-anchor="middle" dominant-baseline="middle" font-family="Inter,sans-serif" font-size="7" fill="${p.done?'#d4a843':'#555570'}">${p.l}</text>`).join('')}
-      <text x="${CX}" y="${CY-6}" text-anchor="middle" font-family="Inter,sans-serif" font-size="18" font-weight="600" fill="#d4a843">${pct}%</text>
-      <text x="${CX}" y="${CY+10}" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#666680">complete</text>
-    </svg></div></div>`;
-  el.innerHTML = html;
-}
-
-function setAITab(tab, btn) {
-  aiTab = tab;
-  document.querySelectorAll('.ap-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.ap-view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  if(tab==='viz') renderViz();
-  if(tab==='decision'&&activeField) renderDecisionSupport(activeField);
-}
-
 // Add field-focused highlight style
 const focusStyle = document.createElement('style');
 focusStyle.textContent = '.field-focused{outline:2px solid var(--navy-g);outline-offset:4px;border-radius:8px;}';
 document.head.appendChild(focusStyle);
-
-// Init viz
-renderViz();
 </script>
 </body>
 </html>
