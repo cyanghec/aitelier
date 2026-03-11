@@ -339,8 +339,11 @@ textarea::placeholder{color:var(--ink4);}
 }
 .chain-cap-name{font-size:11px;font-weight:500;color:var(--ink);}
 .chain-tier-badge{font-size:8px;padding:2px 7px;border-radius:2px;border:1px solid;letter-spacing:.5px;}
-.chain-body{padding:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.chain-body{padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .chain-field-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink4);margin-bottom:5px;}
+.chain-io-hint{font-size:9px;color:var(--ink4);margin-top:4px;font-style:italic;line-height:1.5;}
+.chain-mismatch{font-size:9px;color:#b05000;background:#fff3e8;border:1px solid #f0c080;border-radius:4px;padding:5px 8px;margin-top:6px;line-height:1.55;}
+.chain-oversight-row{grid-column:1/-1;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;}
 .oversight-opts{display:flex;gap:6px;}
 .ov-opt{
   flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;
@@ -1132,7 +1135,7 @@ function toggleCap(el, capName, tier) {
   el.classList.toggle('selected');
   if(el.classList.contains('selected')) {
     if(!state.capabilities.includes(capName)) state.capabilities.push(capName);
-    if(!state.chains[capName]) state.chains[capName] = {tier, input:'', judgment:'', oversight:''};
+    if(!state.chains[capName]) state.chains[capName] = {tier, input:'', output:'', judgment:'', oversight:''};
     logEvent('capability.selected', {capability:capName, tier});
     // RQ3 · T2: Oversight Advisor fires after capability selected
     if(sessionArm === 'T2') {
@@ -1281,6 +1284,43 @@ function switchTab(tab) {
 const TIER_COLORS = {sense:'#2d6ea0',interpret:'#a07830',act:'#c05030',learn:'#2a8060'};
 
 function renderChains() {
+// ── F6: I/O HINTS & CONSISTENCY ──
+const CAP_IO = {
+  'Pattern Recognition':    { in: 'e.g. Transaction logs, sensor readings, image/text streams…',   out: 'e.g. Anomaly flags, pattern labels, confidence scores…' },
+  'Retrieval & Synthesis':  { in: 'e.g. Internal documents, knowledge bases, policies, emails…',   out: 'e.g. Synthesised summaries, retrieved passages, structured answers…' },
+  'Prediction':             { in: 'e.g. Historical outcomes, engineered features, upstream scores…', out: 'e.g. Probability scores, risk forecasts, demand estimates…' },
+  'Decision Support':       { in: 'e.g. Processed signals, rule conditions, contextual data…',      out: 'e.g. Ranked options, recommended action with rationale, risk flags…' },
+  'Automation':             { in: 'e.g. Approved triggers, structured rule conditions…',            out: 'e.g. Executed workflow steps, automated responses, system actions…' },
+  'Learning & Adaptation':  { in: 'e.g. Feedback data, labelled outcomes, model drift signals…',   out: 'e.g. Updated model, refined thresholds, adapted decision rules…' },
+};
+
+// Keywords in the output that signal a mismatch for a given tier
+const TIER_MISMATCH = {
+  sense:     { keywords: ['automate', 'execute', 'approve', 'reject', 'decide', 'action', 'directly'], msg: 'Sense-tier capabilities classify and flag — they don\'t make or execute decisions. Does your output description imply autonomous action?' },
+  interpret: { keywords: ['execute', 'automate', 'directly', 'without human', 'no review'],           msg: 'Interpret-tier capabilities generate insights for human review — they\'re not designed to act autonomously.' },
+  act:       { keywords: ['predict', 'classify', 'score', 'pattern', 'synthesis'],                    msg: 'Act-tier capabilities execute actions — not generate insights or predictions. Is this the right tier?' },
+  learn:     { keywords: ['customer-facing', 'immediate action', 'final decision', 'no validation'],  msg: 'Learn-tier outputs (updated models) should be validated before deployment — not used as immediate decisions.' },
+};
+
+function checkConsistency(cap) {
+  const ch = state.chains[cap];
+  if (!ch) return;
+  const hintEl = document.getElementById('io-hint-' + CSS.escape(cap));
+  if (!hintEl) return;
+  const output = (ch.output || '').toLowerCase();
+  const rules = TIER_MISMATCH[ch.tier];
+  if (!rules || !output || output.length < 10) { hintEl.textContent = ''; hintEl.className = 'chain-io-hint'; return; }
+  const hit = rules.keywords.find(kw => output.includes(kw));
+  if (hit) {
+    hintEl.textContent = '⚠ ' + rules.msg;
+    hintEl.className = 'chain-mismatch';
+  } else {
+    hintEl.textContent = '';
+    hintEl.className = 'chain-io-hint';
+  }
+}
+
+function renderChains() {
   const cl = document.getElementById('chainList');
   if(state.capabilities.length === 0) {
     cl.innerHTML = '<div style="font-size:11px;color:var(--ink4);font-style:italic;padding:20px 0;">← Select capabilities in F5 to build chains here.</div>';
@@ -1289,6 +1329,8 @@ function renderChains() {
   cl.innerHTML = state.capabilities.map(cap => {
     const ch = state.chains[cap] || {};
     const tc = TIER_COLORS[ch.tier] || 'var(--ink3)';
+    const io = CAP_IO[cap] || { in: 'Data sources, upstream outputs…', out: 'What this capability produces…' };
+    const capId = cap.replace(/[^a-zA-Z0-9]/g, '_');
     return `<div class="chain-card">
       <div class="chain-hdr">
         <span class="chain-cap-name">${cap}</span>
@@ -1296,19 +1338,26 @@ function renderChains() {
       </div>
       <div class="chain-body">
         <div>
-          <div class="chain-field-label">What feeds this capability?</div>
-          <textarea style="min-height:72px;font-size:10px" placeholder="Data sources, upstream outputs…" oninput="updateChain('${cap}','input',this.value)">${ch.input||''}</textarea>
+          <div class="chain-field-label">Input — what feeds this?</div>
+          <textarea style="min-height:72px;font-size:10px" placeholder="${io.in}" oninput="updateChain('${cap}','input',this.value)">${ch.input||''}</textarea>
         </div>
         <div>
-          <div class="chain-field-label">Human judgment required</div>
-          <textarea style="min-height:72px;font-size:10px" placeholder="What decisions stay with humans?" oninput="updateChain('${cap}','judgment',this.value)">${ch.judgment||''}</textarea>
+          <div class="chain-field-label">Expected output</div>
+          <textarea style="min-height:72px;font-size:10px" placeholder="${io.out}" oninput="updateChain('${cap}','output',this.value)">${ch.output||''}</textarea>
+          <div class="chain-io-hint" id="io-hint-${capId}"></div>
         </div>
-        <div>
-          <div class="chain-field-label">Oversight level</div>
-          <div class="oversight-opts">
-            <div class="ov-opt${ch.oversight==='Automate'?' sel-automate':''}" onclick="setOversight('${cap}','Automate',this)">Automate</div>
-            <div class="ov-opt${ch.oversight==='Augment'?' sel-augment':''}" onclick="setOversight('${cap}','Augment',this)">Augment</div>
-            <div class="ov-opt${ch.oversight==='Supervise'?' sel-supervise':''}" onclick="setOversight('${cap}','Supervise',this)">Supervise</div>
+        <div class="chain-oversight-row">
+          <div>
+            <div class="chain-field-label">Human judgment required</div>
+            <textarea style="min-height:60px;font-size:10px" placeholder="What decisions stay with humans?" oninput="updateChain('${cap}','judgment',this.value)">${ch.judgment||''}</textarea>
+          </div>
+          <div>
+            <div class="chain-field-label">Oversight level</div>
+            <div class="oversight-opts">
+              <div class="ov-opt${ch.oversight==='Automate'?' sel-automate':''}" onclick="setOversight('${cap}','Automate',this)">Automate</div>
+              <div class="ov-opt${ch.oversight==='Augment'?' sel-augment':''}" onclick="setOversight('${cap}','Augment',this)">Augment</div>
+              <div class="ov-opt${ch.oversight==='Supervise'?' sel-supervise':''}" onclick="setOversight('${cap}','Supervise',this)">Supervise</div>
+            </div>
           </div>
         </div>
       </div>
@@ -1319,6 +1368,7 @@ function renderChains() {
 function updateChain(cap, key, val) {
   if(!state.chains[cap]) return;
   state.chains[cap][key] = val;
+  if(key === 'input' || key === 'output') checkConsistency(cap);
   updateProgress();
   logEvent('field.change', {field:'F6', capability:cap, subfield:key});
 }
