@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "backend",
-      "runtimeExecutable": "/bin/bash",
-      "runtimeArgs": ["/Users/cathyyang/.claude/start-aitelier-backend.sh"],
+      "runtimeExecutable": "/usr/bin/python3",
+      "runtimeArgs": ["/tmp/start_aitelier.py"],
       "port": 8000
     }
   ]
