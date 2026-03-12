@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from database import create_db_and_tables
-from routers import sessions, events, canvas, guidance, blueprint, survey
+from routers import sessions, events, canvas, guidance, blueprint, survey, moderator
 
 app = FastAPI(title="AItelier API", version="0.1.0")
 
@@ -36,6 +36,7 @@ app.include_router(canvas.router)
 app.include_router(guidance.router)
 app.include_router(blueprint.router)
 app.include_router(survey.router)
+app.include_router(moderator.router)
 
 
 @app.on_event("startup")

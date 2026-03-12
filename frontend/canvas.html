@@ -448,6 +448,7 @@ select:focus{border-color:var(--border2);}
   .scope-grid{grid-template-columns:1fr;}
   .feedback-grid{grid-template-columns:1fr;}
 }
+
 </style>
 <!-- API endpoint config — set window.AITELIER_API in config.js for production -->
 <script src="config.js"></script>
@@ -1049,6 +1050,7 @@ function goToPhase(n) {
   document.getElementById('mainContent').scrollTop = 0;
   window.scrollTo(0,0);
   renderSidebar();
+  if (typeof modOnPhaseChange === 'function') modOnPhaseChange(n);
 }
 
 // ── F0: SCOPE ──
@@ -1392,6 +1394,7 @@ async function submitCanvas() {
   document.querySelectorAll('.phase-view').forEach(v=>v.style.display='none');
   document.getElementById('completion').classList.add('show');
   logEvent('session.canvas_complete', {fields_done: FIELDS.filter(f=>isFieldDone(f)).length});
+  if (typeof modOnComplete === 'function') modOnComplete();
 }
 function goToBlueprint() {
   // Write canvas state to sessionStorage so blueprint.html can render it
@@ -1624,5 +1627,7 @@ const focusStyle = document.createElement('style');
 focusStyle.textContent = '.field-focused{outline:2px solid var(--navy-g);outline-offset:4px;border-radius:8px;}';
 document.head.appendChild(focusStyle);
 </script>
+
+<script src="moderator.js"></script>
 </body>
 </html>
