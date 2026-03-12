@@ -1,207 +1,147 @@
 # AItelier
 
-An interactive AI-powered platform for collaborative decision-making and research inquiry sessions. AItelier combines Claude AI agents with a modern web interface to facilitate structured conversations, canvas-based ideation, and guided decision-making workflows.
+A research platform for a randomised controlled field experiment (RQ3) testing three AI governance approaches in executive AI decision-making.
 
-## Features
+## Live Deployments
 
-- **Interactive Sessions**: Create and manage conversation sessions with AI agents
-- **Canvas Interface**: Visual workspace for collaborative ideation and brainstorming
-- **AI Agents**: Multiple specialized agents including:
-  - Decision Challenger: Questions and challenges assumptions
-  - Oversight Advisor: Provides oversight and guidance
-  - Report Generator: Synthesizes findings and generates reports
-  - Reactive Agent: Responds to user queries
-  - Intake Agent: Initial information gathering
-- **Structured Workflows**: Guided surveys and blueprints for different types of inquiries
-- **Event Tracking**: Capture and track interactions during sessions
-- **Database Persistence**: Store sessions, events, and user data using SQLModel
+| Environment | URL | Purpose |
+|---|---|---|
+| **Production** | https://aitelier-demo.netlify.app | Participant-facing |
+| **Test / Dev** | https://aitelier-test.netlify.app | Development & testing |
+| **Backend API** | https://aitelier-tljf.onrender.com | FastAPI (Render, Starter plan) |
+
+## RCT Design — Three Arms
+
+| Arm | Label | Description |
+|---|---|---|
+| T1 | Reactive | AI available on demand, never proactively intervenes |
+| T2 | Oversight Advisor | AI suggests oversight level before F6 capability chains |
+| T3 | Decision Challenger | AI challenges final decisions after F6 capability chains |
+
+Arm assignment is deterministic: `MD5(session_id) % 3`
+
+### Test Links (one per arm)
+
+| Arm | Session | Direct link |
+|---|---|---|
+| T1 | S-TU1203-BFA2 | https://aitelier-demo.netlify.app/canvas.html?session=S-TU1203-BFA2 |
+| T2 | S-TU1203-78F9 | https://aitelier-demo.netlify.app/canvas.html?session=S-TU1203-78F9 |
+| T3 | S-TU1203-4C48 | https://aitelier-demo.netlify.app/canvas.html?session=S-TU1203-4C48 |
+
+New test sessions can be generated via:
+```bash
+curl -s -X POST https://aitelier-tljf.onrender.com/api/sessions \
+  -H "Content-Type: application/json" \
+  -d '{"participant_first":"Test","participant_last":"User","rq":"RQ3"}'
+```
+
+## Participant Flow
+
+```
+index.html  →  canvas.html  →  blueprint.html  →  survey.html
+  (intake)      (4 phases)      (AI blueprint)     (survey)
+```
+
+Session state is passed via URL `?session=` parameter and `sessionStorage`.
 
 ## Tech Stack
 
-### Backend
-- **Framework**: [FastAPI](https://fastapi.tiangolo.com/) 0.115.0
-- **Database ORM**: [SQLModel](https://sqlmodel.tiangolo.com/) 0.0.21
-- **AI Integration**: [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-python) (Claude API)
-- **Server**: [Uvicorn](https://www.uvicorn.org/) 0.30.6
-- **Environment**: Python with python-dotenv
+### Backend (FastAPI · Python 3.11)
+- **Framework**: FastAPI 0.115.0
+- **ORM**: SQLModel 0.0.21 + SQLite (persisted on Render disk at `/data`)
+- **AI**: Anthropic Claude Sonnet 4.6 (`claude-sonnet-4-6`)
+- **Server**: Uvicorn 0.30.6
 
-### Frontend
-- **HTML5** with vanilla JavaScript
-- **CSS3** with custom styling
-- **Config-driven**: Uses `config.js` for API endpoints and settings
-
-### Deployment
-- **Frontend**: [Netlify](https://www.netlify.com/)
-- **Backend**: [Render](https://render.com/)
+### Frontend (Vanilla JS · Netlify)
+- `index.html` — session intake & participant registration
+- `canvas.html` — 4-phase AI governance canvas (F0–F9)
+- `blueprint.html` — AI-generated governance blueprint
+- `survey.html` — post-session survey
+- `config.js` — sets `window.AITELIER_API`
 
 ## Project Structure
 
 ```
 .
-├── backend/                      # FastAPI application
-│   ├── agents/                  # AI agent implementations
-│   │   ├── intake.py           # Initial intake agent
-│   │   ├── reactive.py         # Reactive response agent
-│   │   ├── report_generator.py # Report synthesis
-│   │   ├── rq3_decision_challenger.py
-│   │   └── rq3_oversight_advisor.py
-│   ├── routers/                 # API endpoint routers
-│   │   ├── sessions.py         # Session management
-│   │   ├── events.py           # Event tracking
-│   │   ├── canvas.py           # Canvas interactions
-│   │   ├── guidance.py         # Guidance endpoints
-│   │   ├── blueprint.py        # Blueprint workflows
-│   │   └── survey.py           # Survey endpoints
-│   ├── main.py                 # FastAPI app initialization
-│   ├── database.py             # Database setup
-│   ├── models.py               # SQLModel data models
-│   ├── requirements.txt        # Python dependencies
-│   └── test_e2e.py             # End-to-end tests
-├── frontend/                    # Web interface
-│   ├── index.html              # Main session page
-│   ├── canvas.html             # Canvas workspace
-│   ├── blueprint.html          # Blueprint interface
-│   ├── survey.html             # Survey interface
-│   ├── config.js               # Configuration
-│   └── style.css               # Styling
-├── netlify.toml                # Netlify configuration
-└── render.yaml                 # Render deployment config
+├── backend/
+│   ├── agents/
+│   │   ├── intake.py
+│   │   ├── reactive.py                  # T1 arm
+│   │   ├── rq3_oversight_advisor.py     # T2 arm
+│   │   ├── rq3_decision_challenger.py   # T3 arm
+│   │   └── report_generator.py
+│   ├── routers/
+│   │   ├── sessions.py
+│   │   ├── events.py
+│   │   ├── canvas.py
+│   │   ├── guidance.py
+│   │   ├── blueprint.py
+│   │   └── survey.py
+│   ├── main.py
+│   ├── database.py
+│   ├── models.py
+│   ├── requirements.txt
+│   └── .python-version        # pins Python 3.11.9 for Render
+├── frontend/
+│   ├── index.html
+│   ├── canvas.html
+│   ├── blueprint.html
+│   ├── survey.html
+│   └── config.js
+├── netlify.toml               # publish = "frontend"
+└── render.yaml                # rootDir: backend, disk: /data
 ```
 
-## Getting Started
+## Local Development
 
-### Prerequisites
-- Python 3.8+
-- Node.js (for frontend development)
-- Anthropic API key
-
-### Backend Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/cyanghec/aitelier.git
-   cd aitelier
-   ```
-
-2. **Install dependencies**
-   ```bash
-   cd backend
-   pip install -r requirements.txt
-   ```
-
-3. **Set up environment variables**
-   ```bash
-   # Create a .env file in the backend directory
-   echo "ANTHROPIC_API_KEY=your_api_key_here" > .env
-   ```
-
-4. **Run the development server**
-   ```bash
-   python -m uvicorn main:app --reload
-   ```
-   The API will be available at `http://localhost:8000`
-   API documentation: `http://localhost:8000/docs`
-
-### Frontend Setup
-
-1. **Configure the API endpoint** in `frontend/config.js`
-   ```javascript
-   // Update the API_URL to point to your backend
-   const API_URL = 'http://localhost:8000';
-   ```
-
-2. **Start a local server** (using Python)
-   ```bash
-   cd frontend
-   python -m http.server 8080
-   ```
-   Or use any HTTP server of your choice (Node.js http-server, VS Code Live Server, etc.)
-
-3. **Access the application**
-   Open `http://localhost:8080` in your browser
-
-## API Endpoints
-
-### Sessions
-- `GET /sessions` - List all sessions
-- `POST /sessions` - Create a new session
-- `GET /sessions/{id}` - Get session details
-- `PUT /sessions/{id}` - Update a session
-
-### Events
-- `POST /events` - Record an event
-- `GET /sessions/{session_id}/events` - Get session events
-
-### Canvas
-- `POST /canvas` - Create canvas content
-- `GET /canvas/{id}` - Retrieve canvas
-
-### Guidance
-- `POST /guidance` - Request guidance from AI agents
-
-### Blueprint
-- `GET /blueprints` - List available blueprints
-- `POST /blueprints/{id}/start` - Start a blueprint workflow
-
-### Survey
-- `GET /surveys` - List surveys
-- `POST /surveys/{id}/submit` - Submit survey responses
-
-### Health
-- `GET /health` - API health check
-
-For complete API documentation, run the backend and visit `/docs` (Swagger UI).
-
-## Development
-
-### Running Tests
+### Backend
 ```bash
 cd backend
-python -m pytest test_e2e.py
+pip install -r requirements.txt
+echo "ANTHROPIC_API_KEY=sk-..." > .env
+python -m uvicorn main:app --reload --port 8000
 ```
 
-### Database
-The application uses SQLModel with a SQLite database (by default, see `database.py` for configuration).
+### Frontend
+Open `frontend/index.html` via any HTTP server or directly in browser. `config.js` falls back to `http://localhost:8000` when `AITELIER_API` is empty.
 
-### Adding New Agents
-1. Create a new agent file in `backend/agents/`
-2. Implement the agent logic using the Anthropic SDK
-3. Import and use the agent in the appropriate router
+## Git Branches
 
-### Adding New Routes
-1. Create a new router file in `backend/routers/`
-2. Define FastAPI routes and handlers
-3. Include the router in `backend/main.py`
+| Branch | Purpose |
+|---|---|
+| `main` | Production — auto-deploys to Render; deploy frontend with `netlify deploy --prod` |
+| `staging` | Development — deploy frontend to `aitelier-test.netlify.app` |
 
-## Configuration
+## Key API Endpoints
 
-Key configuration files:
-- **Backend**: `backend/main.py` - CORS settings, router registration
-- **Frontend**: `frontend/config.js` - API URLs and client settings
-- **Deployment**: `netlify.toml`, `render.yaml` - Platform-specific configs
+```
+POST /api/sessions                          Create session (assigns arm)
+GET  /api/sessions/{id}                     Get session
+POST /api/canvas/{id}                       Save canvas state
+POST /api/guidance/reactive-query           T1: on-demand AI query
+POST /api/guidance/oversight-advisor        T2: pre-F6 AI suggestion
+POST /api/guidance/decision-challenger      T3: post-F6 AI challenge
+POST /api/guidance/oversight-advisor-outcome   T2: log DV (accepted_suggestion)
+POST /api/guidance/decision-challenger-outcome T3: log DV (revised_after_challenge)
+POST /api/events                            Log any event
+POST /api/survey/{id}                       Submit survey
+GET  /health                                Health check
+```
 
 ## Environment Variables
 
-Required environment variables (in `backend/.env`):
-- `ANTHROPIC_API_KEY` - Your Anthropic API key for Claude access
+| Variable | Where | Description |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | Render → Environment | Required — Claude API key |
 
 ## Deployment
 
-### Frontend (Netlify)
-The frontend is automatically deployed to Netlify when you push to the main branch.
+```bash
+# Deploy to production (aitelier-demo.netlify.app)
+netlify deploy --dir=frontend --site=fa7c3182-cfaa-44cb-820f-94e484c7b180 --prod
 
-### Backend (Render)
-The backend is configured for deployment on Render. Update `render.yaml` with your service details.
+# Deploy to test (aitelier-test.netlify.app)
+netlify deploy --dir=frontend --site=f2c1dc10-7ca4-4a25-9f63-9e236d4b7c2b --prod
+```
 
-## License
-
-[Add your license information here]
-
-## Contributing
-
-[Add contribution guidelines here]
-
-## Contact
-
-For questions or issues, please contact [Add contact information].
-# Updated
+Backend deploys automatically on push to `main` via Render's GitHub integration.
