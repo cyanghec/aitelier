@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "backend",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["/Users/cathyyang/.claude/start-aitelier-backend.sh"],
+      "port": 8000
+    }
+  ]
+}

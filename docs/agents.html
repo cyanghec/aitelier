@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AItelier · Agentic System Documentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #f4f3f0;
+  --surface: #ffffff;
+  --border:  #e2dfd8;
+  --ink:     #141624;
+  --ink2:    #3e4260;
+  --ink3:    #505470;
+  --ink4:    #9095b0;
+  --navy:    #1E2761;
+  --navy2:   #2A3580;
+  --gold:    #C8922A;
+  --gold-b:  #C8922A18;
+  --green:   #1a7a4a;
+  --red:     #b03030;
+  --amber:   #b06010;
+  --t1:      #2d6ea0;
+  --t2:      #7a4a9a;
+  --t3:      #2a8060;
+  --code-bg: #0f111a;
+  --code-fg: #c9d1d9;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;}
+
+/* ── TOP NAV ── */
+.topnav{position:sticky;top:0;z-index:100;background:var(--navy);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;box-shadow:0 2px 12px #00000030;}
+.topnav-logo{font-family:'Playfair Display',serif;font-size:20px;color:#fff;}
+.topnav-logo em{font-style:italic;color:var(--gold);}
+.topnav-title{font-size:12px;color:rgba(255,255,255,.5);letter-spacing:.5px;text-transform:uppercase;}
+.topnav-links{display:flex;gap:20px;}
+.topnav-links a{font-size:12px;color:rgba(255,255,255,.55);text-decoration:none;letter-spacing:.3px;transition:color .15s;}
+.topnav-links a:hover{color:#fff;}
+
+/* ── LAYOUT ── */
+.page{display:flex;min-height:100vh;}
+.sidebar{width:240px;flex-shrink:0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;background:var(--surface);border-right:1px solid var(--border);padding:28px 0;}
+.main{flex:1;padding:48px 56px;max-width:960px;}
+
+/* ── SIDEBAR NAV ── */
+.sbnav-section{padding:0 20px 4px;font-size:9px;font-weight:600;color:var(--ink4);letter-spacing:.8px;text-transform:uppercase;margin-top:16px;}
+.sbnav-section:first-child{margin-top:0;}
+.sbnav-link{display:block;padding:7px 20px;font-size:12.5px;color:var(--ink3);text-decoration:none;transition:all .12s;border-left:2px solid transparent;}
+.sbnav-link:hover{color:var(--navy);background:#1e27610a;border-left-color:var(--gold);}
+.sbnav-link.active{color:var(--navy);font-weight:500;background:var(--gold-b);border-left-color:var(--gold);}
+
+/* ── SECTIONS ── */
+section{margin-bottom:64px;}
+.section-tag{display:inline-block;font-size:9px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--gold);background:var(--gold-b);padding:3px 8px;border-radius:3px;margin-bottom:10px;}
+h1{font-family:'Playfair Display',serif;font-size:36px;font-weight:600;color:var(--navy);line-height:1.2;margin-bottom:8px;}
+h2{font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--navy);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+h3{font-size:14px;font-weight:600;color:var(--ink);margin:24px 0 10px;text-transform:uppercase;letter-spacing:.4px;}
+h4{font-size:13px;font-weight:600;color:var(--ink2);margin:16px 0 8px;}
+p{font-size:14px;color:var(--ink3);margin-bottom:12px;line-height:1.75;}
+p:last-child{margin-bottom:0;}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);border-radius:12px;padding:40px 48px;margin-bottom:48px;color:#fff;}
+.hero h1{color:#fff;margin-bottom:12px;}
+.hero p{color:rgba(255,255,255,.7);font-size:15px;max-width:600px;}
+.hero-meta{display:flex;gap:24px;margin-top:24px;}
+.hero-chip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:5px 14px;font-size:11px;color:rgba(255,255,255,.75);letter-spacing:.3px;}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:16px;}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.card-title{font-size:15px;font-weight:600;color:var(--ink);}
+.card-sub{font-size:12px;color:var(--ink4);margin-top:2px;}
+
+/* ── AGENT CARDS ── */
+.agent-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px;}
+.agent-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;}
+.agent-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.agent-body{padding:24px;}
+.agent-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:12px;letter-spacing:.2px;}
+.chip-model{background:#1E276110;color:var(--navy);border:1px solid #1E276125;}
+.chip-tokens{background:#C8922A10;color:#9a6a10;border:1px solid #C8922A25;}
+.chip-t1{background:#2d6ea015;color:var(--t1);border:1px solid #2d6ea030;}
+.chip-t2{background:#7a4a9a15;color:var(--t2);border:1px solid #7a4a9a30;}
+.chip-t3{background:#2a806015;color:var(--t3);border:1px solid #2a806030;}
+.chip-all{background:#50547015;color:var(--ink3);border:1px solid #50547030;}
+.chip-facilitator{background:#b8601010;color:#8a3800;border:1px solid #b8601030;}
+
+/* ── PROMPT BLOCKS ── */
+.prompt-block{background:var(--code-bg);border-radius:8px;overflow:hidden;margin:16px 0;}
+.prompt-label{padding:8px 16px;font-size:10px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:rgba(255,255,255,.35);border-bottom:1px solid rgba(255,255,255,.06);}
+.prompt-text{padding:16px;font-family:'DM Mono',monospace;font-size:12px;color:var(--code-fg);line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+.prompt-text .hl-key{color:#79c0ff;}
+.prompt-text .hl-val{color:#a5d6a7;}
+.prompt-text .hl-constraint{color:#ff9800;}
+.prompt-text .hl-emphasis{color:var(--gold);}
+
+/* ── CODE BLOCKS ── */
+pre{background:var(--code-bg);border-radius:8px;padding:16px;overflow-x:auto;margin:12px 0;}
+code{font-family:'DM Mono',monospace;font-size:12px;color:var(--code-fg);line-height:1.65;}
+p code, li code{background:#1e276112;color:var(--navy2);padding:1px 5px;border-radius:3px;font-size:12px;}
+
+/* ── TABLES ── */
+.table-wrap{overflow-x:auto;margin:16px 0;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{background:var(--navy);color:#fff;padding:10px 14px;text-align:left;font-weight:500;font-size:12px;letter-spacing:.3px;}
+tbody tr{border-bottom:1px solid var(--border);}
+tbody tr:last-child{border-bottom:none;}
+tbody td{padding:10px 14px;color:var(--ink3);vertical-align:top;}
+tbody tr:hover{background:#1e27610a;}
+.td-arm{font-weight:600;}
+.td-t1{color:var(--t1);}
+.td-t2{color:var(--t2);}
+.td-t3{color:var(--t3);}
+
+/* ── ENDPOINT BLOCKS ── */
+.endpoint{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-radius:7px;border:1px solid var(--border);margin-bottom:8px;background:var(--surface);}
+.method{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;padding:3px 8px;border-radius:4px;flex-shrink:0;margin-top:1px;}
+.method-get{background:#1a7a4a15;color:var(--green);}
+.method-post{background:#2d6ea015;color:var(--t1);}
+.method-put{background:#C8922A15;color:var(--gold);}
+.endpoint-path{font-family:'DM Mono',monospace;font-size:13px;color:var(--navy);font-weight:500;}
+.endpoint-desc{font-size:12px;color:var(--ink4);margin-top:3px;}
+
+/* ── FLOW DIAGRAM ── */
+.flow{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px;margin:16px 0;}
+.flow-row{display:flex;align-items:center;gap:0;margin-bottom:12px;}
+.flow-row:last-child{margin-bottom:0;}
+.flow-box{background:var(--navy);color:#fff;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:500;flex-shrink:0;white-space:nowrap;}
+.flow-box.intake{background:#1a7a4a;}
+.flow-box.t1{background:var(--t1);}
+.flow-box.t2{background:var(--t2);}
+.flow-box.t3{background:var(--t3);}
+.flow-box.report{background:#c05030;}
+.flow-box.moderator{background:#8a5010;}
+.flow-box.event{background:#555;}
+.flow-arrow{flex:1;height:2px;background:var(--border);position:relative;min-width:20px;}
+.flow-arrow::after{content:'▶';position:absolute;right:-6px;top:-8px;font-size:11px;color:var(--border);}
+.flow-label{font-size:10px;color:var(--ink4);position:absolute;top:-16px;left:0;right:0;text-align:center;white-space:nowrap;}
+.flow-arrow-wrap{flex:1;position:relative;display:flex;align-items:center;}
+
+/* ── FIELD GRID ── */
+.field-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:12px 0;}
+.field-item{background:var(--gold-b);border:1px solid #C8922A25;border-radius:7px;padding:10px 12px;}
+.field-id{font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);font-weight:500;margin-bottom:3px;}
+.field-name{font-size:12px;font-weight:500;color:var(--ink);}
+
+/* ── DECISION MATRIX ── */
+.matrix-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:16px 0;}
+.matrix-cell{border-radius:8px;padding:16px;text-align:center;}
+.matrix-cell.auto{background:#1a7a4a12;border:1px solid #1a7a4a30;}
+.matrix-cell.augment{background:#2d6ea012;border:1px solid #2d6ea030;}
+.matrix-cell.supervise{background:#b0303012;border:1px solid #b0303030;}
+.matrix-level{font-size:13px;font-weight:600;margin-bottom:6px;}
+.matrix-level.auto{color:var(--green);}
+.matrix-level.augment{color:var(--t1);}
+.matrix-level.supervise{color:var(--red);}
+.matrix-desc{font-size:11px;color:var(--ink4);line-height:1.5;}
+
+/* ── CONSTRAINT PILLS ── */
+.constraints{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0;}
+.constraint{font-size:11px;padding:4px 10px;border-radius:4px;}
+.constraint-never{background:#b0303012;color:var(--red);border:1px solid #b0303030;}
+.constraint-always{background:#1a7a4a12;color:var(--green);border:1px solid #1a7a4a30;}
+
+/* ── DIVIDER ── */
+hr{border:none;border-top:1px solid var(--border);margin:40px 0;}
+
+/* ── DATA FLOW TIMELINE ── */
+.timeline{position:relative;padding-left:28px;}
+.timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--border);}
+.tl-item{position:relative;margin-bottom:24px;}
+.tl-dot{width:20px;height:20px;border-radius:50%;background:var(--navy);border:3px solid var(--bg);position:absolute;left:-24px;top:0;display:flex;align-items:center;justify-content:center;}
+.tl-dot-inner{width:6px;height:6px;border-radius:50%;background:#fff;}
+.tl-phase{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--gold);margin-bottom:4px;}
+.tl-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px;}
+.tl-body{font-size:13px;color:var(--ink3);line-height:1.6;}
+.tl-endpoints{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.tl-ep{font-family:'DM Mono',monospace;font-size:11px;background:var(--navy);color:#fff;padding:2px 8px;border-radius:3px;}
+
+/* ── TIER BADGE ── */
+.tier-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;text-transform:uppercase;}
+.tier-sense{background:#2d6ea015;color:var(--t1);}
+.tier-interpret{background:#7a4a9a15;color:var(--t2);}
+.tier-act{background:#b0303015;color:var(--red);}
+.tier-learn{background:#1a7a4a15;color:var(--green);}
+
+/* ── SCROLL SPY ── */
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .main{padding:32px 24px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-logo">AI<em>telier</em></div>
+  <div class="topnav-title">Agentic System Documentation</div>
+  <div class="topnav-links">
+    <a href="#overview">Overview</a>
+    <a href="#agents">Agents</a>
+    <a href="#api">API</a>
+    <a href="#data">Data Flow</a>
+    <a href="#rct">RCT Design</a>
+  </div>
+</nav>
+
+<div class="page">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sbnav-section">Introduction</div>
+  <a class="sbnav-link" href="#overview">System Overview</a>
+  <a class="sbnav-link" href="#architecture">Architecture</a>
+  <a class="sbnav-link" href="#models">Data Models</a>
+
+  <div class="sbnav-section">Agents</div>
+  <a class="sbnav-link" href="#agent-intake">Intake Agent</a>
+  <a class="sbnav-link" href="#agent-reactive">Reactive Agent (T1)</a>
+  <a class="sbnav-link" href="#agent-advisor">Oversight Advisor (T2)</a>
+  <a class="sbnav-link" href="#agent-challenger">Decision Challenger (T3)</a>
+  <a class="sbnav-link" href="#agent-moderator">Moderator Agent</a>
+  <a class="sbnav-link" href="#agent-report">Report Generator</a>
+
+  <div class="sbnav-section">API Reference</div>
+  <a class="sbnav-link" href="#api-sessions">Sessions</a>
+  <a class="sbnav-link" href="#api-guidance">Guidance Hub</a>
+  <a class="sbnav-link" href="#api-canvas">Canvas</a>
+  <a class="sbnav-link" href="#api-blueprint">Blueprint</a>
+  <a class="sbnav-link" href="#api-survey">Survey</a>
+  <a class="sbnav-link" href="#api-moderator">Moderator</a>
+  <a class="sbnav-link" href="#api-events">Events</a>
+
+  <div class="sbnav-section">Design</div>
+  <a class="sbnav-link" href="#data">Data Flow</a>
+  <a class="sbnav-link" href="#rct">RCT Design</a>
+  <a class="sbnav-link" href="#principles">Principles</a>
+</aside>
+
+<!-- ── MAIN CONTENT ── -->
+<main class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="section-tag">Technical Documentation</div>
+  <h1>AItelier Agentic System</h1>
+  <p>Six specialised Claude agents powering a controlled field experiment on AI governance decision-making among executive teams.</p>
+  <div class="hero-meta">
+    <span class="hero-chip">6 Agents</span>
+    <span class="hero-chip">claude-sonnet-4-6</span>
+    <span class="hero-chip">3-Arm RCT</span>
+    <span class="hero-chip">FastAPI + SQLite</span>
+    <span class="hero-chip">7 Routers · 16 Endpoints</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="overview">
+  <div class="section-tag">Overview</div>
+  <h2>System Overview</h2>
+  <p>AItelier is a web-based platform where executive teams design AI governance frameworks using a structured canvas. The backend deploys six Claude agents across three experimental arms, testing how different AI facilitation styles affect governance quality and decision-making behaviour.</p>
+  <p>Every agent interaction is logged to an audit database, enabling causal identification of agent effects through random assignment at session creation.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Agent</th><th>Role</th><th>Arm</th><th>Model</th><th>Max Tokens</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Intake</strong></td>
+          <td>Multi-turn scoping conversation before canvas opens</td>
+          <td><span class="chip chip-all">All arms</span></td>
+          <td><code>claude-sonnet-4-6</code></td>
+          <td>1024</td>
+        </tr>
+        <tr>
+          <td><strong>Reactive</strong></td>
+          <td>Answer-only — responds only when explicitly asked</td>
+          <td><span class="chip chip-t1">T1</span></td>
+          <td><code>claude-sonnet-4-6</code></td>
+          <td>400</td>
+        </tr>
+        <tr>
+          <td><strong>Oversight Advisor</strong></td>
+          <td>Proactively suggests oversight level after capability selection</td>
+          <td><span class="chip chip-t2">T2</span></td>
+          <td><code>claude-sonnet-4-6</code></td>
+          <td>512</td>
+        </tr>
+        <tr>
+          <td><strong>Decision Challenger</strong></td>
+          <td>Challenges executive's oversight choice with failure scenarios</td>
+          <td><span class="chip chip-t3">T3</span></td>
+          <td><code>claude-sonnet-4-6</code></td>
+          <td>300</td>
+        </tr>
+        <tr>
+          <td><strong>Moderator</strong></td>
+          <td>Professor avatar — timers, discussion cues, phase facilitation</td>
+          <td><span class="chip chip-all">All arms</span></td>
+          <td><code>claude-sonnet-4-6</code></td>
+          <td>120</td>
+        </tr>
+        <tr>
+          <td><strong>Report Generator</strong></td>
+          <td>Synthesises canvas + intake → AI Decision Blueprint JSON</td>
+          <td><span class="chip chip-all">All arms</span></td>
+          <td><code>claude-sonnet-4-6</code></td>
+          <td>2048</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="architecture">
+  <div class="section-tag">Architecture</div>
+  <h2>System Architecture</h2>
+
+  <div class="flow" style="overflow-x:auto;">
+    <h3 style="margin-top:0;margin-bottom:20px;">Agent-Router Connection Map</h3>
+    <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--ink3);line-height:2.2;">
+<pre><code style="background:transparent;color:var(--ink3);">
+ ┌─────────────────────────────────────────────────────────────────┐
+ │                     FRONTEND (4 pages)                          │
+ │  index.html  ·  canvas.html  ·  blueprint.html  ·  survey.html  │
+ └──────────────────────────┬──────────────────────────────────────┘
+                            │ HTTP / fetch()
+ ┌──────────────────────────▼──────────────────────────────────────┐
+ │                   FastAPI Backend                               │
+ │                                                                 │
+ │  /api/sessions ──────────────────► sessions.py                  │
+ │  /api/events ────────────────────► events.py                    │
+ │  /api/canvas ────────────────────► canvas.py                    │
+ │  /api/survey ────────────────────► survey.py                    │
+ │  /api/moderator/message ─────────► moderator.py ─► agents/moderator.py
+ │  /api/blueprint ─────────────────► blueprint.py ──► agents/report_generator.py
+ │                                                                 │
+ │  /api/guidance/intake-message ───► guidance.py ───► agents/intake.py
+ │  /api/guidance/reactive-query  ──► guidance.py ───► agents/reactive.py     [T1]
+ │  /api/guidance/oversight-advisor ► guidance.py ───► agents/rq3_oversight_advisor.py [T2]
+ │  /api/guidance/decision-challenger► guidance.py ──► agents/rq3_decision_challenger.py [T3]
+ │                                                                 │
+ └──────────────────────────┬──────────────────────────────────────┘
+                            │
+ ┌──────────────────────────▼──────────────────────────────────────┐
+ │                   SQLite Database                               │
+ │  SessionDB · CanvasStateDB · EventDB · IntakeMessageDB          │
+ │  SurveyResponseDB · BlueprintDB                                 │
+ └─────────────────────────────────────────────────────────────────┘
+</code></pre>
+    </div>
+  </div>
+
+  <h3>Technology Stack</h3>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Layer</th><th>Technology</th><th>Details</th></tr></thead>
+        <tbody>
+          <tr><td>Frontend</td><td>Vanilla HTML/CSS/JS</td><td>4 pages · no build step · served via Netlify CDN</td></tr>
+          <tr><td>Backend framework</td><td>FastAPI (Python)</td><td>Auto-docs at <code>/docs</code> · async-ready</td></tr>
+          <tr><td>Agent runtime</td><td>Anthropic API</td><td><code>claude-sonnet-4-6</code> across all agents</td></tr>
+          <tr><td>Database</td><td>SQLite + SQLModel</td><td>WAL mode · file at <code>$DATA_DIR/aitelier.db</code></td></tr>
+          <tr><td>Frontend hosting</td><td>Netlify</td><td>Production: aitelier-demo.netlify.app · Dev: aitelier-test.netlify.app</td></tr>
+          <tr><td>Backend hosting</td><td>Render</td><td>https://aitelier-tljf.onrender.com · Python 3.11.9</td></tr>
+          <tr><td>Source control</td><td>GitHub</td><td>main = production · staging = development</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="models">
+  <div class="section-tag">Database</div>
+  <h2>Data Models</h2>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">SessionDB</div>
+        <div class="card-sub">Core session record — created on POST /api/sessions</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>session_id</code></td><td>TEXT PK</td><td>Format: <code>S-{INITIALS}{DDMM}-{HEX}</code></td></tr>
+          <tr><td><code>rq</code></td><td>TEXT</td><td>Default "RQ3" (research question identifier)</td></tr>
+          <tr><td><code>arm</code></td><td>TEXT</td><td>T1 | T2 | T3 — assigned deterministically via MD5(session_id) % 3</td></tr>
+          <tr><td><code>participant_first</code></td><td>TEXT</td><td>Optional participant first name</td></tr>
+          <tr><td><code>participant_last</code></td><td>TEXT</td><td>Optional participant last name</td></tr>
+          <tr><td><code>intake_summary</code></td><td>JSON string</td><td>Structured summary emitted by Intake Agent on completion</td></tr>
+          <tr><td><code>intake_complete</code></td><td>BOOLEAN</td><td>Set true when Intake Agent emits &lt;intake_summary&gt; tags</td></tr>
+          <tr><td><code>canvas_complete</code></td><td>BOOLEAN</td><td>Set true on POST /api/canvas/{id}/complete</td></tr>
+          <tr><td><code>created_at</code></td><td>DATETIME</td><td>Auto-set at creation</td></tr>
+          <tr><td><code>updated_at</code></td><td>DATETIME</td><td>Auto-updated on each write</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div><div class="card-title">EventDB</div><div class="card-sub">Audit log — every agent interaction and user action</div></div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>session_id</code></td><td>TEXT (indexed)</td><td>FK to SessionDB</td></tr>
+          <tr><td><code>treatment</code></td><td>TEXT</td><td>T1 | T2 | T3</td></tr>
+          <tr><td><code>event_type</code></td><td>TEXT</td><td>e.g. <code>oversight.suggested</code>, <code>challenge.prompted</code>, <code>agent.queried</code></td></tr>
+          <tr><td><code>timestamp</code></td><td>DATETIME</td><td>Client-provided or server-generated</td></tr>
+          <tr><td><code>data_json</code></td><td>JSON string</td><td>All extra payload fields serialised as JSON</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:8px;">CanvasStateDB</div>
+      <p style="font-size:13px;">Full canvas JSON snapshot per session. Updated on every <code>PUT /api/canvas/{id}</code> call. Used by Report Generator as input.</p>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:8px;">IntakeMessageDB</div>
+      <p style="font-size:13px;">Full multi-turn conversation history for the intake chatbot. Each row is one <code>user</code> or <code>assistant</code> turn, enabling stateful multi-turn context.</p>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:8px;">BlueprintDB</div>
+      <p style="font-size:13px;">Cached blueprint JSON + readiness score (0–5). Generated once on first call to <code>GET /api/blueprint/{id}</code>, never regenerated.</p>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:8px;">SurveyResponseDB</div>
+      <p style="font-size:13px;">Post-session survey: four Likert items (confidence, advice-seeking, delegation, implementation) plus an open reflection field.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- AGENTS -->
+<hr/>
+<section id="agents">
+  <div class="section-tag">Agents</div>
+  <h2>Agent Specifications</h2>
+</section>
+
+<!-- ── INTAKE ── -->
+<section id="agent-intake">
+  <div class="agent-card">
+    <div class="agent-header">
+      <div class="agent-icon" style="background:#1a7a4a15;font-size:22px;">🎙️</div>
+      <div>
+        <div style="font-size:16px;font-weight:600;color:var(--ink);">Intake Agent</div>
+        <div style="font-size:12px;color:var(--ink4);margin-top:3px;">agents/intake.py · Multi-turn scoping conversation</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="chip chip-all">All Arms</span>
+        <span class="chip chip-model">claude-sonnet-4-6</span>
+        <span class="chip chip-tokens">max 1024 tokens</span>
+      </div>
+    </div>
+    <div class="agent-body">
+      <p><strong>Purpose:</strong> Conducts a structured intake interview before the canvas opens. Gathers enough context to personalise subsequent agent responses and prepopulate the initiative overview section of the final blueprint.</p>
+
+      <h4>System Prompt</h4>
+      <div class="prompt-block">
+        <div class="prompt-label">agents/intake.py — SYSTEM_PROMPT</div>
+        <div class="prompt-text">You are an intake assistant for a strategy workshop on AI governance.
+Your role is to conduct a brief, structured scoping conversation
+before the participant opens their canvas.
+
+<span class="hl-key">Gather the following in a warm, professional tone:</span>
+  - <span class="hl-val">problem</span>: the specific business problem or opportunity
+  - <span class="hl-val">domain</span>: the business function or domain (finance, HR, ops, etc.)
+  - <span class="hl-val">data_type</span>: the primary type of data involved
+  - <span class="hl-val">team_size</span>: the size of the team or organisation
+  - <span class="hl-val">industry</span>: the industry sector
+  - <span class="hl-val">implementer_roles</span>: who will implement and govern the AI
+
+Ask open questions. Do not use a checklist format.
+Aim for <span class="hl-emphasis">3–8 conversational turns</span> before completing the intake.
+
+<span class="hl-constraint">When you have enough information</span>, emit a structured JSON summary
+wrapped in XML tags, then end the conversation:
+
+&lt;intake_summary&gt;
+{"problem": "...", "domain": "...", "data_type": "...",
+ "team_size": "...", "industry": "...", "implementer_roles": [...]}
+&lt;/intake_summary&gt;
+
+<span class="hl-constraint">Never mention</span>: the canvas, field names, the experimental structure,
+or the research study. Speak as a collegial workshop facilitator.</div>
+      </div>
+
+      <h4>Opening Message</h4>
+      <div class="card" style="background:#1a7a4a08;border-color:#1a7a4a25;">
+        <p style="font-style:italic;color:var(--ink2);">"Before we open your canvas — tell me about the AI initiative you're here to design. What problem are you trying to solve, and what's the business context around it?"</p>
+      </div>
+
+      <h4>Function Signature</h4>
+      <pre><code>def chat(history: List[dict]) -> Tuple[str, Optional[dict]]:
+    """
+    history: list of {role: "user"|"assistant", content: str}
+    Returns: (reply_text, intake_summary_dict | None)
+    intake_summary_dict is populated only when agent emits &lt;intake_summary&gt; tags
+    """</code></pre>
+
+      <h4>Completion Trigger</h4>
+      <p>The agent's reply is scanned for <code>&lt;intake_summary&gt;...&lt;/intake_summary&gt;</code> tags using regex. On detection: the JSON is parsed and stored in <code>SessionDB.intake_summary</code>, and <code>intake_complete</code> is set to <code>true</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── REACTIVE ── -->
+<section id="agent-reactive">
+  <div class="agent-card">
+    <div class="agent-header">
+      <div class="agent-icon" style="background:#2d6ea015;font-size:22px;">💬</div>
+      <div>
+        <div style="font-size:16px;font-weight:600;color:var(--ink);">Reactive Agent</div>
+        <div style="font-size:12px;color:var(--ink4);margin-top:3px;">agents/reactive.py · Answer-only mode</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="chip chip-t1">T1 Only</span>
+        <span class="chip chip-model">claude-sonnet-4-6</span>
+        <span class="chip chip-tokens">max 400 tokens</span>
+      </div>
+    </div>
+    <div class="agent-body">
+      <p><strong>Purpose:</strong> The control-adjacent arm. Available to executives but only responds to explicit questions — never proactively suggests, recommends, or challenges. Provides a factual baseline against T2 and T3 guidance conditions.</p>
+
+      <h4>System Prompt</h4>
+      <div class="prompt-block">
+        <div class="prompt-label">agents/reactive.py — SYSTEM_PROMPT</div>
+        <div class="prompt-text">You are a reference assistant for an AI governance workshop.
+You are in <span class="hl-emphasis">listen-only mode</span>: you respond only when
+explicitly asked a direct question.
+
+<span class="hl-constraint">ABSOLUTE CONSTRAINTS — never violate these:</span>
+  - Never suggest oversight levels unless explicitly asked
+  - Never challenge or question a decision the participant has made
+  - Never volunteer opinions, recommendations, or observations
+  - Never initiate a response beyond a direct answer to a direct question
+  - Never say "I recommend", "you should", "consider", or similar
+  - Do not offer alternative framings unless asked
+
+<span class="hl-key">When asked:</span>
+  - Answer directly, factually, and concisely
+  - Use the intake summary context if relevant to the question
+  - Explain governance concepts neutrally, without advocacy
+  - Keep responses brief — one paragraph maximum
+
+Tone: <span class="hl-emphasis">helpful, neutral, brief</span> — a reference resource, not a consultant.</div>
+      </div>
+
+      <h4>Function Signature</h4>
+      <pre><code>def answer(
+    question: str,
+    intake_summary: dict,
+    canvas_context: Optional[dict] = None
+) -> str:
+    """Returns plain text answer string"""</code></pre>
+
+      <h4>Behavioural Constraints</h4>
+      <div class="constraints">
+        <span class="constraint constraint-never">Never suggest oversight levels unprompted</span>
+        <span class="constraint constraint-never">Never challenge decisions</span>
+        <span class="constraint constraint-never">Never volunteer recommendations</span>
+        <span class="constraint constraint-never">Never initiate beyond direct answer</span>
+        <span class="constraint constraint-always">Answer directly when asked</span>
+        <span class="constraint constraint-always">Explain concepts neutrally</span>
+        <span class="constraint constraint-always">One paragraph maximum</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── OVERSIGHT ADVISOR ── -->
+<section id="agent-advisor">
+  <div class="agent-card">
+    <div class="agent-header">
+      <div class="agent-icon" style="background:#7a4a9a15;font-size:22px;">🧭</div>
+      <div>
+        <div style="font-size:16px;font-weight:600;color:var(--ink);">Oversight Advisor</div>
+        <div style="font-size:12px;color:var(--ink4);margin-top:3px;">agents/rq3_oversight_advisor.py · Proactive suggestion after capability selection</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="chip chip-t2">T2 Only</span>
+        <span class="chip chip-model">claude-sonnet-4-6</span>
+        <span class="chip chip-tokens">max 512 tokens</span>
+      </div>
+    </div>
+    <div class="agent-body">
+      <p><strong>Purpose:</strong> When an executive in the T2 arm selects an AI capability (field F5) and before they set the oversight level (field F6), this agent proactively recommends a default oversight level with a rationale. Tests whether expert AI suggestions anchor governance choices.</p>
+
+      <h4>System Prompt</h4>
+      <div class="prompt-block">
+        <div class="prompt-label">agents/rq3_oversight_advisor.py — SYSTEM_PROMPT</div>
+        <div class="prompt-text">You are an AI governance advisor. Given an AI capability and its
+role in a business initiative, recommend an appropriate oversight level.
+
+<span class="hl-key">Oversight levels:</span>
+  - <span class="hl-val">Automate</span>: AI acts without human review.
+    Use for: low-stakes, highly reversible, well-understood decisions
+    where errors are easily detected and corrected.
+  - <span class="hl-val">Augment</span>: AI recommends; human approves before action.
+    Use for: moderate stakes, or where human context and judgment
+    add meaningful value beyond the AI output.
+  - <span class="hl-val">Supervise</span>: Human decides; AI provides supporting information only.
+    Use for: high-stakes, hard-to-reverse, accountability-sensitive
+    decisions where the cost of AI error is significant.
+
+<span class="hl-key">Tier heuristics (adjust based on context):</span>
+  - Sense     → often Automate (if stakes are low)
+  - Interpret → usually Augment
+  - Act       → default Supervise unless trivially reversible
+  - Learn     → usually Augment (validate model drift before deployment)
+
+<span class="hl-constraint">Required output format (exactly):</span>
+SUGGESTED_LEVEL: &lt;Automate|Augment|Supervise&gt;
+RATIONALE: &lt;2–3 sentences explaining the recommendation&gt;
+DISPLAY: &lt;1–2 sentences addressed to the executive in second person,
+          explaining why this level fits their specific initiative&gt;</div>
+      </div>
+
+      <h4>Oversight Level Decision Matrix</h4>
+      <div class="matrix-grid">
+        <div class="matrix-cell auto">
+          <div class="matrix-level auto">Automate</div>
+          <div class="matrix-desc">AI acts without review. Low-stakes · high-reversibility · well-understood decisions.</div>
+        </div>
+        <div class="matrix-cell augment">
+          <div class="matrix-level augment">Augment</div>
+          <div class="matrix-desc">AI recommends; human approves. Moderate stakes or where human judgment matters.</div>
+        </div>
+        <div class="matrix-cell supervise">
+          <div class="matrix-level supervise">Supervise</div>
+          <div class="matrix-desc">Human decides with AI support. High-stakes · hard-to-reverse · accountability-sensitive.</div>
+        </div>
+      </div>
+
+      <h4>Capability Tier Defaults</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tier</th><th>Default</th><th>Rationale</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tier-badge tier-sense">Sense</span></td><td>Automate</td><td>Low-stakes data capture; errors are detectable. Overridden if high-stakes context.</td></tr>
+            <tr><td><span class="tier-badge tier-interpret">Interpret</span></td><td>Augment</td><td>Recommendations require human validation before acting on insights.</td></tr>
+            <tr><td><span class="tier-badge tier-act">Act</span></td><td>Supervise</td><td>Direct actions are often irreversible; accountability must be assigned to humans.</td></tr>
+            <tr><td><span class="tier-badge tier-learn">Learn</span></td><td>Augment</td><td>Model drift must be validated before updated models are deployed.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Function Signature</h4>
+      <pre><code>def advise(
+    capability_name: str,
+    capability_tier: str,          # "sense" | "interpret" | "act" | "learn"
+    intake_summary: dict,          # from SessionDB.intake_summary
+    capability_input: str = "",    # what feeds into this capability
+    capability_output: str = ""    # what this capability produces
+) -> dict:
+    """
+    Returns:
+    {
+        "suggested_level": "Automate" | "Augment" | "Supervise",
+        "rationale": str,          # 2-3 sentences
+        "display_message": str     # shown to executive in UI
+    }
+    """</code></pre>
+
+      <h4>Outcome Logging</h4>
+      <p>After the executive confirms their choice, <code>POST /api/guidance/oversight-advisor-outcome</code> logs the event with fields: <code>F6_suggestion</code> (what the agent recommended), <code>F6_final</code> (what the executive chose), and <code>accepted_suggestion</code> (boolean). This is the primary dependent variable for T2.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── DECISION CHALLENGER ── -->
+<section id="agent-challenger">
+  <div class="agent-card">
+    <div class="agent-header">
+      <div class="agent-icon" style="background:#2a806015;font-size:22px;">⚡</div>
+      <div>
+        <div style="font-size:16px;font-weight:600;color:var(--ink);">Decision Challenger</div>
+        <div style="font-size:12px;color:var(--ink4);margin-top:3px;">agents/rq3_decision_challenger.py · Challenge oversight choice with failure scenarios</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="chip chip-t3">T3 Only</span>
+        <span class="chip chip-model">claude-sonnet-4-6</span>
+        <span class="chip chip-tokens">max 300 tokens</span>
+      </div>
+    </div>
+    <div class="agent-body">
+      <p><strong>Purpose:</strong> After an executive in the T3 arm sets an oversight level, this agent fires a single challenge prompt — surfacing a concrete failure scenario and asking who is responsible if it happens. Tests whether adversarial probing causes executives to revise governance choices.</p>
+
+      <h4>System Prompt</h4>
+      <div class="prompt-block">
+        <div class="prompt-label">agents/rq3_decision_challenger.py — SYSTEM_PROMPT</div>
+        <div class="prompt-text">You are a governance reviewer challenging an executive's AI oversight decision.
+Your goal is to surface accountability and failure-mode implications —
+<span class="hl-emphasis">not to tell them they are wrong</span>.
+
+<span class="hl-key">Structure your challenge as follows:</span>
+  1. Name the capability and the oversight level they chose
+  2. Present a <span class="hl-emphasis">concrete, specific failure scenario</span> — e.g., the AI
+     produces a systematic error that persists undetected for months
+  3. Ask: who in the organisation is responsible, and what is
+     the remediation path?
+  4. Ask: does this change their choice?
+
+<span class="hl-key">Tone:</span> direct, intellectually serious, peer-level —
+not a compliance officer, but a trusted critical colleague.
+
+<span class="hl-constraint">Format:</span> exactly one paragraph, 3–5 sentences.
+No headers. No bullet points. Second person.
+Do not soften with "you might want to consider" — be direct.</div>
+      </div>
+
+      <h4>Challenge Structure</h4>
+      <div class="card" style="background:#2a806008;border-color:#2a806025;">
+        <ol style="padding-left:20px;font-size:13px;color:var(--ink3);line-height:2;">
+          <li>Name the capability and chosen oversight level</li>
+          <li>State a specific, concrete failure scenario (systematic error, months undetected)</li>
+          <li>Ask who is accountable and what the remediation path is</li>
+          <li>Ask directly: does this change the choice?</li>
+        </ol>
+      </div>
+
+      <h4>Function Signature</h4>
+      <pre><code>def challenge(
+    capability_name: str,
+    oversight_chosen: str,         # "Automate" | "Augment" | "Supervise"
+    intake_summary: dict,
+    capability_input: str = "",
+    capability_output: str = "",
+    canvas_context: Optional[dict] = None
+) -> str:
+    """Returns a single-paragraph challenge string"""</code></pre>
+
+      <h4>Outcome Logging</h4>
+      <p>After the executive responds, <code>POST /api/guidance/decision-challenger-outcome</code> logs: <code>F6_choice_before</code>, <code>F6_choice_after</code>, and <code>revised_after_challenge</code> (boolean). This is the primary dependent variable for T3.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── MODERATOR ── -->
+<section id="agent-moderator">
+  <div class="agent-card">
+    <div class="agent-header">
+      <div class="agent-icon" style="background:#8a501015;font-size:22px;">
+        <svg viewBox="0 0 36 36" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="18" fill="#1E2761"/>
+          <circle cx="18" cy="16" r="9" fill="#f2c18a"/>
+          <path d="M8 14 Q8 6 18 6 Q28 6 28 14 L28 10 Q28 3 18 3 Q8 3 8 10Z" fill="#3d2015"/>
+          <rect x="10" y="14" width="7" height="5" rx="2" fill="none" stroke="#C8922A" stroke-width="1.4"/>
+          <rect x="19" y="14" width="7" height="5" rx="2" fill="none" stroke="#C8922A" stroke-width="1.4"/>
+          <line x1="17" y1="16.5" x2="19" y2="16.5" stroke="#C8922A" stroke-width="1.2"/>
+          <path d="M5 36 Q5 28 18 28 Q31 28 31 36" fill="#2A3580"/>
+        </svg>
+      </div>
+      <div>
+        <div style="font-size:16px;font-weight:600;color:var(--ink);">Moderator Agent</div>
+        <div style="font-size:12px;color:var(--ink4);margin-top:3px;">agents/moderator.py · Professor avatar — session facilitation across all 4 pages</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="chip chip-all">All Arms</span>
+        <span class="chip chip-facilitator">Facilitator</span>
+        <span class="chip chip-model">claude-sonnet-4-6</span>
+        <span class="chip chip-tokens">max 120 tokens</span>
+      </div>
+    </div>
+    <div class="agent-body">
+      <p><strong>Purpose:</strong> An illustrated professor avatar that appears on all four pages throughout the session. Independent of the experimental arm — visible to all participants. Provides brief, sharp facilitation prompts, sets discussion timers, and cues individual team members by name.</p>
+
+      <h4>System Prompt</h4>
+      <div class="prompt-block">
+        <div class="prompt-label">agents/moderator.py — SYSTEM_PROMPT</div>
+        <div class="prompt-text">You are a professor facilitating a team strategy session on AI governance.
+You appear as an avatar throughout the session.
+
+<span class="hl-key">Your role:</span> guide discussion, maintain momentum, prompt reflection.
+You do NOT teach, lecture, or explain concepts.
+
+<span class="hl-key">Style constraints:</span>
+  - <span class="hl-constraint">1–2 sentences maximum</span>
+  - Direct, warm, intellectually sharp
+  - Surface disagreement or blind spots where relevant
+  - No bullet points or lists
+  - Speak to the group unless cueing a specific member by first name
+
+<span class="hl-constraint">Never mention technology explicitly</span> — focus on decisions,
+accountability, and governance. Let the participants bring in the AI.
+
+Context provided per call:
+  - page: which page the team is on
+  - trigger: what event prompted this message
+  - phase: 1–4 (canvas phases) or null
+  - team_members: [{initials, name}, ...]
+  - fields_done: number of fields completed so far</div>
+      </div>
+
+      <h4>Function Signature</h4>
+      <pre><code>def facilitate(
+    page: str,                         # "index" | "canvas" | "blueprint" | "survey"
+    trigger: str,                      # "page_load" | "phase_change" | "field_complete" | "canvas_complete"
+    context: dict,                     # {phase, fields_done, scope, ...}
+    team_members: list,                # [{initials: str, name: str}, ...]
+    session_summary: Optional[str] = None
+) -> dict:
+    """
+    Returns:
+    {
+        "message": str,                # 1-2 sentence facilitation prompt
+        "cue_member": str | None,      # first name to call on, or null
+        "timer_minutes": int | None    # suggested discussion timer, or null
+    }
+    """</code></pre>
+
+      <h4>Trigger Events & Timer Map</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Trigger</th><th>When fired</th><th>Timer</th><th>Cue member?</th></tr></thead>
+          <tbody>
+            <tr><td><code>page_load</code></td><td>On every page load</td><td>None</td><td>No</td></tr>
+            <tr><td><code>phase_change</code></td><td>goToPhase(n) called in canvas.html</td><td>Phase 1: 20 min · Phase 2: 25 min · Phase 3: 20 min · Phase 4: 15 min</td><td>Phases 2 & 3 only</td></tr>
+            <tr><td><code>field_complete</code></td><td>Individual canvas field completed</td><td>None</td><td>Yes (deterministic)</td></tr>
+            <tr><td><code>canvas_complete</code></td><td>submitCanvas() called</td><td>None</td><td>No</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Team Member Cueing</h4>
+      <p>When cueing is active, the member is selected deterministically via <code>MD5(page + trigger + phase + fields_done) % len(team_members)</code> — ensuring reproducibility and balanced distribution across cues. The member's first name appears in both the message and a highlighted cue row in the avatar panel.</p>
+
+      <h4>Fallback Messages</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Trigger</th><th>Fallback (if API unavailable)</th></tr></thead>
+          <tbody>
+            <tr><td><code>page_load</code></td><td><em>"Welcome. Take a moment to settle in — read the brief, orient your team, and decide who will speak first."</em></td></tr>
+            <tr><td><code>phase_change</code></td><td><em>"Moving to the next phase. Before you proceed — what's the one assumption in the previous section you're least confident about?"</em></td></tr>
+            <tr><td><code>canvas_complete</code></td><td><em>"Well done. Your blueprint is being generated. Before you continue — what surprised you most about this session?"</em></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Frontend Integration</h4>
+      <p>The moderator widget is a self-contained IIFE in <code>frontend/moderator.js</code> — injected on all 4 pages via <code>&lt;script src="moderator.js"&gt;&lt;/script&gt;</code> before <code>&lt;/body&gt;</code>. It injects its own CSS and HTML into the DOM, calls <code>POST /api/moderator/message</code>, and falls back to pre-scripted messages if the API is unreachable.</p>
+      <p>Canvas.html hooks into the module via: <code>if (typeof modOnPhaseChange === 'function') modOnPhaseChange(n);</code> in <code>goToPhase()</code>, and similarly in <code>submitCanvas()</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── REPORT GENERATOR ── -->
+<section id="agent-report">
+  <div class="agent-card">
+    <div class="agent-header">
+      <div class="agent-icon" style="background:#c0503015;font-size:22px;">📋</div>
+      <div>
+        <div style="font-size:16px;font-weight:600;color:var(--ink);">Report Generator</div>
+        <div style="font-size:12px;color:var(--ink4);margin-top:3px;">agents/report_generator.py · Canvas + Intake → AI Decision Blueprint JSON</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="chip chip-all">All Arms</span>
+        <span class="chip chip-model">claude-sonnet-4-6</span>
+        <span class="chip chip-tokens">max 2048 tokens</span>
+      </div>
+    </div>
+    <div class="agent-body">
+      <p><strong>Purpose:</strong> Triggered once when the executive navigates to the blueprint page. Synthesises the full canvas state and intake summary into a structured AI Decision Blueprint JSON. The output strips all agent suggestions — it reflects only the participant's own field values.</p>
+
+      <h4>System Prompt (abridged)</h4>
+      <div class="prompt-block">
+        <div class="prompt-label">agents/report_generator.py — SYSTEM_PROMPT (key constraints)</div>
+        <div class="prompt-text">You are a senior AI governance analyst producing an AI Decision Blueprint.
+
+<span class="hl-constraint">CRITICAL: The blueprint must reflect ONLY the participant's own field values.
+Do not include, reference, or infer any AI agent suggestions, prompts,
+or recommended levels. The participant's choices are the record.</span>
+
+<span class="hl-key">Required output — strict JSON with these exact keys:</span>
+{
+  "initiative_title": str,
+  "executive_summary": str,              <span class="hl-val">// 2-3 sentences</span>
+  "initiative_overview": {
+    "scope": str,                        <span class="hl-val">// from F0</span>
+    "problem_statement": str,            <span class="hl-val">// from F0 + intake</span>
+    "data_sources": [str],               <span class="hl-val">// from F1</span>
+    "human_roles": [str],                <span class="hl-val">// from F2</span>
+    "systems_infrastructure": str,       <span class="hl-val">// from F3</span>
+    "tacit_constraints": str             <span class="hl-val">// from F4</span>
+  },
+  "capability_stack": [{
+    "name": str,
+    "tier": "sense|interpret|act|learn",
+    "input_sources": str,
+    "human_judgment": str,
+    "oversight_level": "Automate|Augment|Supervise"
+  }],
+  "oversight_design": {
+    "automate_count": int,
+    "augment_count": int,
+    "supervise_count": int,
+    "oversight_notes": str
+  },
+  "feedback_loops": {...},               <span class="hl-val">// from F7</span>
+  "business_outcomes": str,             <span class="hl-val">// from F8</span>
+  "governance": {...},                   <span class="hl-val">// from F9</span>
+  "readiness_score": float,             <span class="hl-val">// 0.0–5.0</span>
+  "readiness_rationale": str,           <span class="hl-val">// 1-2 sentences</span>
+  "recommendations": [{
+    "severity": "red|amber|green",
+    "message": str
+  }]
+}</div>
+      </div>
+
+      <h4>Readiness Score Rubric</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Score</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><strong>5</strong></td><td>Governance-ready: well-specified, operationally grounded, clear oversight chains</td></tr>
+            <tr><td><strong>4</strong></td><td>Strong foundation with minor gaps in oversight or accountability</td></tr>
+            <tr><td><strong>3</strong></td><td>Reasonable structure but notable ambiguities in key areas</td></tr>
+            <tr><td><strong>2</strong></td><td>Significant gaps in oversight design or tacit knowledge capture</td></tr>
+            <tr><td><strong>1</strong></td><td>Foundational work needed before any deployment consideration</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Canvas Field Mapping</h4>
+      <div class="field-grid">
+        <div class="field-item"><div class="field-id">F0</div><div class="field-name">Initiative Scope</div></div>
+        <div class="field-item"><div class="field-id">F1</div><div class="field-name">Data Inputs</div></div>
+        <div class="field-item"><div class="field-id">F2</div><div class="field-name">Human Inputs</div></div>
+        <div class="field-item"><div class="field-id">F3</div><div class="field-name">Systems & Infra</div></div>
+        <div class="field-item"><div class="field-id">F4</div><div class="field-name">Tacit Constraints</div></div>
+        <div class="field-item"><div class="field-id">F5</div><div class="field-name">Capability Type</div></div>
+        <div class="field-item"><div class="field-id">F6</div><div class="field-name">Oversight Chains</div></div>
+        <div class="field-item"><div class="field-id">F7</div><div class="field-name">Feedback Loops</div></div>
+        <div class="field-item"><div class="field-id">F8</div><div class="field-name">Business Outcomes</div></div>
+        <div class="field-item"><div class="field-id">F9</div><div class="field-name">Governance & Accountability</div></div>
+      </div>
+
+      <h4>Caching</h4>
+      <p>Generated once and cached in <code>BlueprintDB</code>. Subsequent calls to <code>GET /api/blueprint/{session_id}</code> return the cached version — the report is never regenerated for the same session.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- API REFERENCE -->
+<hr/>
+<section id="api">
+  <div class="section-tag">API Reference</div>
+  <h2>REST API Endpoints</h2>
+  <p>Base URL (production): <code>https://aitelier-tljf.onrender.com</code></p>
+</section>
+
+<section id="api-sessions">
+  <h3>Sessions</h3>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div>
+      <div class="endpoint-path">/api/sessions</div>
+      <div class="endpoint-desc">Create a new session. Returns session_id with deterministic arm assignment (T1/T2/T3 via MD5 hash).</div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-get">GET</span>
+    <div>
+      <div class="endpoint-path">/api/sessions/{session_id}</div>
+      <div class="endpoint-desc">Retrieve session metadata including arm, intake status, canvas status, and intake summary.</div>
+    </div>
+  </div>
+</section>
+
+<section id="api-guidance">
+  <h3>Guidance Hub (Agent Endpoints)</h3>
+  <div class="endpoint">
+    <span class="method method-get">GET</span>
+    <div>
+      <div class="endpoint-path">/api/guidance/intake-opening</div>
+      <div class="endpoint-desc">Returns the static opening message for the intake conversation.</div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div>
+      <div class="endpoint-path">/api/guidance/intake-message</div>
+      <div class="endpoint-desc">Multi-turn intake chatbot. Appends user message to history, calls Intake Agent, saves to IntakeMessageDB. Returns reply and optional intake_summary when complete. 403 if already complete.</div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div>
+      <div class="endpoint-path">/api/guidance/oversight-advisor</div>
+      <div class="endpoint-desc"><span class="chip chip-t2" style="font-size:10px;">T2 only</span> Suggest oversight level after capability selection. 403 if arm ≠ T2.</div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div>
+      <div class="endpoint-path">/api/guidance/decision-challenger</div>
+      <div class="endpoint-desc"><span class="chip chip-t3" style="font-size:10px;">T3 only</span> Challenge the executive's oversight choice. 403 if arm ≠ T3.</div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div>
+      <div class="endpoint-path">/api/guidance/reactive-query</div>
+      <div class="endpoint-desc"><span class="chip chip-t1" style="font-size:10px;">T1 only</span> Answer an explicit question from the executive. 403 if arm ≠ T1.</div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div>
+      <div class="endpoint-path">/api/guidance/oversight-advisor-outcome</div>
+      <div class="endpoint-desc"><span class="chip chip-t2" style="font-size:10px;">T2 DV</span> Log outcome: suggested level, final choice, accepted boolean. Primary dependent variable for T2.</div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div>
+      <div class="endpoint-path">/api/guidance/decision-challenger-outcome</div>
+      <div class="endpoint-desc"><span class="chip chip-t3" style="font-size:10px;">T3 DV</span> Log outcome: choice before, choice after, revised boolean. Primary dependent variable for T3.</div>
+    </div>
+  </div>
+</section>
+
+<section id="api-canvas">
+  <h3>Canvas</h3>
+  <div class="endpoint">
+    <span class="method method-put">PUT</span>
+    <div>
+      <div class="endpoint-path">/api/canvas/{session_id}</div>
+      <div class="endpoint-desc">Save or update full canvas state as JSON. Called on every auto-save.</div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-get">GET</span>
+    <div>
+      <div class="endpoint-path">/api/canvas/{session_id}</div>
+      <div class="endpoint-desc">Retrieve latest canvas state. Returns empty object if not yet saved.</div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div>
+      <div class="endpoint-path">/api/canvas/{session_id}/complete</div>
+      <div class="endpoint-desc">Mark canvas as complete. Sets canvas_complete = true in SessionDB.</div>
+    </div>
+  </div>
+</section>
+
+<section id="api-blueprint">
+  <h3>Blueprint</h3>
+  <div class="endpoint">
+    <span class="method method-get">GET</span>
+    <div>
+      <div class="endpoint-path">/api/blueprint/{session_id}</div>
+      <div class="endpoint-desc">Retrieve or generate the AI Decision Blueprint. Returns cached version if already generated. Calls Report Generator on first call.</div>
+    </div>
+  </div>
+</section>
+
+<section id="api-survey">
+  <h3>Survey</h3>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div>
+      <div class="endpoint-path">/api/survey/{session_id}</div>
+      <div class="endpoint-desc">Submit post-session survey. Four Likert items (confidence, advice-seeking, delegation, implementation) plus open reflection.</div>
+    </div>
+  </div>
+</section>
+
+<section id="api-moderator">
+  <h3>Moderator</h3>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div>
+      <div class="endpoint-path">/api/moderator/message</div>
+      <div class="endpoint-desc">Get contextual facilitation message from Moderator Agent. Accepts page, trigger, context, and team_members. Returns message, optional cue_member, and optional timer_minutes.</div>
+    </div>
+  </div>
+</section>
+
+<section id="api-events">
+  <h3>Events</h3>
+  <div class="endpoint">
+    <span class="method method-post">POST</span>
+    <div>
+      <div class="endpoint-path">/api/events</div>
+      <div class="endpoint-desc">Append an event to the audit log. Accepts session_id, event_type, and any extra fields (stored as JSON). Used for all user interactions, page views, and agent interactions.</div>
+    </div>
+  </div>
+  <div class="endpoint">
+    <span class="method method-get">GET</span>
+    <div>
+      <div class="endpoint-path">/health</div>
+      <div class="endpoint-desc">Health check endpoint. Returns <code>{"status": "ok"}</code>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr/>
+<section id="data">
+  <div class="section-tag">Data Flow</div>
+  <h2>Session Data Flow</h2>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-phase">Step 1 — Session Creation</div>
+      <div class="tl-title">Participant arrives at index.html</div>
+      <div class="tl-body">Session is created via POST /api/sessions. Session ID generated from initials + date + UUID. Arm assigned deterministically: MD5(session_id) % 3 → T1, T2, or T3. Session stored in SessionDB.</div>
+      <div class="tl-endpoints"><span class="tl-ep">POST /api/sessions</span></div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-phase">Step 2 — Intake</div>
+      <div class="tl-title">Multi-turn scoping conversation (all arms)</div>
+      <div class="tl-body">Intake Agent conducts 3–8 turn conversation. Each turn saved to IntakeMessageDB. When agent emits &lt;intake_summary&gt; tags, JSON is parsed and stored in SessionDB. intake_complete set to true.</div>
+      <div class="tl-endpoints"><span class="tl-ep">GET /api/guidance/intake-opening</span><span class="tl-ep">POST /api/guidance/intake-message</span></div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-phase">Step 3 — Canvas (Phases 1–4)</div>
+      <div class="tl-title">Structured governance design — arm-specific guidance active</div>
+      <div class="tl-body">Executive completes 10 canvas fields across 4 phases. Canvas state auto-saved on every change. Moderator fires on phase transitions and field completions. Arm-specific guidance fires at Phase 2 (F5/F6).</div>
+      <div class="tl-endpoints">
+        <span class="tl-ep">PUT /api/canvas/{id}</span>
+        <span class="tl-ep">POST /api/moderator/message</span>
+        <span class="tl-ep">POST /api/guidance/reactive-query [T1]</span>
+        <span class="tl-ep">POST /api/guidance/oversight-advisor [T2]</span>
+        <span class="tl-ep">POST /api/guidance/decision-challenger [T3]</span>
+        <span class="tl-ep">POST /api/events</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-phase">Step 4 — Completion & Outcome Logging</div>
+      <div class="tl-title">Canvas submitted — outcomes recorded</div>
+      <div class="tl-body">canvas_complete set to true. Arm-specific outcome events logged (accepted_suggestion for T2, revised_after_challenge for T3). These are the primary dependent variables for the RCT.</div>
+      <div class="tl-endpoints">
+        <span class="tl-ep">POST /api/canvas/{id}/complete</span>
+        <span class="tl-ep">POST /api/guidance/oversight-advisor-outcome [T2]</span>
+        <span class="tl-ep">POST /api/guidance/decision-challenger-outcome [T3]</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-phase">Step 5 — Blueprint Generation</div>
+      <div class="tl-title">AI Decision Blueprint synthesised and cached</div>
+      <div class="tl-body">Report Generator called on first blueprint page load. Synthesises canvas_state + intake_summary → structured JSON with oversight design, capability stack, readiness score, and recommendations. Cached in BlueprintDB — never regenerated.</div>
+      <div class="tl-endpoints"><span class="tl-ep">GET /api/blueprint/{id}</span></div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-phase">Step 6 — Survey</div>
+      <div class="tl-title">Post-session self-report measures</div>
+      <div class="tl-body">Four Likert items measuring confidence in AI governance decisions, advice-seeking disposition, delegation willingness, and implementation intent. Plus open reflection. Stored in SurveyResponseDB.</div>
+      <div class="tl-endpoints"><span class="tl-ep">POST /api/survey/{id}</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr/>
+<section id="rct">
+  <div class="section-tag">Research Design</div>
+  <h2>RCT Experimental Design</h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Arm</th>
+          <th>Treatment</th>
+          <th>Agent Active</th>
+          <th>Trigger Point</th>
+          <th>Primary DV</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="td-arm td-t1">T1</span></td>
+          <td>Reactive-only guidance</td>
+          <td>Reactive Agent</td>
+          <td>Only when executive explicitly asks a question</td>
+          <td>Does the executive proactively seek AI input? (agent.queried event rate)</td>
+        </tr>
+        <tr>
+          <td><span class="td-arm td-t2">T2</span></td>
+          <td>Proactive oversight suggestion</td>
+          <td>Oversight Advisor</td>
+          <td>Immediately after F5 capability selection</td>
+          <td>Does the executive accept the suggested oversight level? (accepted_suggestion boolean)</td>
+        </tr>
+        <tr>
+          <td><span class="td-arm td-t3">T3</span></td>
+          <td>Adversarial challenge</td>
+          <td>Decision Challenger</td>
+          <td>Immediately after F6 oversight level is set</td>
+          <td>Does the executive revise the oversight level after the challenge? (revised_after_challenge boolean)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Arm Assignment</h3>
+  <pre><code>def assign_arm(session_id: str) -> str:
+    """Deterministic: same session_id always maps to the same arm"""
+    h = int(hashlib.md5(session_id.encode()).hexdigest(), 16)
+    return ["T1", "T2", "T3"][h % 3]</code></pre>
+
+  <h3>Test Session Links</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Arm</th><th>Session ID</th><th>Canvas URL</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="td-arm td-t1">T1</span></td>
+          <td><code>S-TU1203-BFA2</code></td>
+          <td><a href="https://aitelier-demo.netlify.app/canvas.html?session=S-TU1203-BFA2" target="_blank" style="color:var(--navy);font-size:12px;">canvas.html?session=S-TU1203-BFA2</a></td>
+        </tr>
+        <tr>
+          <td><span class="td-arm td-t2">T2</span></td>
+          <td><code>S-TU1203-78F9</code></td>
+          <td><a href="https://aitelier-demo.netlify.app/canvas.html?session=S-TU1203-78F9" target="_blank" style="color:var(--navy);font-size:12px;">canvas.html?session=S-TU1203-78F9</a></td>
+        </tr>
+        <tr>
+          <td><span class="td-arm td-t3">T3</span></td>
+          <td><code>S-TU1203-4C48</code></td>
+          <td><a href="https://aitelier-demo.netlify.app/canvas.html?session=S-TU1203-4C48" target="_blank" style="color:var(--navy);font-size:12px;">canvas.html?session=S-TU1203-4C48</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Arm Isolation</h3>
+  <p>Guidance endpoints return <code>403 Forbidden</code> if the session's arm does not match the endpoint's intended arm. This prevents cross-contamination:</p>
+  <pre><code>if session.arm != "T2":
+    raise HTTPException(status_code=403, detail="Not available for this arm")</code></pre>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<hr/>
+<section id="principles">
+  <div class="section-tag">Design Principles</div>
+  <h2>Key Design Principles</h2>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <h4 style="margin-top:0;">Experimental Neutrality</h4>
+      <p>No agent ever mentions the experimental structure, other arms, or the research study. Blueprints strip all agent-suggested values — they reflect only the participant's own choices. The intake agent is instructed to never mention "canvas", "fields", or the study.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0;">Arm Isolation</h4>
+      <p>Each guidance endpoint verifies the session arm before calling any agent. A T1 session can never receive a proactive suggestion or challenge, even if the endpoint is called directly. 403 is returned on mismatch.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0;">Full Audit Trail</h4>
+      <p>Every agent interaction is logged to EventDB with session_id, treatment arm, event_type, and full payload. This enables causal identification of treatment effects in the analysis phase.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0;">Deterministic Assignment</h4>
+      <p>Arm assignment and moderator cue selection both use MD5 hashing — making them fully reproducible from session ID alone. No random state is stored; the same inputs always produce the same output.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0;">Blueprint Caching</h4>
+      <p>Blueprints are generated once and cached. This prevents regeneration on page reload (which could produce different results) and ensures the participant always sees the same document throughout the session.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0;">Graceful Degradation</h4>
+      <p>All agents have fallback paths. The Moderator's pre-scripted messages are used if the API call fails. Report Generator returns a minimal structure on parse errors. The frontend canvas works fully offline if the backend is unavailable.</p>
+    </div>
+  </div>
+</section>
+
+<div style="height:64px;"></div>
+</main>
+</div>
+
+<script>
+// Scroll-spy for sidebar
+const links = document.querySelectorAll('.sbnav-link');
+const sections = Array.from(links).map(l => {
+  const id = l.getAttribute('href').slice(1);
+  return document.getElementById(id);
+}).filter(Boolean);
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.sbnav-link[href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-10% 0px -85% 0px' });
+
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
