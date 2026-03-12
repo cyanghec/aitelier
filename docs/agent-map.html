@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AItelier · Agent System Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #f4f3ef;
+  --surface: #ffffff;
+  --surf2:   #f9f8f5;
+  --border:  #dbd8d0;
+  --border2: #c8c4bb;
+  --ink:     #18172a;
+  --ink2:    #48466a;
+  --ink3:    #9896b8;
+  --gold:    #8a6000;
+  --shared:  #5a5890;
+  --ctrl:    #276b2a;
+  --t2:      #14569e;
+  --t3:      #b52222;
+  --mod:     #7a4a00;
+  --rpt:     #5a3d9e;
+  --rq3:     #c86800;
+  --meas:    #1a7a60;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Inter',sans-serif;color:var(--ink);}
+
+.bar{
+  position:fixed;top:0;left:0;right:0;height:52px;
+  background:#fff;border-bottom:1.5px solid var(--border);
+  display:flex;align-items:center;padding:0 20px;gap:0;z-index:300;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.bar-brand{font-size:13px;font-weight:600;color:var(--gold);letter-spacing:.5px;padding-right:18px;border-right:1.5px solid var(--border);margin-right:18px;}
+.bar-rq{font-size:11px;font-weight:600;color:var(--rq3);letter-spacing:.3px;padding-right:18px;border-right:1.5px solid var(--border);margin-right:18px;}
+.fp{display:flex;align-items:center;gap:6px;}
+.fl{font-size:10px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:.8px;margin-right:4px;}
+.fpill{padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:none;font-family:'Inter',sans-serif;font-size:10px;font-weight:500;color:var(--ink2);cursor:pointer;transition:all .15s;letter-spacing:.2px;}
+.fpill:hover{border-color:var(--border2);color:var(--ink);}
+.fpill.on-all {border-color:var(--shared);color:var(--shared);background:color-mix(in srgb,var(--shared) 8%,transparent);}
+.fpill.on-t1  {border-color:var(--ctrl);  color:var(--ctrl);  background:color-mix(in srgb,var(--ctrl)   8%,transparent);}
+.fpill.on-t2  {border-color:var(--t2);    color:var(--t2);    background:color-mix(in srgb,var(--t2)     8%,transparent);}
+.fpill.on-t3  {border-color:var(--t3);    color:var(--t3);    background:color-mix(in srgb,var(--t3)     8%,transparent);}
+.bar-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.zb{width:28px;height:28px;border:1.5px solid var(--border);background:#fff;border-radius:6px;font-family:'Inter',sans-serif;font-size:15px;color:var(--ink2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s;}
+.zb:hover{border-color:var(--border2);color:var(--ink);}
+.zv{font-size:10px;color:var(--ink3);min-width:36px;text-align:center;font-variant-numeric:tabular-nums;}
+.rb{padding:5px 12px;border:1.5px solid var(--border);background:#fff;border-radius:6px;font-family:'Inter',sans-serif;font-size:10px;font-weight:500;color:var(--ink2);cursor:pointer;transition:all .15s;}
+.rb:hover{border-color:var(--border2);color:var(--ink);}
+
+#wrap{position:fixed;top:52px;left:0;right:0;bottom:0;overflow:hidden;cursor:grab;}
+#wrap.grabbing{cursor:grabbing;}
+#scene{position:absolute;top:0;left:0;transform-origin:0 0;width:1400px;height:1950px;}
+
+#scene::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,#b0aec830 1px,transparent 1px);
+  background-size:32px 32px;
+}
+
+.lane-bg{position:absolute;border-radius:14px;pointer-events:none;}
+.lane-hdr{position:absolute;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:5px;border:1.5px solid;pointer-events:none;white-space:nowrap;}
+.row-label{position:absolute;font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);pointer-events:none;}
+
+.node{
+  position:absolute;width:230px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  cursor:pointer;
+  transition:border-color .15s,box-shadow .15s,opacity .2s;
+  overflow:hidden;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.node::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--nc);}
+.node:hover{border-color:var(--nc);box-shadow:0 2px 12px color-mix(in srgb,var(--nc) 18%,transparent);}
+.node.sel{border-color:var(--nc);box-shadow:0 0 0 2px var(--nc),0 4px 20px color-mix(in srgb,var(--nc) 18%,transparent);}
+.node.dim{opacity:.1;pointer-events:none;}
+
+.nh{padding:10px 13px 8px;border-bottom:1.5px solid var(--border);display:flex;align-items:flex-start;gap:9px;}
+.nicn{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:color-mix(in srgb,var(--nc) 10%,transparent);border:1.5px solid color-mix(in srgb,var(--nc) 20%,transparent);}
+.ntop{flex:1;min-width:0;}
+.nsub{font-size:8.5px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--nc);margin-bottom:2px;opacity:.9;}
+.nname{font-size:12px;font-weight:600;color:var(--ink);line-height:1.25;}
+.nb{padding:9px 13px 11px;}
+.ndesc{font-size:10px;color:var(--ink2);line-height:1.6;}
+.nfields{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px;}
+.nfbadge{font-size:9px;font-weight:500;padding:2px 7px;border-radius:4px;border:1.5px solid;color:var(--nc);border-color:color-mix(in srgb,var(--nc) 35%,transparent);background:color-mix(in srgb,var(--nc) 8%,transparent);}
+.nprompt{margin-top:8px;padding:8px 10px;background:var(--surf2);border-left:3px solid var(--nc);border-radius:0 5px 5px 0;font-size:9px;color:var(--ink2);line-height:1.65;font-style:italic;}
+
+.dgate{position:absolute;cursor:pointer;transition:opacity .2s;}
+.dgate.dim{opacity:.1;pointer-events:none;}
+
+#edges{position:absolute;top:0;left:0;width:1400px;height:1950px;pointer-events:none;overflow:visible;}
+
+.insp{
+  position:fixed;right:0;top:52px;bottom:0;width:330px;
+  background:#fff;border-left:1.5px solid var(--border);
+  transform:translateX(100%);transition:transform .22s ease;
+  z-index:200;display:flex;flex-direction:column;
+  box-shadow:-4px 0 20px rgba(0,0,0,.08);
+}
+.insp.open{transform:translateX(0);}
+.ih{padding:16px 18px 12px;border-bottom:1.5px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0;}
+.ilt{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
+.ihn{font-size:16px;font-weight:600;}
+.icl{background:none;border:none;color:var(--ink3);cursor:pointer;font-size:18px;padding:2px 4px;}
+.icl:hover{color:var(--ink);}
+.iscroll{flex:1;overflow-y:auto;padding:16px 18px;}
+.iscroll::-webkit-scrollbar{width:4px;}
+.iscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.isec{margin-bottom:18px;}
+.islbl{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;padding-bottom:5px;border-bottom:1.5px solid var(--border);}
+.irow{display:flex;gap:10px;margin-bottom:6px;align-items:flex-start;}
+.ikey{font-size:9.5px;color:var(--ink3);min-width:90px;flex-shrink:0;line-height:1.5;font-weight:500;}
+.ival{font-size:9.5px;color:var(--ink2);line-height:1.6;}
+.ival strong{color:var(--ink);font-weight:600;}
+.iprompt-box{background:var(--surf2);border:1.5px solid var(--border2);border-radius:8px;padding:12px 14px;font-size:10px;color:var(--ink2);line-height:1.75;font-style:italic;margin-top:4px;border-left:4px solid;}
+.rblock{background:var(--surf2);border:1.5px solid var(--border);border-radius:7px;padding:10px 13px;font-size:9.5px;line-height:1.9;font-family:'JetBrains Mono',monospace;}
+.rk{color:var(--gold);font-weight:500;}.rv{color:var(--ctrl);}.rc{color:var(--ink3);font-style:italic;}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px;}
+.chip{font-size:9px;font-weight:500;padding:3px 9px;border-radius:4px;border:1.5px solid;}
+
+.legend{
+  position:fixed;left:14px;bottom:14px;
+  background:#fff;border:1.5px solid var(--border);border-radius:10px;
+  padding:12px 15px;z-index:200;
+  box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+.lgt{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:9px;}
+.lgi{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:10px;color:var(--ink2);font-weight:500;}
+.lgl{width:20px;height:2.5px;border-radius:1px;flex-shrink:0;}
+.lgdia{width:10px;height:10px;transform:rotate(45deg);border:2px solid var(--gold);flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-brand">AItelier</div>
+  <div class="bar-rq">RQ3 · Full Agent System</div>
+  <div class="fp">
+    <span class="fl">Arm</span>
+    <button class="fpill on-all" id="fp-all" onclick="setArm('all',this)">All arms</button>
+    <button class="fpill" id="fp-t1" onclick="setArm('t1',this)">T1 · Reactive</button>
+    <button class="fpill" id="fp-t2" onclick="setArm('t2',this)">T2 · AI Suggests</button>
+    <button class="fpill" id="fp-t3" onclick="setArm('t3',this)">T3 · AI Challenges</button>
+  </div>
+  <div class="bar-right">
+    <button class="zb" onclick="adjustZoom(.1)">+</button>
+    <div class="zv" id="zv">65%</div>
+    <button class="zb" onclick="adjustZoom(-.1)">−</button>
+    <button class="rb" onclick="resetView()">Fit</button>
+  </div>
+</div>
+
+<div id="wrap">
+  <div id="scene">
+    <svg id="edges"></svg>
+  </div>
+</div>
+
+<div class="insp" id="insp">
+  <div class="ih">
+    <div>
+      <div class="ilt">Node detail</div>
+      <div class="ihn" id="ihn">—</div>
+    </div>
+    <button class="icl" onclick="closeInsp()">✕</button>
+  </div>
+  <div class="iscroll" id="ibody"></div>
+</div>
+
+<div class="legend">
+  <div class="lgt">Legend</div>
+  <div class="lgi"><div class="lgl" style="background:var(--shared)"></div>Shared · All arms</div>
+  <div class="lgi"><div class="lgl" style="background:var(--ctrl)"></div>T1 · Reactive only</div>
+  <div class="lgi"><div class="lgl" style="background:var(--t2)"></div>T2 · AI Suggests</div>
+  <div class="lgi"><div class="lgl" style="background:var(--t3)"></div>T3 · AI Challenges</div>
+  <div class="lgi"><div class="lgl" style="background:var(--mod)"></div>Moderator · Ambient</div>
+  <div class="lgi"><div class="lgl" style="background:var(--rpt)"></div>Report Generator</div>
+  <div class="lgi"><div class="lgdia"></div>Decision gate</div>
+</div>
+
+<script>
+const C = {
+  shared:'#5a5890', ctrl:'#276b2a', t2:'#14569e', t3:'#b52222',
+  mod:'#7a4a00', rpt:'#5a3d9e', gold:'#8a6000', meas:'#1a7a60'
+};
+
+const SX = 440;
+const T1X = 60, T2X = 440, T3X = 820;
+const MOD_X = 1110;
+const NW = 230;
+
+const NODES = [
+
+// ══════════════════════════════════════════
+// SHARED SPINE
+// ══════════════════════════════════════════
+
+{ id:'participant', x:SX, y:60,
+  nc:C.gold, icon:'👤', sub:'Entry · All arms', name:'Participant',
+  arms:['t1','t2','t3'],
+  desc:'Executive opens the canvas via a session link containing their session ID. Arm assignment (T1/T2/T3) is performed immediately and is deterministic — the same session ID always maps to the same arm.',
+  fields:[],
+  det:{
+    'Session ID format':'S-{INITIALS}{DDMM}-{hex4}',
+    'Arm assignment':'MD5(session_id) % 3 → T1 | T2 | T3',
+    'Blind to arm':'Participant never sees their treatment condition',
+    'Team size':'3–5 per session (shared canvas)',
+  }
+},
+
+{ id:'intake', x:SX, y:230,
+  nc:C.shared, icon:'💬', sub:'Agent 1 · Pre-treatment · All arms', name:'Intake Agent',
+  arms:['t1','t2','t3'],
+  desc:'Conversational scoping interview run before the canvas opens. Gathers initiative context used to personalise downstream agents. Fires identically across all arms — no treatment difference.',
+  fields:['F0','F1','F2'],
+  prompt:'"Before we open your canvas — tell me about the AI initiative you\'re here to design. What business problem are you solving, and which team or data would be involved?" [3–8 turns until scope confirmed]',
+  det:{
+    Model:'claude-sonnet-4-6',
+    'Max tokens':'1024',
+    Turns:'3–8 conversational turns',
+    Output:'intake_summary · {problem, domain, data_type, team_size, industry, implementer_roles}',
+    'Completion signal':'Emits <intake_summary>…</intake_summary> XML tags when ready',
+    'Never mentions':'Canvas fields · oversight levels · experimental arms',
+  },
+  rules:[
+    {k:'gather', v:'problem, domain, data_type, team_size, industry, implementer_roles', c:'6 required fields'},
+    {k:'stop when', v:'all 6 fields confirmed via conversation', c:'3–8 turns typical'},
+    {k:'emit', v:'<intake_summary> JSON block', c:'seeds all arm-specific agents'},
+    {k:'never', v:'mention canvas fields, capabilities, or oversight', c:'neutral elicitation only'},
+  ]
+},
+
+{ id:'orch', x:SX, y:420,
+  nc:C.gold, icon:'⚙', sub:'Router · Deterministic · Not an LLM', name:'Orchestrator',
+  arms:['t1','t2','t3'],
+  desc:'Pure rule engine — no inference. Reads session.arm from DB and routes to arm-specific canvas config. Arm is immutable after first assignment; cannot be changed mid-session.',
+  fields:[],
+  det:{
+    Type:'Deterministic hash — no LLM call',
+    Formula:'ARMS[MD5(session_id) % 3]',
+    'T1':'Blank canvas · reactive agent only available on request',
+    'T2':'Oversight Advisor fires on F5 capability selection',
+    'T3':'Decision Challenger fires on F6 oversight level selection',
+    'Arm isolation':'403 returned if wrong arm calls a guidance endpoint',
+  }
+},
+
+{ id:'gate-arm', x:SX+55, y:570, isDiamond:true,
+  nc:C.gold, name:'Arm?',
+  arms:['t1','t2','t3'],
+  desc:'Routes each participant to their assigned arm canvas configuration. Canvas UI is visually identical across all three arms — only agent behaviour and timing differ.',
+},
+
+// ══════════════════════════════════════════
+// MODERATOR (Ambient — all pages, all arms)
+// ══════════════════════════════════════════
+
+{ id:'moderator', x:MOD_X, y:760,
+  nc:C.mod, icon:'🎓', sub:'Agent 2 · Ambient · All arms · All pages', name:'Moderator Agent',
+  arms:['t1','t2','t3'],
+  desc:'Professor avatar present on all 4 pages throughout the session. Independent of experimental arm. Fires on page_load, phase_change, field_complete, and canvas_complete events. Sets discussion timers, cues individual team members by name.',
+  fields:['All pages'],
+  prompt:'"[phase_change → Phase 2] The question isn\'t which AI types fit your initiative — it\'s who owns accountability when each one is wrong. [cue: Sophie] Sophie, what\'s the highest-stakes decision in your capability list?"',
+  det:{
+    Model:'claude-sonnet-4-6',
+    'Max tokens':'120',
+    'Trigger events':'page_load · phase_change · field_complete · canvas_complete',
+    'Timer map':'Phase 1: 20 min · Phase 2: 25 min · Phase 3: 20 min · Phase 4: 15 min',
+    'Cue logic':'MD5(page+trigger+phase+fields_done) % len(team_members) — deterministic',
+    Output:'{message, cue_member | null, timer_minutes | null}',
+    'Pages active':'index.html · canvas.html · blueprint.html · survey.html',
+    'Frontend module':'moderator.js (IIFE) — injected on all 4 pages',
+  },
+  rules:[
+    {k:'style', v:'1–2 sentences maximum · direct, warm, intellectually sharp', c:''},
+    {k:'never', v:'lecture or explain concepts · that\'s the canvas\'s job', c:'facilitate only'},
+    {k:'cue member', v:'on phase_change (phases 2–3) and field_complete', c:'deterministic selection'},
+    {k:'fallback', v:'pre-scripted messages if API unavailable', c:'graceful degradation'},
+    {k:'never', v:'mention AI/ML/technology explicitly', c:'focus on decisions + accountability'},
+  ]
+},
+
+// ══════════════════════════════════════════
+// ARM ENTRY NODES
+// ══════════════════════════════════════════
+
+{ id:'arm-t1', x:T1X, y:760,
+  nc:C.ctrl, icon:'🔇', sub:'T1 · Control', name:'Reactive AI Only',
+  arms:['t1'],
+  desc:'Executive fills all oversight fields without proactive AI input. A reactive agent is available but never initiates. Establishes the behavioral baseline — how executives calibrate oversight when AI is present but passive.',
+  fields:[],
+  det:{
+    State:'No proactive AI · reactive Q&A available on demand',
+    Hypothesis:'Baseline: unaided executive judgment with AI accessible but not initiating',
+    Purpose:'Isolates proactive AI initiation as the causal variable vs T2 and T3',
+  }
+},
+{ id:'arm-t2', x:T2X, y:760,
+  nc:C.t2, icon:'💡', sub:'T2 · AI Suggests Before', name:'Oversight Advisor Active',
+  arms:['t2'],
+  desc:'Oversight Advisor fires after F5 capability selection, before F6 is set. Executive sees suggested level with rationale and can Accept or Override. Tests whether pre-decision AI suggestions anchor oversight choices.',
+  fields:[],
+  det:{
+    Hypothesis:'AI-suggested defaults improve oversight calibration vs unaided judgment',
+    'Active fields':'F5 (Capability) → Advisor fires → F6 (Oversight Level)',
+    'Key DV':'accepted_suggestion: did executive take the AI recommendation?',
+  }
+},
+{ id:'arm-t3', x:T3X, y:760,
+  nc:C.t3, icon:'⚡', sub:'T3 · AI Challenges After', name:'Decision Challenger Active',
+  arms:['t3'],
+  desc:'Executive sets F6 oversight level first, then Decision Challenger fires — surfacing failure scenarios and accountability questions before the choice is confirmed. Tests deliberative revision under adversarial probing.',
+  fields:[],
+  det:{
+    Hypothesis:'Post-decision challenge produces more deliberate oversight than pre-decision suggestion or no AI',
+    'Active fields':'F6 set → Challenger fires → Confirm or Revise',
+    'Key DV':'revised_after_challenge: did executive change their oversight level?',
+  }
+},
+
+// ══════════════════════════════════════════
+// AGENTS
+// ══════════════════════════════════════════
+
+{ id:'agent-t1', x:T1X, y:960,
+  nc:C.ctrl, icon:'💬', sub:'T1 Agent · Reactive', name:'Reactive Agent',
+  arms:['t1'],
+  desc:'Passive agent available throughout the canvas. Answers only when the executive explicitly asks a question. Never suggests an oversight level, never challenges a decision, never initiates. Maximum neutrality.',
+  fields:['F0–F9'],
+  prompt:'"[Responds only when directly asked] Here is a neutral explanation of [topic the executive asked about]. I\'m available if you have further questions." — No proactive output, ever.',
+  det:{
+    Model:'claude-sonnet-4-6',
+    'Max tokens':'400',
+    'Initiation mode':'Pull only — never push',
+    Trigger:'Executive-initiated question only',
+    Output:'Direct factual answer · no suggestions · no challenges',
+    Logged:'agent.queried (Y/N) · query_count · query_content · F6 value at time of query',
+    'Key constraint':'Same Claude capability as T2/T3 — only initiation mode differs',
+  },
+  rules:[
+    {k:'never', v:'suggest an oversight level unprompted', c:'core T1 constraint'},
+    {k:'never', v:'challenge or question executive decisions', c:'core T1 constraint'},
+    {k:'never', v:'say "I recommend", "you should", or "consider"', c:'neutrality constraint'},
+    {k:'respond', v:'only when explicitly invoked by executive', c:'pull-only mode'},
+    {k:'log', v:'whether executive queried the agent (secondary DV)', c:''},
+  ]
+},
+
+{ id:'agent-t2', x:T2X, y:960,
+  nc:C.t2, icon:'🧭', sub:'T2 Agent · Oversight Advisor', name:'Oversight Advisor',
+  arms:['t2'],
+  desc:'Fires immediately after a capability is selected in F5. Recommends Automate / Augment / Supervise based on capability tier and initiative context. Executive sees suggestion before touching F6.',
+  fields:['F5','F6'],
+  prompt:'"For [capability] — given the stakes and reversibility of this decision type, the suggested oversight level is [Automate/Augment/Supervise] because [rationale grounded in initiative context]. You can set a different level if your situation warrants it."',
+  det:{
+    Model:'claude-sonnet-4-6',
+    'Max tokens':'512',
+    Trigger:'F5 capability selected · fires before F6 is touched',
+    'Tier defaults':'sense → Automate · interpret → Augment · act → Supervise · learn → Augment',
+    Output:'{suggested_level, rationale, display_message}',
+    Logged:'oversight.suggested · F6.suggestion · F6.final · accepted_suggestion (primary T2 DV)',
+  },
+  rules:[
+    {k:'fire', v:'after F5 selection, before F6 is touched', c:'pre-decision timing'},
+    {k:'ground', v:'suggestion in capability tier + initiative stakes', c:'contextualised advice'},
+    {k:'allow', v:'executive to override with no friction', c:'Accept / Override buttons'},
+    {k:'log', v:'accepted_suggestion: primary T2 dependent variable', c:''},
+  ]
+},
+
+{ id:'agent-t3', x:T3X, y:960,
+  nc:C.t3, icon:'🔍', sub:'T3 Agent · Decision Challenger', name:'Decision Challenger',
+  arms:['t3'],
+  desc:'Fires immediately after the executive sets an oversight level in F6. Challenges their choice by surfacing a concrete failure scenario and asking who is accountable before they can confirm and proceed.',
+  fields:['F6'],
+  prompt:'"You\'ve chosen [oversight level] for [capability]. Before confirming — if this capability produces a systematic error for 3 months before anyone notices, who in your organisation is responsible and what\'s the remediation path? Does that change your oversight choice?"',
+  det:{
+    Model:'claude-sonnet-4-6',
+    'Max tokens':'300',
+    Trigger:'F6 oversight level clicked · fires before confirmation',
+    Format:'Exactly one paragraph · 3–5 sentences · second person · no headers',
+    Output:'{challenge} — plain paragraph string',
+    Logged:'challenge.prompted · F6.choice.before · F6.choice.after · revised_after_challenge (primary T3 DV)',
+  },
+  rules:[
+    {k:'fire', v:'after F6 click, before confirmation', c:'post-decision timing'},
+    {k:'name', v:'the capability and the chosen oversight level explicitly', c:''},
+    {k:'surface', v:'a concrete failure scenario (3-month undetected error)', c:''},
+    {k:'ask', v:'"who is responsible and what\'s the remediation path?"', c:''},
+    {k:'ask', v:'"does this change your choice?"', c:''},
+    {k:'log', v:'revised_after_challenge: primary T3 dependent variable', c:''},
+  ]
+},
+
+// ══════════════════════════════════════════
+// CANVAS (4 phases, 10 fields)
+// ══════════════════════════════════════════
+
+{ id:'canvas-t1', x:T1X, y:1170,
+  nc:C.ctrl, icon:'📋', sub:'T1 Canvas · Reactive AI', name:'Canvas — T1',
+  arms:['t1'],
+  desc:'All 10 canvas fields completed without proactive AI involvement. F6 oversight level set by executive judgment alone. Behavioral baseline with AI accessible but passive.',
+  fields:['F0','F1','F2','F3','F4','F5','F6','F7','F8','F9'],
+  det:{
+    Phase1:'F0 Initiative Scope · F1 Data Inputs · F2 Human Inputs · F3 Systems · F4 Tacit Constraints',
+    Phase2:'F5 Capability Type · F6 Oversight Chains',
+    Phase3:'F7 Feedback Loops · F8 Business Outcomes',
+    Phase4:'F9 Governance & Accountability',
+    Logged:'field.focus · field.change · F6.oversight.value · time_on_field_ms',
+    AI:'Reactive only — responds if asked, never initiates',
+  }
+},
+{ id:'canvas-t2', x:T2X, y:1170,
+  nc:C.t2, icon:'📋', sub:'T2 Canvas · AI Suggests', name:'Canvas — T2',
+  arms:['t2'],
+  desc:'Identical to T1 UI. After F5 capability selected, Oversight Advisor suggestion appears in the guidance panel with Accept / Override buttons before F6 can be set.',
+  fields:['F5','F6'],
+  det:{
+    Treatment:'Oversight Advisor suggestion rendered between F5 and F6',
+    'UI difference':'Accept / Override CTA on advisor card · rest of canvas identical to T1',
+    'Key comparison':'Does T2 F6 distribution differ from T1 baseline? More conservative? Better tier-calibration?',
+  }
+},
+{ id:'canvas-t3', x:T3X, y:1170,
+  nc:C.t3, icon:'📋', sub:'T3 Canvas · AI Challenges', name:'Canvas — T3',
+  arms:['t3'],
+  desc:'Identical to T1 UI. After F6 oversight level clicked, Decision Challenger fires in guidance panel with Reconsider / Confirm buttons before executive can proceed to next field.',
+  fields:['F6'],
+  det:{
+    Treatment:'Decision Challenger fires after F6 click, before confirmation',
+    'UI difference':'Reconsider / Confirm CTA on challenger card · rest of canvas identical to T1',
+    'Key comparison':'Does T3 revise F6 more than T1? Is revision toward more or less oversight?',
+  }
+},
+
+// ══════════════════════════════════════════
+// COMPLETION + REPORT + SURVEY
+// ══════════════════════════════════════════
+
+{ id:'complete', x:SX, y:1390,
+  nc:C.shared, icon:'✓', sub:'All arms · 10/10 fields', name:'Canvas Complete',
+  arms:['t1','t2','t3'],
+  desc:'All 10 canvas fields submitted. Triggers Report Generator. Arm-specific outcome events logged (accepted_suggestion for T2, revised_after_challenge for T3). Endpoint is identical across all three arms.',
+  fields:[],
+  det:{
+    Required:'F0–F9 all filled · participant confirms submission',
+    Saves:'canvas_state JSON → CanvasStateDB',
+    'Outcome logging T2':'POST /api/guidance/oversight-advisor-outcome → accepted_suggestion boolean',
+    'Outcome logging T3':'POST /api/guidance/decision-challenger-outcome → revised_after_challenge boolean',
+  }
+},
+
+{ id:'report', x:SX, y:1560,
+  nc:C.rpt, icon:'📄', sub:'Agent 6 · Synthesis · All arms', name:'Report Generator',
+  arms:['t1','t2','t3'],
+  desc:'Synthesises canvas_state + intake_summary → structured AI Decision Blueprint JSON. Strips all agent suggestions and treatment arm before export — blueprint reflects only participant field values.',
+  fields:[],
+  prompt:'"You are a senior AI governance analyst. Produce an AI Decision Blueprint from the canvas fields provided. CRITICAL: reflect only participant\'s own field values — do not include any agent suggestions, recommendations, or prompts."',
+  det:{
+    Model:'claude-sonnet-4-6',
+    'Max tokens':'2048',
+    Inputs:'canvas_state + intake_summary',
+    Output:'Blueprint JSON · {initiative_overview, capability_stack, oversight_design, feedback_loops, governance, readiness_score 0–5, recommendations [red/amber/green]}',
+    Critical:'Strip treatment_arm + all agent text — experts score final participant choices only',
+    Caching:'Generated once · cached in BlueprintDB · never regenerated for same session',
+  },
+  rules:[
+    {k:'strip', v:'treatment_arm from output', c:'blind expert scoring invariant'},
+    {k:'strip', v:'all agent suggestions and prompts from output', c:'participant choices only'},
+    {k:'output', v:'readiness_score (0.0–5.0)', c:'governance readiness rubric'},
+    {k:'output', v:'recommendations with red/amber/green severity', c:''},
+    {k:'cache', v:'after first generation — never regenerate', c:'consistency guarantee'},
+  ]
+},
+
+{ id:'blueprint', x:T1X+30, y:1750,
+  nc:C.rpt, icon:'📑', sub:'Output · blueprint.html', name:'AI Decision Blueprint',
+  arms:['t1','t2','t3'],
+  desc:'Rendered blueprint page showing initiative overview, capability stack with oversight levels, governance structure, readiness score, and expert recommendations. Served to all participants identically.',
+  fields:[],
+  det:{
+    Route:'GET /api/blueprint/{session_id}',
+    Sections:'Initiative overview · Capability stack · Oversight design · Feedback loops · Governance · Readiness score',
+    'Expert scoring':'Readiness 0–5 · red/amber/green recommendations · stripped of treatment condition',
+  }
+},
+
+{ id:'survey', x:T3X-30, y:1750,
+  nc:C.meas, icon:'📊', sub:'Measurement · survey.html', name:'Post-Session Survey',
+  arms:['t1','t2','t3'],
+  desc:'Four Likert-scale items measuring post-session confidence, advice-seeking disposition, delegation willingness, and implementation intent. Plus open reflection field.',
+  fields:[],
+  det:{
+    Route:'POST /api/survey/{session_id}',
+    'Q1':'Confidence in AI governance decisions (1–5)',
+    'Q2':'Likelihood to seek external AI advice (1–5)',
+    'Q3':'Comfort delegating decisions to AI (1–5)',
+    'Q4':'Implementation intent (1–5)',
+    'Q5':'Open reflection (text)',
+    'Secondary DVs':'Advice-seeking and delegation as proxies for AI reliance disposition',
+  }
+},
+
+]; // end NODES
+
+// ══════════════════════════════════════════
+// EDGES
+// ══════════════════════════════════════════
+const EDGES = [
+  // Shared spine
+  {f:'participant',  t:'intake',      arm:'all', lbl:''},
+  {f:'intake',       t:'orch',        arm:'all', lbl:'intake_summary'},
+  {f:'orch',         t:'gate-arm',    arm:'all', lbl:''},
+
+  // Arm split
+  {f:'gate-arm',     t:'arm-t1',      arm:'t1',  lbl:'T1 · reactive'},
+  {f:'gate-arm',     t:'arm-t2',      arm:'t2',  lbl:'T2 · suggest'},
+  {f:'gate-arm',     t:'arm-t3',      arm:'t3',  lbl:'T3 · challenge'},
+
+  // Moderator fires from gate (ambient, all arms)
+  {f:'gate-arm',     t:'moderator',   arm:'all', lbl:'all pages'},
+
+  // Arm → Agent → Canvas
+  {f:'arm-t1',       t:'agent-t1',    arm:'t1',  lbl:''},
+  {f:'agent-t1',     t:'canvas-t1',   arm:'t1',  lbl:'reactive only'},
+  {f:'arm-t2',       t:'agent-t2',    arm:'t2',  lbl:''},
+  {f:'agent-t2',     t:'canvas-t2',   arm:'t2',  lbl:'suggest before F6'},
+  {f:'arm-t3',       t:'agent-t3',    arm:'t3',  lbl:''},
+  {f:'agent-t3',     t:'canvas-t3',   arm:'t3',  lbl:'challenge after F6'},
+
+  // Moderator → Canvas (fires on phase changes)
+  {f:'moderator',    t:'canvas-t1',   arm:'t1',  lbl:'phase cues'},
+  {f:'moderator',    t:'canvas-t2',   arm:'t2',  lbl:'phase cues'},
+  {f:'moderator',    t:'canvas-t3',   arm:'t3',  lbl:'phase cues'},
+
+  // Canvas → Complete
+  {f:'canvas-t1',    t:'complete',    arm:'t1',  lbl:''},
+  {f:'canvas-t2',    t:'complete',    arm:'t2',  lbl:''},
+  {f:'canvas-t3',    t:'complete',    arm:'t3',  lbl:''},
+
+  // Complete → Report
+  {f:'complete',     t:'report',      arm:'all', lbl:'canvas_state + intake_summary'},
+
+  // Report → Blueprint + Survey
+  {f:'report',       t:'blueprint',   arm:'all', lbl:'blueprint JSON'},
+  {f:'report',       t:'survey',      arm:'all', lbl:''},
+
+  // Moderator → Blueprint + Survey (fires on page load)
+  {f:'moderator',    t:'blueprint',   arm:'all', lbl:'page cues'},
+  {f:'moderator',    t:'survey',      arm:'all', lbl:'page cues'},
+];
+
+// ══════════════════════════════════════════
+// STATE + HELPERS
+// ══════════════════════════════════════════
+let armFilter='all', selId=null;
+let sc=0.65, px=40, py=20;
+let panning=false, panStart={x:0,y:0};
+const gn = id => NODES.find(n=>n.id===id);
+
+function cx(n){ return n.isDiamond ? n.x+52 : n.x+NW/2; }
+function cy(n){ return n.isDiamond ? n.y+52 : n.y+75; }
+function ctop(n){ return n.y; }
+function cbot(n){ return n.isDiamond ? n.y+104 : n.y+150; }
+
+function nodeVis(n){ return armFilter==='all' || n.arms.includes(armFilter); }
+function edgeVis(e){ return armFilter==='all' || e.arm==='all' || e.arm===armFilter; }
+function edgeColor(e){
+  if(e.arm==='all') return C.shared;
+  return {t1:C.ctrl, t2:C.t2, t3:C.t3}[e.arm] || C.shared;
+}
+
+// ══════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════
+const scene = document.getElementById('scene');
+
+function renderNodes(){
+  document.querySelectorAll('.node,.dgate').forEach(e=>e.remove());
+  NODES.forEach(n=>{
+    const vis = nodeVis(n);
+    if(n.isDiamond){
+      const d=document.createElement('div');
+      d.className='dgate'+(vis?'':' dim');
+      d.style.cssText=`left:${n.x}px;top:${n.y}px;width:104px;height:104px;`;
+      d.innerHTML=`<svg width="104" height="104" viewBox="0 0 104 104" style="overflow:visible" onclick="openInsp('${n.id}')">
+        <polygon points="52,4 100,52 52,100 4,52" fill="#fff"
+          stroke="${n.nc}" stroke-width="${selId===n.id?2.5:2}" opacity="${selId===n.id?1:.85}"/>
+        <text x="52" y="49" text-anchor="middle" dominant-baseline="middle"
+          font-family="Inter,sans-serif" font-size="9.5" font-weight="600" fill="${n.nc}">${n.name}</text>
+        <text x="52" y="63" text-anchor="middle" dominant-baseline="middle"
+          font-family="Inter,sans-serif" font-size="7.5" fill="${n.nc}" opacity=".6">Gate</text>
+      </svg>`;
+      scene.appendChild(d); return;
+    }
+    const el=document.createElement('div');
+    el.className='node'+(selId===n.id?' sel':'')+(vis?'':' dim');
+    el.style.cssText=`left:${n.x}px;top:${n.y}px;width:${NW}px;--nc:${n.nc};`;
+    let inner=`<div class="nh">
+      <div class="nicn">${n.icon||''}</div>
+      <div class="ntop">
+        <div class="nsub">${n.sub}</div>
+        <div class="nname">${n.name}</div>
+      </div>
+    </div><div class="nb"><div class="ndesc">${n.desc}</div>`;
+    if(n.fields && n.fields.length)
+      inner+=`<div class="nfields">${n.fields.map(f=>`<span class="nfbadge">${f}</span>`).join('')}</div>`;
+    if(n.prompt)
+      inner+=`<div class="nprompt">${n.prompt.slice(0,110)}${n.prompt.length>110?'…':''}</div>`;
+    inner+=`</div>`;
+    el.innerHTML=inner;
+    el.onclick=()=>openInsp(n.id);
+    scene.appendChild(el);
+  });
+}
+
+const NS='http://www.w3.org/2000/svg';
+function mk(t,a){ const e=document.createElementNS(NS,t); Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v)); return e; }
+
+function renderEdges(){
+  const svg=document.getElementById('edges');
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const defs=mk('defs',{});
+  // Arrow markers
+  Object.entries({all:C.shared, t1:C.ctrl, t2:C.t2, t3:C.t3, mod:C.mod}).forEach(([k,col])=>{
+    const m=mk('marker',{id:`arr-${k}`,markerWidth:'7',markerHeight:'6',refX:'7',refY:'3',orient:'auto'});
+    m.appendChild(mk('polygon',{points:'0 0,7 3,0 6',fill:col,opacity:'0.9'}));
+    defs.appendChild(m);
+  });
+  svg.appendChild(defs);
+
+  EDGES.forEach(e=>{
+    const fn=gn(e.f), tn=gn(e.t);
+    if(!fn||!tn) return;
+    const vis=edgeVis(e);
+    const col = (fn.id==='moderator'||tn.id==='moderator') ? C.mod : edgeColor(e);
+    const arrowKey = (fn.id==='moderator'||tn.id==='moderator') ? 'mod' : (e.arm==='all'?'all':e.arm);
+
+    const x1=cx(fn), y1=cbot(fn), x2=cx(tn), y2=ctop(tn);
+    const dy=Math.abs(y2-y1);
+    const dx=Math.abs(x2-x1);
+
+    // Use an S-curve for cross-column connections (moderator)
+    let d;
+    if(dx > 100){
+      const tension = Math.max(60, dy*0.4);
+      const xmid = (x1+x2)/2;
+      d = `M${x1},${y1} C${x1},${y1+tension} ${x2},${y2-tension} ${x2},${y2}`;
+    } else {
+      const tension = Math.max(50, dy*0.38);
+      d = `M${x1},${y1} C${x1},${y1+tension} ${x2},${y2-tension} ${x2},${y2}`;
+    }
+
+    // Glow
+    svg.appendChild(mk('path',{d, fill:'none', stroke:col, 'stroke-width':'6', opacity:vis?'0.08':'0.015'}));
+
+    // Main path
+    const path=mk('path',{d, fill:'none', stroke:col,
+      'stroke-width':vis?'2':'1', 'opacity':vis?'0.8':'0.03',
+      'marker-end':`url(#arr-${arrowKey})`,
+    });
+    // Dash animation for moderator edges and long edges
+    const isMod = fn.id==='moderator'||tn.id==='moderator';
+    if(vis && (dy>80 || isMod)){
+      const an=document.createElementNS(NS,'animate');
+      an.setAttribute('attributeName','stroke-dashoffset');
+      an.setAttribute('from','0'); an.setAttribute('to','-24');
+      an.setAttribute('dur', isMod ? '3s' : '2s');
+      an.setAttribute('repeatCount','indefinite');
+      path.setAttribute('stroke-dasharray', isMod ? '4 8' : '9 7');
+      path.appendChild(an);
+    }
+    svg.appendChild(path);
+
+    if(e.lbl && vis){
+      const mx=(x1+x2)/2, my=(y1+y2)/2;
+      const w=e.lbl.length*5.5+14;
+      svg.appendChild(mk('rect',{x:mx-w/2,y:my-9,width:w,height:16,rx:4,fill:'#f4f3ef',stroke:col,'stroke-width':'0.5',opacity:'0.95'}));
+      const txt=mk('text',{x:mx,y:my+4,'text-anchor':'middle',
+        'font-family':'Inter,sans-serif','font-size':'8.5','font-weight':'500',fill:col});
+      txt.textContent=e.lbl.length>22?e.lbl.slice(0,22)+'…':e.lbl;
+      svg.appendChild(txt);
+    }
+  });
+}
+
+function renderLanes(){
+  document.querySelectorAll('.lane-bg,.lane-hdr,.row-label').forEach(e=>e.remove());
+
+  // Arm column backgrounds
+  [
+    {x:40,  y:730, w:270, h:610, col:C.ctrl, lbl:'T1 · Reactive only'},
+    {x:420, y:730, w:270, h:610, col:C.t2,   lbl:'T2 · AI Suggests'},
+    {x:800, y:730, w:270, h:610, col:C.t3,   lbl:'T3 · AI Challenges'},
+    {x:1090,y:730, w:270, h:290, col:C.mod,  lbl:'Moderator · Ambient'},
+  ].forEach(l=>{
+    const bg=document.createElement('div');
+    bg.className='lane-bg';
+    bg.style.cssText=`left:${l.x}px;top:${l.y}px;width:${l.w}px;height:${l.h}px;background:color-mix(in srgb,${l.col} 4%,transparent);border:1.5px solid color-mix(in srgb,${l.col} 14%,transparent);`;
+    scene.insertBefore(bg,scene.firstChild);
+    const hdr=document.createElement('div');
+    hdr.className='lane-hdr';
+    hdr.style.cssText=`left:${l.x+10}px;top:${l.y+8}px;color:${l.col};border-color:color-mix(in srgb,${l.col} 30%,transparent);background:color-mix(in srgb,${l.col} 7%,transparent);font-family:Inter,sans-serif;`;
+    hdr.textContent=l.lbl;
+    scene.appendChild(hdr);
+  });
+
+  // Row labels
+  [
+    {x:20, y:75,   t:'Entry'},
+    {x:20, y:245,  t:'Intake'},
+    {x:20, y:435,  t:'Router'},
+    {x:20, y:590,  t:'Gate'},
+    {x:20, y:780,  t:'Arm'},
+    {x:20, y:980,  t:'Agent'},
+    {x:20, y:1190, t:'Canvas'},
+    {x:20, y:1410, t:'Complete'},
+    {x:20, y:1580, t:'Blueprint'},
+    {x:20, y:1770, t:'Output'},
+  ].forEach(r=>{
+    const el=document.createElement('div');
+    el.className='row-label';
+    el.style.cssText=`left:${r.x}px;top:${r.y}px;font-family:Inter,sans-serif;`;
+    el.textContent=r.t;
+    scene.appendChild(el);
+  });
+}
+
+// ══════════════════════════════════════════
+// INSPECTOR
+// ══════════════════════════════════════════
+function openInsp(id){
+  selId=id; renderNodes();
+  const n=gn(id); if(!n) return;
+  document.getElementById('ihn').textContent=n.name;
+  document.getElementById('ihn').style.color=n.nc;
+  let h='';
+  h+=`<div class="isec"><div class="islbl">Description</div><div class="ival">${n.desc}</div></div>`;
+  if(n.prompt) h+=`<div class="isec"><div class="islbl">Agent Prompt (excerpt)</div><div class="iprompt-box" style="border-left-color:${n.nc}">${n.prompt}</div></div>`;
+  if(n.fields && n.fields.length) h+=`<div class="isec"><div class="islbl">Fields / Pages</div><div class="chips">${n.fields.map(f=>`<span class="chip" style="color:${n.nc};border-color:color-mix(in srgb,${n.nc} 35%,transparent);background:color-mix(in srgb,${n.nc} 8%,transparent)">${f}</span>`).join('')}</div></div>`;
+  if(n.arms) h+=`<div class="isec"><div class="islbl">Treatment arms</div><div class="chips">${n.arms.map(a=>{const col={t1:C.ctrl,t2:C.t2,t3:C.t3}[a]||C.shared;return`<span class="chip" style="color:${col};border-color:color-mix(in srgb,${col} 35%,transparent);background:color-mix(in srgb,${col} 8%,transparent)">${a.toUpperCase()}</span>`;}).join('')}</div></div>`;
+  if(n.det){ h+=`<div class="isec"><div class="islbl">Specification</div>`; Object.entries(n.det).forEach(([k,v])=>{ h+=`<div class="irow"><div class="ikey">${k}</div><div class="ival">${v}</div></div>`; }); h+=`</div>`; }
+  if(n.rules){ h+=`<div class="isec"><div class="islbl">Orchestration rules</div><div class="rblock">`; n.rules.forEach(r=>{ h+=`<div><span class="rk">${r.k}</span>: <span class="rv">${r.v}</span>${r.c?` <span class="rc">// ${r.c}</span>`:''}</div>`; }); h+=`</div></div>`; }
+  document.getElementById('ibody').innerHTML=h;
+  document.getElementById('insp').classList.add('open');
+}
+function closeInsp(){ document.getElementById('insp').classList.remove('open'); selId=null; renderNodes(); }
+
+// ══════════════════════════════════════════
+// FILTERS + PAN + ZOOM
+// ══════════════════════════════════════════
+function setArm(a,btn){
+  armFilter=a;
+  document.querySelectorAll('[id^="fp-"]').forEach(b=>{ b.className='fpill'; });
+  btn.className=`fpill on-${a}`;
+  renderNodes(); renderEdges();
+}
+
+function applyT(){ scene.style.transform=`translate(${px}px,${py}px) scale(${sc})`; document.getElementById('zv').textContent=Math.round(sc*100)+'%'; }
+function adjustZoom(d){ sc=Math.max(.2,Math.min(2,sc+d)); applyT(); }
+function resetView(){ sc=0.65; px=40; py=20; applyT(); }
+
+const wrap=document.getElementById('wrap');
+wrap.addEventListener('mousedown',e=>{ if(e.target.closest('.node,.dgate,.insp,.legend')) return; panning=true; panStart={x:e.clientX-px,y:e.clientY-py}; wrap.classList.add('grabbing'); });
+window.addEventListener('mousemove',e=>{ if(!panning) return; px=e.clientX-panStart.x; py=e.clientY-panStart.y; applyT(); });
+window.addEventListener('mouseup',()=>{ panning=false; wrap.classList.remove('grabbing'); });
+wrap.addEventListener('wheel',e=>{ e.preventDefault(); adjustZoom(e.deltaY>0?-.07:.07); },{passive:false});
+
+// ── INIT ──
+renderLanes();
+renderNodes();
+renderEdges();
+applyT();
+</script>
+</body>
+</html>
